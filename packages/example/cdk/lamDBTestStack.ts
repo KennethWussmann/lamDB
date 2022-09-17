@@ -1,6 +1,7 @@
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { LamDB } from '../lib';
+import { LamDB } from '@lamdb/infrastructure';
+import { join } from 'path';
 
 export class LamDBTestStack extends Stack {
   constructor(scope: Construct, name: string) {
@@ -9,7 +10,10 @@ export class LamDBTestStack extends Stack {
     });
 
     new LamDB(this, 'LamDBTest', {
-      name: 'test',
+      name: 'lambd-test',
+      writerFunction: {
+        entry: join(__dirname, '../src/index.ts'),
+      },
     });
   }
 }

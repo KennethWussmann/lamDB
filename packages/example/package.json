@@ -1,0 +1,23 @@
+{
+  "name": "@lamdb/example",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "prepack": "npm run build",
+    "dev": "npm run build --watch",
+    "deploy": "cdk deploy --require-approval never",
+    "build": "tsc",
+    "clean": "find test src -name '*.d.ts' -or -name '*.js' -or -name '*.map' | xargs rm"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.42.0",
+    "aws-cdk-lib": "^2.42.0",
+    "constructs": "^10.1.105",
+    "esbuild": "^0.15.7"
+  },
+  "dependencies": {
+    "@lamdb/infrastructure": "*",
+    "@lamdb/lambda": "*"
+  }
+}

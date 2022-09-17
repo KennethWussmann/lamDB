@@ -6,20 +6,20 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc --build",
-    "deploy": "cdk deploy --require-approval never",
     "diff": "cdk diff",
     "test": "jest --maxWorkers=50% --passWithNoTests",
     "clean": "find bin lib -name '*.d.ts' -or -name '*.js' -or -name '*.map' | xargs rm",
     "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
   },
   "devDependencies": {
-    "aws-cdk": "2.10.0",
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.42.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.42.0-alpha.0",
-    "aws-cdk-lib": "2.10.0",
+    "aws-cdk-lib": "^2.42.0",
     "constructs": "^10.1.105"
   },
   "dependencies": {
+    "aws-cdk": "^2.42.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.42.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.42.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.42.0-alpha.0",
     "@lamdb/lambda": "*"
   }
 }

@@ -1,7 +1,7 @@
 import { S3 } from '@aws-sdk/client-s3';
 import { PrismaClient } from '@prisma/client';
 import { createReadStream, createWriteStream } from 'fs';
-import { access, readFile } from 'fs/promises';
+import { access } from 'fs/promises';
 import { Readable } from 'stream';
 
 const bucketName = process.env.DATABASE_STORAGE_BUCKET_NAME;

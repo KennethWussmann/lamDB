@@ -86,7 +86,7 @@ export class LamDB extends Construct {
     const fn = new LamDBFunction(this, id, {
       environment: {
         GRAPHQL_API_BASE_URL: this.api.url ?? '',
-        DATABASE_STORAGE_BUCKET_ARN: this.databaseStorageBucket.bucketArn,
+        DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket.bucketName,
       },
       ...props,
     });

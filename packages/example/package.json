@@ -18,6 +18,7 @@
     "prisma": "^4.3.1"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.171.0",
     "@lamdb/infrastructure": "*",
     "@lamdb/lambda": "*",
     "@prisma/client": "^4.3.1"

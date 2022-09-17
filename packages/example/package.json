@@ -14,10 +14,12 @@
     "aws-cdk": "^2.42.0",
     "aws-cdk-lib": "^2.42.0",
     "constructs": "^10.1.105",
-    "esbuild": "^0.15.7"
+    "esbuild": "^0.15.7",
+    "prisma": "^4.3.1"
   },
   "dependencies": {
     "@lamdb/infrastructure": "*",
-    "@lamdb/lambda": "*"
+    "@lamdb/lambda": "*",
+    "@prisma/client": "^4.3.1"
   }
 }

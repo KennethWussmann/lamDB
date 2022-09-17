@@ -1,0 +1,27 @@
+{
+  "name": "@template/lambda",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "prepack": "npm run build",
+    "dev": "npm run build --watch",
+    "build": "tsc",
+    "test": "jest --maxWorkers=50% --passWithNoTests",
+    "clean": "find test src -name '*.d.ts' -or -name '*.js' -or -name '*.map' | xargs rm",
+    "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
+  },
+  "keywords": [
+    "lambda",
+    "aws",
+    "turborepo",
+    "api",
+    "remote cache"
+  ],
+  "author": "MOIA GmbH",
+  "license": "Apache-2.0",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.104"
+  }
+}

@@ -1,3 +1,6 @@
-import { App } from "aws-cdk-lib";
+import { App } from 'aws-cdk-lib';
+import { LamDBTestStack } from './lamdbTestStack';
 
-new App();
+const app = new App();
+
+new LamDBTestStack(app, 'lamdb');

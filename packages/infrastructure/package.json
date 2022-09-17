@@ -1,5 +1,5 @@
 {
-  "name": "@template/infrastructure",
+  "name": "@lamdb/infrastructure",
   "version": "1.0.0",
   "license": "ISC",
   "main": "lib/index.js",
@@ -20,6 +20,6 @@
     "constructs": "^10.1.105"
   },
   "dependencies": {
-    "@template/lambda": "*"
+    "@lamdb/lambda": "*"
   }
 }

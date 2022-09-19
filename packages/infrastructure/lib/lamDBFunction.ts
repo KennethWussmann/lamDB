@@ -15,13 +15,14 @@ export class LamDBFunction extends NodejsFunction {
       timeout: Duration.seconds(5),
       architecture: Architecture.ARM_64,
       logRetention: RetentionDays.TWO_WEEKS,
+      ...props,
       bundling: {
         minify: true,
         sourceMap: true,
         target: 'node16',
         tsconfig: 'tsconfig.json',
+        ...props.bundling,
       },
-      ...props,
     });
   }
 }

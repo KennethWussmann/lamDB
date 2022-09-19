@@ -17,7 +17,7 @@ export class LamDBTestStack extends Stack {
       },
     });
 
-    new LamDBFunction(this, 'TestQuery', {
+    const queryHandler = new LamDBFunction(this, 'TestQuery', {
       functionName: 'lamdb-test-query',
       entry: join(__dirname, '../src/index.ts'),
       handler: 'queryDatabase',
@@ -26,6 +26,20 @@ export class LamDBTestStack extends Stack {
         DATABASE_STORAGE_BUCKET_NAME: lamDB.databaseStorageBucket.bucketName,
         DATABASE_URL: 'file:/tmp/database.db',
       },
+      bundling: {
+        nodeModules: ['@prisma/client', 'prisma'],
+        commandHooks: {
+          beforeBundling: () => [],
+          beforeInstall: (_, outputDir: string) => [`cp -R packages/example/prisma ${outputDir}`],
+          afterBundling: (_, outputDir: string) => [
+            `cd ${outputDir}`,
+            'npx prisma dev',
+            'rm -rf node_modules/@prisma/engines',
+            'rm -rf node_modules/@prisma/client/node_modules node_modules/.bin node_modules/prisma',
+          ],
+        },
+      },
     });
+    lamDB.databaseStorageBucket.grantReadWrite(queryHandler);
   }
 }

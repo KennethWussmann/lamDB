@@ -20,8 +20,8 @@ const downloadDatabaseFile = async (): Promise<boolean> => {
       throw new Error('Cannot return object of non readable type');
     }
     responseBody = response.Body;
-  } catch {
-    //
+  } catch (e) {
+    console.warn(e);
   }
   if (!responseBody) {
     return false;
@@ -62,7 +62,13 @@ const uploadDatabaseFile = async () => {
 
 const listAndCreateUsers = async () => {
   console.log('Querying db');
-  const prisma = new PrismaClient();
+  const prisma = new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL,
+      },
+    },
+  });
   const userIds: { id: number }[] = await prisma.user.findMany({
     select: { id: true },
   });

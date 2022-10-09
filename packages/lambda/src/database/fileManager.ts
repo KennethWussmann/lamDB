@@ -11,7 +11,7 @@ export class FileManager {
   constructor(
     private filePath: string = databaseFilePath,
     private fileAdapter: FileAdapter = defaultFileAdapter,
-    private cacheSeconds: number = 30,
+    private cacheSeconds: number = parseInt(process.env.CACHE_SECONDS ?? '30', 10),
   ) {}
 
   download = async () => {

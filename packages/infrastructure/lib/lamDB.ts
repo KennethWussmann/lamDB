@@ -1,4 +1,4 @@
-import { Aws, RemovalPolicy } from 'aws-cdk-lib';
+import { Aws, Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { Bucket, BucketAccessControl, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
@@ -13,6 +13,20 @@ export type LamDBProps = {
    * Path to the Prisma schema file
    */
   schemaPath: string;
+  /**
+   * Time a reader instance will cache a database file. Once downloaded the lambda won't download an updated file for the configured amount of time.
+   * Introduces drift between writer and reader for the sake of performance. Set to 0 to disable = always download fresh file.
+   * Readers don't upload database files.
+   * @default Duration.seconds(30)
+   */
+  readerCacheDuration?: Duration;
+  /**
+   * Time a writer instance will cache a database file. Usually a writer is the source of truth and does not need to download the database often.
+   * Introduces drift between writer and S3 for the sake of performance. Set to 0 to disable.
+   * Database files will always be uploaded at the end of a request.
+   * @default Duration.minutes(30)
+   */
+  writerCacheDuration?: Duration;
   writerFunction: { entry: string } & Partial<LamDBFunctionProps>;
   readerFunction?: { entry: string } & Partial<LamDBFunctionProps>;
   proxyFunction?: { entry: string } & Partial<LamDBFunctionProps>;
@@ -55,11 +69,17 @@ export class LamDB extends Construct {
       //defaultAuthorizer: new HttpIamAuthorizer(),
     });
 
-    const reader = this.createLambda('ReaderFunction', {
-      functionName: `${props.name}-reader`,
-      handler: 'readerHandler',
-      ...(props.readerFunction ?? props.writerFunction),
-    });
+    const reader = this.createLambda(
+      'ReaderFunction',
+      {
+        functionName: `${props.name}-reader`,
+        handler: 'readerHandler',
+        ...(props.readerFunction ?? props.writerFunction),
+      },
+      {
+        CACHE_SECONDS: `${(this.props.readerCacheDuration ?? Duration.seconds(30)).toSeconds()}`,
+      },
+    );
     const writer = this.createLambda(
       'WriterFunction',
       {
@@ -70,6 +90,7 @@ export class LamDB extends Construct {
       },
       {
         ENABLE_PLAYGROUND: this.props.enablePlayground ? 'true' : 'false',
+        CACHE_SECONDS: `${(this.props.writerCacheDuration ?? Duration.minutes(30)).toSeconds()}`,
       },
     );
     const proxy = this.createLambda('ProxyFunction', {

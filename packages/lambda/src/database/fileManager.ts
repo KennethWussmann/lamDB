@@ -17,7 +17,7 @@ export class FileManager {
   download = async () => {
     if (this.downloadedAt) {
       const cacheAgeMillis = new Date().getTime() - this.downloadedAt.getTime();
-      if (cacheAgeMillis > this.cacheSeconds * 1000) {
+      if (cacheAgeMillis < this.cacheSeconds * 1000) {
         this.logger.debug('Using cached database file', {
           cacheAgeMillis,
           downloadedAt: this.downloadedAt.toISOString(),

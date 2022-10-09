@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "dev": "npx turbo run dev",
-    "deploy": "npm run deploy --workspace=@lamdb/example",
+    "deploy": "npx turbo run deploy",
     "build": "npx turbo run build",
     "test": "npx turbo run test",
     "clean": "npx turbo run clean",

@@ -20,6 +20,7 @@
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.42.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.42.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.42.0-alpha.0",
-    "@lamdb/lambda": "*"
+    "@lamdb/lambda": "*",
+    "@lamdb/engine-layer": "*"
   }
 }

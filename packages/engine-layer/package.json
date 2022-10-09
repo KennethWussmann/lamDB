@@ -1,0 +1,14 @@
+{
+  "name": "@lamdb/engine-layer",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "build": "ts-node src/build.ts",
+    "build:darwin": "TARGET=darwin ts-node src/build.ts"
+  },
+  "devDependencies": {
+    "@prisma/fetch-engine": "^4.4.0",
+    "@prisma/get-platform": "^4.4.0"
+  }
+}

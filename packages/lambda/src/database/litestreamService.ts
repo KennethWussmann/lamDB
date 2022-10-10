@@ -11,6 +11,7 @@ export type LitestreamServiceSettings = {
 
 export class LitestreamService {
   private s3Url = `s3://${this.settings.bucketName}/${this.settings.objectKey}`;
+  private restoredOnce = false;
   private replicateProcess: ChildProcessMonitor = new ChildProcessMonitor(
     'LitestreamReplicate',
     this.settings.binaryPath,
@@ -46,5 +47,15 @@ export class LitestreamService {
 
   replicate = this.replicateProcess.initialize;
 
-  restore = this.restoreProcess.start;
+  restore = async () => {
+    this.restoredOnce = true;
+    await this.restoreProcess.start();
+  };
+
+  restoreOnce = async () => {
+    if (this.restoredOnce) {
+      return;
+    }
+    await this.restore();
+  };
 }

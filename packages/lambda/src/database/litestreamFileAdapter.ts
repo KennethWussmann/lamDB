@@ -5,6 +5,7 @@ export const litestreamReplicaFileAdapter: (litestreamService: LitestreamService
   litestreamService: LitestreamService,
 ) => ({
   download: async () => {
+    await litestreamService.restoreOnce();
     await litestreamService.replicate();
   },
   upload: async () => {

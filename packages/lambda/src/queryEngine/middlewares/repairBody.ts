@@ -12,7 +12,7 @@ export const repairBody: QueryEngineProxyMiddleware = (context: MiddlewareContex
         request: {
           ...request,
           body: JSON.stringify({
-            operationName: bodyParsed?.operationName ?? '',
+            operationName: !bodyParsed?.operationName ? '' : bodyParsed?.operationName,
             query: bodyParsed.query,
             variables: bodyParsed?.variables ?? {},
           }),

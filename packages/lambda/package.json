@@ -1,8 +1,8 @@
 {
   "name": "@lamdb/lambda",
   "version": "1.0.0",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
     "prepack": "npm run build",
     "dev": "npm run build --watch",

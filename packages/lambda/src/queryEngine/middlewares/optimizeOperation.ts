@@ -34,7 +34,6 @@ export const optimizeOperation: QueryEngineProxyMiddleware = async (
     // skip middleware if not graphql or body empty
     return next(context);
   }
-
   return next({
     ...context,
     request: {

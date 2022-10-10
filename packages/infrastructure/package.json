@@ -2,8 +2,8 @@
   "name": "@lamdb/infrastructure",
   "version": "1.0.0",
   "license": "ISC",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "lib/index.ts",
+  "types": "lib/index.ts",
   "scripts": {
     "build": "tsc --build",
     "diff": "cdk diff",

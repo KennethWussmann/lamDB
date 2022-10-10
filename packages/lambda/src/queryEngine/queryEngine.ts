@@ -96,8 +96,7 @@ export class QueryEngine {
             this.logger.debug('Query engine is ready to accept connections');
           }
           if (logMessage.fields.message === 'PANIC' && logMessage.fields.reason.includes('Address already in use')) {
-            this.logger.log('fatal', `Query engine cannot start on port ${this.port}`);
-            this.stop();
+            this.logger.log('error', `Query engine cannot start on port ${this.port}`);
           }
           this.logger.info(logMessage);
         } catch {
@@ -155,10 +154,14 @@ export class QueryEngine {
   /**
    * Start query engine if not running and wait until it's ready to receive requests
    */
-  initialize = async () => {
+  initialize = async (
+    onStop: (exitCode: number | undefined) => void = () => {
+      // no op
+    },
+  ) => {
     if (!this.isRunning()) {
       this.logger.info('Starting query engine');
-      this.start();
+      this.start().then(onStop).catch(onStop);
       await this.awaitReady();
     } else {
       this.logger.info('Query engine is running already');

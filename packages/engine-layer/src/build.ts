@@ -43,7 +43,7 @@ const isCacheCompatible = async () => {
 };
 
 const downloadPrisma = async () => {
-  console.log('Downloading engines', { prismaVersion, engines, prismaTarget });
+  console.log('Downloading prisma engines', { prismaVersion, engines, prismaTarget });
   await download({
     binaries: Object.fromEntries(engines.map((engine) => [engine, destination])),
     version: prismaVersion,
@@ -60,10 +60,12 @@ const downloadPrisma = async () => {
 };
 
 const downloadLitestream = async () => {
+  console.log('Downloading litestream', { litestreamVersion, litestreamTarget });
   const downloadUrl = `https://github.com/benbjohnson/litestream/releases/download/v${litestreamVersion}/litestream-v${litestreamVersion}-${litestreamTarget}.${litestreamArchiveType}`;
   const archivePath = join(buildDirectory, `litestream.${litestreamArchiveType}`);
   await $`curl -L ${downloadUrl} -o ${archivePath}`;
 
+  console.log('Extracting archive');
   if (litestreamArchiveType === 'tar.gz') {
     await $`tar -xvf ${archivePath} -C ${destination}`;
   } else {
@@ -87,7 +89,13 @@ const build = async () => {
       });
       await mkdir(destination);
     } else {
-      console.log('Using cached binaries', { prismaVersion, engines, prismaTarget });
+      console.log('Using cached binaries', {
+        prismaVersion,
+        engines,
+        prismaTarget,
+        litestreamTarget,
+        litestreamVersion,
+      });
       return;
     }
   } else {

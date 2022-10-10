@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "ts-node --esm src/build.ts",
-    "build:darwin": "OS=darwin ts-node --esm src/build.ts"
+    "build:darwin": "OS=darwin ts-node --esm src/build.ts",
+    "clean": "rm -rf ./dist ./build"
   },
   "devDependencies": {
     "@prisma/fetch-engine": "^4.4.0",

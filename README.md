@@ -42,9 +42,9 @@ If you keep the limitations in mind, yes. LamDB uses Prisma, Litestream and AWS 
 ### How does auto-scaling work?
 
 Just like AWS lambda, because it's running on it. The default setup is using single-writer, multi-reader.
-Means the default configuration is designed for high read demand and lower writer throughput. That's to avoid merge conflicts with the SQLite database when multiple lambda instance want to write to the database.
+Means the default configuration is designed for high read demand and lower writer throughput. That's to avoid merge conflicts with the SQLite database when multiple lambda instances want to write to the database.
 
-You don't need to worry about redirecting your writes to reads to a certain instance. The writer and readers are conveniently behind an extra proxy endpoint that takes care of routing reads and writes to the correct destination. It also takes care of write throttling.
+You don't need to worry about redirecting your writes or reads to a certain instance. The writer and readers are conveniently behind an extra proxy endpoint that takes care of routing reads and writes to the correct destination. It also takes care of write throttling.
 
 ### How can I access the database?
 

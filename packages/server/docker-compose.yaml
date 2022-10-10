@@ -1,0 +1,10 @@
+services:
+  minio:
+    image: minio/minio:latest
+    volumes:
+      - ./data:/data
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    entrypoint: sh
+    command: -c 'mkdir -p /data/lamdb && minio server /data --console-address ":9001"'

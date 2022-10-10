@@ -2,10 +2,11 @@ import { Aws, Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { Bucket, BucketAccessControl, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
-import { CorsHttpMethod, HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { CorsHttpMethod, HttpApi, HttpApiProps, HttpMethod } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import { EngineLayer } from './engineLayer';
 import { LayerVersion } from 'aws-cdk-lib/aws-lambda';
+import { HttpIamAuthorizer } from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
 
 export type LamDBProps = {
   name: string;
@@ -31,14 +32,28 @@ export type LamDBProps = {
   readerFunction?: { entry: string } & Partial<LamDBFunctionProps>;
   proxyFunction?: { entry: string } & Partial<LamDBFunctionProps>;
   /**
+   * Use Litestream for replication.
+   * If disabled uses plain S3 operations to download and upload database file.
+   * Important: Change requires replacement! Database may be empty after change.
+   * @default true
+   */
+  enableLitestream?: boolean;
+  /**
    * Expose a GET /playground route on the writer to access a graphical user interface for the database
+   * @default false
    */
   enablePlayground?: boolean;
   /**
    * Expose additional GraphQL queries to execute raw SQL
+   * @default false
    */
   enableRawQueries?: boolean;
-};
+  /**
+   * Log level of LamDB and subprocesses.
+   * @default info
+   */
+  logLevel?: 'info' | 'debug' | 'error';
+} & Pick<HttpApiProps, 'defaultAuthorizer'>;
 
 export class LamDB extends Construct {
   private api: HttpApi;
@@ -66,7 +81,7 @@ export class LamDB extends Construct {
         allowMethods: [CorsHttpMethod.ANY],
         allowOrigins: ['*'],
       },
-      //defaultAuthorizer: new HttpIamAuthorizer(),
+      defaultAuthorizer: this.props.defaultAuthorizer,
     });
 
     const reader = this.createLambda(
@@ -119,12 +134,12 @@ export class LamDB extends Construct {
       });
     }
 
-    this.api.addRoutes({
+    const writerRoute = this.api.addRoutes({
       integration: writerIntegration,
       path: '/writer',
       methods,
     });
-    this.api.addRoutes({
+    const readerRoute = this.api.addRoutes({
       integration: new HttpLambdaIntegration('ReaderIntegration', reader),
       path: '/reader',
       methods,
@@ -134,8 +149,10 @@ export class LamDB extends Construct {
       path: '/graphql',
       methods,
     });
-    // writerRoute[0].grantInvoke(proxy);
-    // readerRoute[0].grantInvoke(proxy);
+    if (this.props.defaultAuthorizer && this.props.defaultAuthorizer instanceof HttpIamAuthorizer) {
+      writerRoute[0].grantInvoke(proxy);
+      readerRoute[0].grantInvoke(proxy);
+    }
   };
 
   private grantGeneralLambdaPermissions = (fn: LamDBFunction) => {
@@ -149,10 +166,11 @@ export class LamDB extends Construct {
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
       environment: {
+        LOG_LEVEL: this.props.logLevel ?? 'info',
         GRAPHQL_API_BASE_URL: this.api.url ?? '',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket.bucketName,
         ENABLE_RAW_QUERIES: this.props.enableRawQueries ? 'true' : 'false',
-        LOG_LEVEL: 'debug',
+        ENABLE_LITESTREAM: this.props.enableLitestream ?? true ? 'true' : 'false',
         ...additionalEnvironmentVariables,
       },
       layers: [this.engineLayer],

@@ -1,6 +1,6 @@
+import { LamDB } from '@lamdb/infrastructure';
 import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { LamDB } from '@lamdb/infrastructure';
 import { join } from 'path';
 
 export class LamDBTestStack extends Stack {
@@ -10,13 +10,14 @@ export class LamDBTestStack extends Stack {
     });
 
     new LamDB(this, 'LamDBTest', {
-      name: 'lambd-test',
+      name: 'lamdb-test',
       schemaPath: join(__dirname, '../prisma/schema.prisma'),
       enablePlayground: true,
       enableRawQueries: true,
       writerFunction: {
         entry: join(__dirname, '../src/index.ts'),
       },
+      logLevel: 'debug',
     });
   }
 }

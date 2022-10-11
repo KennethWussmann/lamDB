@@ -2,8 +2,9 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { Response } from './requestResponse';
 import { createLogger } from './logger';
 import { QueryEngine } from './queryEngine/queryEngine';
-import { databaseFilePath, useDatabase } from './database/fileManager';
 import {
+  databaseFilePath,
+  useDatabase,
   FileManager,
   litestreamReplicaFileAdapter,
   defaultFileAdapter,

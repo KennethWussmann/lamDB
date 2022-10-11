@@ -1,15 +1,14 @@
 import { exists } from '../fileUtils';
 import { createLogger } from '../logger';
-import { defaultFileAdapter, FileAdapter } from './fileAdapter';
+import { defaultFileAdapter, FileAdapter } from './fileAdapter/fileAdapter';
 
-export const databaseFilePath = '/tmp/database.db';
+const defaultFilePath = '/tmp/database.db';
 
 export class FileManager {
   private downloadedAt: Date | undefined;
   private logger = createLogger({ name: 'FileManager' });
 
   constructor(
-    private filePath: string = databaseFilePath,
     private fileAdapter: FileAdapter = defaultFileAdapter,
     private cacheSeconds: number = parseInt(process.env.CACHE_SECONDS ?? '30', 10),
   ) {}
@@ -32,15 +31,15 @@ export class FileManager {
     } else {
       this.logger.debug('Downloading database file because none cached yet');
     }
-    await this.fileAdapter.download(this.filePath);
+    await this.fileAdapter.download(this.fileAdapter.filePath ?? defaultFilePath);
     this.downloadedAt = new Date();
   };
 
   upload = async () => {
-    if (!(await exists(this.filePath))) {
+    if (!(await exists(this.fileAdapter.filePath ?? defaultFilePath))) {
       return;
     }
-    await this.fileAdapter.upload(this.filePath);
+    await this.fileAdapter.upload(this.fileAdapter.filePath ?? defaultFilePath);
   };
 }
 

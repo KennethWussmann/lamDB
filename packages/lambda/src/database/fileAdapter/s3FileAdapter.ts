@@ -1,7 +1,10 @@
 import { S3 } from '@aws-sdk/client-s3';
 import { createReadStream, createWriteStream } from 'fs';
 import { Readable } from 'stream';
+import { createLogger } from '../../logger';
 import { FileAdapter } from './fileAdapter';
+
+const logger = createLogger({ name: 'S3FileAdapter' });
 
 export const s3FileAdapter = (
   s3: S3 = new S3({}),
@@ -20,8 +23,8 @@ export const s3FileAdapter = (
           throw new Error('Cannot return object of non readable type');
         }
         responseBody = response.Body;
-      } catch (e) {
-        console.warn(e);
+      } catch (e: any) {
+        logger.warn('Failed to download database file from S3', { error: e?.message });
       }
       if (!responseBody) {
         return;

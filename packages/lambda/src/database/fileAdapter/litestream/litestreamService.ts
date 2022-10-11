@@ -1,4 +1,4 @@
-import { ChildProcessMonitor } from '../childProcessMonitor';
+import { ChildProcessMonitor } from '../../../childProcessMonitor';
 
 export type LitestreamServiceSettings = {
   binaryPath: string;

@@ -1,8 +1,8 @@
 import { unlink } from 'fs/promises';
 import { basename, dirname, join } from 'path';
-import { exists } from '../fileUtils';
-import { createLogger } from '../logger';
-import { FileAdapter } from './fileAdapter';
+import { exists } from '../../../fileUtils';
+import { createLogger } from '../../../logger';
+import { FileAdapter } from '../fileAdapter';
 import { LitestreamService } from './litestreamService';
 
 const logger = createLogger({ name: 'LitestreamFileAdapter' });

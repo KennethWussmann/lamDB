@@ -99,7 +99,7 @@ export class LamDB extends Construct {
       {
         functionName: `${props.name}-writer`,
         handler: 'writerHandler',
-        //reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 1,
         ...props.writerFunction,
       },
       {

@@ -134,6 +134,7 @@ export class LamDB extends Construct {
       {
         functionName: `${props.name}-reader`,
         handler: 'readerHandler',
+        layers: [this.engineLayer],
         filesystem,
         ...(props.readerFunction ?? props.writerFunction),
       },
@@ -147,6 +148,7 @@ export class LamDB extends Construct {
         functionName: `${props.name}-writer`,
         handler: 'writerHandler',
         reservedConcurrentExecutions: 1,
+        layers: [this.engineLayer],
         filesystem,
         ...props.writerFunction,
       },
@@ -234,7 +236,7 @@ export class LamDB extends Construct {
           this.getPersistenceProps().type === 'efs' ? join(efsMountPath, 'database.db') : '/tmp/database.db',
         ...additionalEnvironmentVariables,
       },
-      layers: [this.engineLayer],
+      vpc: this.vpc,
       bundling: {
         commandHooks: {
           afterBundling: () => [],

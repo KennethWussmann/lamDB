@@ -6,13 +6,7 @@ import { s3FileAdapter } from './s3FileAdapter';
 
 export type PersistenceType = 's3' | 'efs';
 export type S3PersistenceProps = {
-  /**
-   * Use Litestream for replication.
-   * If disabled uses plain S3 operations to download and upload database file.
-   * Important: Change requires replacement! Database may be empty after change.
-   * @default true
-   */
-  enableLitestream?: boolean;
+  enableLitestream: boolean;
   bucketName: string;
 };
 export type EFSPersistenceProps = {

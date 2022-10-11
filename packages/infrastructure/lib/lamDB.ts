@@ -54,11 +54,6 @@ export type LamDBProps = {
   persistence?: PersistenceProps;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;
 
-const defaultPersistenceProps: PersistenceProps = {
-  type: 's3',
-  enableLitestream: true,
-};
-
 export class LamDB extends Construct {
   private api: HttpApi;
   public databaseStorageBucket: IBucket;
@@ -163,8 +158,18 @@ export class LamDB extends Construct {
     this.databaseStorageBucket.grantReadWrite(fn);
   };
 
-  private persistenceProps = this.props.persistence ?? defaultPersistenceProps;
-  private isLitestreamEnabled = () => this.persistenceProps.type === 's3' && this.persistenceProps.enableLitestream;
+  private getPersistenceProps = (): PersistenceProps =>
+    this.props.persistence ?? {
+      type: 's3',
+      databaseFilePath: '/tmp/database.db',
+      enableLitestream: true,
+      bucketName: this.databaseStorageBucket.bucketName,
+    };
+
+  private isLitestreamEnabled = () => {
+    const persistenceProps = this.getPersistenceProps();
+    return persistenceProps.type === 's3' && persistenceProps.enableLitestream;
+  };
 
   private createLambda = (
     id: string,
@@ -178,7 +183,8 @@ export class LamDB extends Construct {
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket.bucketName,
         ENABLE_RAW_QUERIES: this.props.enableRawQueries ? 'true' : 'false',
         ENABLE_LITESTREAM: this.isLitestreamEnabled() ? 'true' : 'false',
-        PERSISTENCE_TYPE: this.persistenceProps.type,
+        PERSISTENCE_TYPE: this.getPersistenceProps().type,
+        DATABASE_FILE_PATH: this.getPersistenceProps().databaseFilePath,
         ...additionalEnvironmentVariables,
       },
       layers: [this.engineLayer],

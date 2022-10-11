@@ -5,11 +5,11 @@ import { QueryEngine } from './queryEngine/queryEngine';
 import { databaseFilePath, useDatabase } from './database/fileManager';
 import {
   FileManager,
-  litestreamRestoreFileAdapter,
   litestreamReplicaFileAdapter,
   defaultFileAdapter,
   LitestreamService,
   LitestreamServiceSettings,
+  litestreamRestoreFileAdapter,
 } from './database';
 
 const logger = createLogger({ name: 'LambdaHandler' });

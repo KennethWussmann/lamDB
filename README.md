@@ -22,6 +22,11 @@
 ### Whom is this for?
 
 The applications can be versatile. It is designed for high read demand and lower write throughput.
+
+It's not desgined to replace your DynamoDB (in most cases), but rather to extend your serverless options. LamDB can be a perfect serverless search engine, for example. Just mirror searchable content from DynamoDB to lamDB for complex queries and fulltext search.
+
+TODO: Add a pricing example of Algolia vs lamDB. Maybe even a formula for lamDB price per request.
+
 Given how Lambda works there are cold starts, where the database may need to be downloaded to the instance. Due to the single writer you may experience throttling in high throughput times. That's sadly a limitation that is hard to get around.
 
 The database size is also important to monitor. As the file grows cold-starts are getting longer.

@@ -12,7 +12,6 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     "**/node_modules": true,
-    "**/*.js": true,
     "**/*.d.ts": true,
     "**/*.map": true,
     "**/.turbo": true

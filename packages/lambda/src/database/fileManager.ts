@@ -1,4 +1,4 @@
-import { access } from 'fs/promises';
+import { exists } from '../fileUtils';
 import { createLogger } from '../logger';
 import { defaultFileAdapter, FileAdapter } from './fileAdapter';
 
@@ -45,15 +45,6 @@ export class FileManager {
 }
 
 const defaultFileManager = new FileManager();
-
-const exists = async (file: string): Promise<boolean> => {
-  try {
-    await access(file);
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 export const useDatabase = async <T>(
   fn: () => T,

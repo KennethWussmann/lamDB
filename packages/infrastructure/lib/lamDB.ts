@@ -100,12 +100,12 @@ export class LamDB extends Construct {
       {
         functionName: `${props.name}-writer`,
         handler: 'writerHandler',
-        reservedConcurrentExecutions: 1,
+        //reservedConcurrentExecutions: 1,
         ...props.writerFunction,
       },
       {
         ENABLE_PLAYGROUND: this.props.enablePlayground ? 'true' : 'false',
-        CACHE_SECONDS: `${(this.props.writerCacheDuration ?? Duration.minutes(30)).toSeconds()}`,
+        CACHE_SECONDS: `${(this.props.writerCacheDuration ?? Duration.seconds(30)).toSeconds()}`,
       },
     );
     const proxy = this.createLambda('ProxyFunction', {

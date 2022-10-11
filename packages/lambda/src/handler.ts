@@ -1,59 +1,24 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { Response } from './requestResponse';
 import { createLogger } from './logger';
-import { QueryEngine } from './queryEngine/queryEngine';
-import {
-  databaseFilePath,
-  useDatabase,
-  FileManager,
-  litestreamReplicaFileAdapter,
-  defaultFileAdapter,
-  LitestreamService,
-  LitestreamServiceSettings,
-  litestreamRestoreFileAdapter,
-} from './database';
+import { getEnvironmentPersistenceConfig, getFileAdapter, getFileManager, useDatabase } from './database';
+import { getQueryEngine } from './queryEngine/queryEngine';
 
 const logger = createLogger({ name: 'LambdaHandler' });
-const queryEngine = new QueryEngine({
-  databaseFilePath,
-  binaryPath: '/opt/query-engine',
-  prismaSchemaPath: './schema.prisma',
-  enablePlayground: process.env.ENABLE_PLAYGROUND === 'true',
-  enableRawQueries: process.env.ENABLE_RAW_QUERIES === 'true',
-});
-
-let fileManager: FileManager | undefined;
-
-const getFileManager = (reader: boolean): FileManager => {
-  if (fileManager) {
-    return fileManager;
-  }
-  if (!process.env.DATABASE_STORAGE_BUCKET_NAME) {
-    throw new Error('Env var DATABASE_STORAGE_BUCKET_NAME missing');
-  }
-
-  const litestreamSettings: LitestreamServiceSettings = {
-    binaryPath: '/opt/litestream',
-    bucketName: process.env.DATABASE_STORAGE_BUCKET_NAME,
-    objectKey: 'litestream',
-    databasePath: databaseFilePath,
-  };
-  fileManager = new FileManager(
-    databaseFilePath,
-    process.env.ENABLE_LITESTREAM === 'true'
-      ? reader
-        ? litestreamRestoreFileAdapter(new LitestreamService(litestreamSettings))
-        : litestreamReplicaFileAdapter(new LitestreamService(litestreamSettings))
-      : defaultFileAdapter,
-  );
-  return fileManager;
-};
 
 const handleRequest = async (
   uploadAfterWrite: boolean,
   request: APIGatewayProxyEventV2,
 ): Promise<APIGatewayProxyResultV2> => {
+  const persistenceProps = getEnvironmentPersistenceConfig();
+  const fileManager = getFileManager(
+    persistenceProps.databaseFilePath,
+    getFileAdapter(uploadAfterWrite, persistenceProps),
+  );
+  const queryEngine = getQueryEngine(persistenceProps.databaseFilePath);
+
   const response: Response = await useDatabase(
+    fileManager,
     async (): Promise<Response> => {
       queryEngine.initialize();
 
@@ -84,7 +49,6 @@ const handleRequest = async (
       }
     },
     uploadAfterWrite,
-    getFileManager(!uploadAfterWrite),
   );
 
   return {

@@ -7,6 +7,7 @@ import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-al
 import { EngineLayer } from './engineLayer';
 import { LayerVersion } from 'aws-cdk-lib/aws-lambda';
 import { HttpIamAuthorizer } from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
+import { PersistenceProps } from '@lamdb/lambda';
 
 export type LamDBProps = {
   name: string;
@@ -32,13 +33,6 @@ export type LamDBProps = {
   readerFunction?: { entry: string } & Partial<LamDBFunctionProps>;
   proxyFunction?: { entry: string } & Partial<LamDBFunctionProps>;
   /**
-   * Use Litestream for replication.
-   * If disabled uses plain S3 operations to download and upload database file.
-   * Important: Change requires replacement! Database may be empty after change.
-   * @default true
-   */
-  enableLitestream?: boolean;
-  /**
    * Expose a GET /playground route on the writer to access a graphical user interface for the database
    * @default false
    */
@@ -53,7 +47,17 @@ export type LamDBProps = {
    * @default info
    */
   logLevel?: 'info' | 'debug' | 'error';
+  /**
+   * Control where and how the database will be persisted.
+   * @default S3 with Litestream
+   */
+  persistence?: PersistenceProps;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;
+
+const defaultPersistenceProps: PersistenceProps = {
+  type: 's3',
+  enableLitestream: true,
+};
 
 export class LamDB extends Construct {
   private api: HttpApi;
@@ -159,6 +163,9 @@ export class LamDB extends Construct {
     this.databaseStorageBucket.grantReadWrite(fn);
   };
 
+  private persistenceProps = this.props.persistence ?? defaultPersistenceProps;
+  private isLitestreamEnabled = () => this.persistenceProps.type === 's3' && this.persistenceProps.enableLitestream;
+
   private createLambda = (
     id: string,
     props: LamDBFunctionProps,
@@ -170,7 +177,8 @@ export class LamDB extends Construct {
         GRAPHQL_API_BASE_URL: this.api.url ?? '',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket.bucketName,
         ENABLE_RAW_QUERIES: this.props.enableRawQueries ? 'true' : 'false',
-        ENABLE_LITESTREAM: this.props.enableLitestream ?? true ? 'true' : 'false',
+        ENABLE_LITESTREAM: this.isLitestreamEnabled() ? 'true' : 'false',
+        PERSISTENCE_TYPE: this.persistenceProps.type,
         ...additionalEnvironmentVariables,
       },
       layers: [this.engineLayer],

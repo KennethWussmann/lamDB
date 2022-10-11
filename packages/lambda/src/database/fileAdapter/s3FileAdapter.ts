@@ -6,11 +6,7 @@ import { FileAdapter } from './fileAdapter';
 
 const logger = createLogger({ name: 'S3FileAdapter' });
 
-export const s3FileAdapter = (
-  s3: S3 = new S3({}),
-  bucketName: string = process.env.DATABASE_STORAGE_BUCKET_NAME ?? '',
-  objectKey = 'database.db',
-): FileAdapter => {
+export const s3FileAdapter = (bucketName: string, s3: S3 = new S3({}), objectKey = 'database.db'): FileAdapter => {
   return {
     download: async (destination: string): Promise<void> => {
       let responseBody: Readable | undefined;

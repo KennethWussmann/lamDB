@@ -1,15 +1,14 @@
 import { exists } from '../fileUtils';
 import { createLogger } from '../logger';
-import { defaultFileAdapter, FileAdapter } from './fileAdapter/fileAdapter';
-
-const defaultFilePath = '/tmp/database.db';
+import { FileAdapter } from './fileAdapter/fileAdapter';
 
 export class FileManager {
   private downloadedAt: Date | undefined;
   private logger = createLogger({ name: 'FileManager' });
 
   constructor(
-    private fileAdapter: FileAdapter = defaultFileAdapter,
+    private databaseFilePath: string,
+    private fileAdapter: FileAdapter,
     private cacheSeconds: number = parseInt(process.env.CACHE_SECONDS ?? '30', 10),
   ) {}
 
@@ -31,25 +30,19 @@ export class FileManager {
     } else {
       this.logger.debug('Downloading database file because none cached yet');
     }
-    await this.fileAdapter.download(this.fileAdapter.filePath ?? defaultFilePath);
+    await this.fileAdapter.download(this.databaseFilePath);
     this.downloadedAt = new Date();
   };
 
   upload = async () => {
-    if (!(await exists(this.fileAdapter.filePath ?? defaultFilePath))) {
+    if (!(await exists(this.databaseFilePath))) {
       return;
     }
-    await this.fileAdapter.upload(this.fileAdapter.filePath ?? defaultFilePath);
+    await this.fileAdapter.upload(this.databaseFilePath);
   };
 }
 
-const defaultFileManager = new FileManager();
-
-export const useDatabase = async <T>(
-  fn: () => T,
-  uploadAfterWrite = true,
-  fileManager = defaultFileManager,
-): Promise<T> => {
+export const useDatabase = async <T>(fileManager: FileManager, fn: () => T, uploadAfterWrite = true): Promise<T> => {
   await fileManager.download();
 
   const result = await fn();
@@ -59,4 +52,14 @@ export const useDatabase = async <T>(
   }
 
   return result;
+};
+
+let fileManager: FileManager | undefined;
+
+export const getFileManager = (databaseFilePath: string, fileAdapter: FileAdapter): FileManager => {
+  if (fileManager) {
+    return fileManager;
+  }
+  fileManager = new FileManager(databaseFilePath, fileAdapter);
+  return fileManager;
 };

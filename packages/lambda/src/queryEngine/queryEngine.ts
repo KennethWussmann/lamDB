@@ -132,3 +132,23 @@ export class QueryEngine {
     );
   };
 }
+
+let queryEngine: QueryEngine | undefined;
+
+export const getQueryEngine = (
+  databaseFilePath: string,
+  enablePlayground: boolean = process.env.ENABLE_PLAYGROUND === 'true',
+  enableRawQueries: boolean = process.env.ENABLE_RAW_QUERIES === 'true',
+): QueryEngine => {
+  if (queryEngine) {
+    return queryEngine;
+  }
+  queryEngine = new QueryEngine({
+    databaseFilePath,
+    binaryPath: '/opt/query-engine',
+    prismaSchemaPath: './schema.prisma',
+    enablePlayground,
+    enableRawQueries,
+  });
+  return queryEngine;
+};

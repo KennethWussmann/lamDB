@@ -14,6 +14,7 @@ const start = async (configuration: Configuration = new Configuration()) => {
   const fileManager = new FileManager(configuration.databasePath, litestreamReplicaFileAdapter(litestreamService));
 
   useDatabase(
+    fileManager,
     async () => {
       const queryEngine = new QueryEngine({
         binaryPath: configuration.queryEngineBinaryPath,
@@ -29,7 +30,6 @@ const start = async (configuration: Configuration = new Configuration()) => {
       startProxy(configuration, queryEngine);
     },
     false,
-    fileManager,
   );
 };
 

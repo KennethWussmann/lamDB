@@ -20,7 +20,7 @@ export class LamDBTestStack extends Stack {
       logLevel: 'debug',
       persistence: {
         type: 'efs',
-        enableBastionHost: true,
+        bastionHost: true,
       },
     });
   }

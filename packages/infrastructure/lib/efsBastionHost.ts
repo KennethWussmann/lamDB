@@ -9,12 +9,23 @@ import {
   Vpc,
 } from 'aws-cdk-lib/aws-ec2';
 import { FileSystem } from 'aws-cdk-lib/aws-efs';
+import { IKey } from 'aws-cdk-lib/aws-kms';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 export type EfsBastionHostProps = {
   name: string;
   efs: FileSystem;
   vpc: Vpc;
+  /**
+   * In case you want to encryt SSM sessions, define the KMS key used
+   * @default undefined
+   */
+  kmsKey?: IKey;
+  /**
+   * Bucket that the efs bastion host will have read/write access to, to transfer data back and forth.
+   */
+  supportBucket: IBucket;
 };
 
 export class EfsBastionHost extends Construct {
@@ -54,6 +65,14 @@ export class EfsBastionHost extends Construct {
       vpc: props.vpc,
       securityGroup: this.securityGroup,
     });
+    props.supportBucket.grantReadWrite(this.bastionHost.instance);
+    if (props.kmsKey) {
+      props.vpc.addInterfaceEndpoint('KMS', {
+        service: InterfaceVpcEndpointAwsService.KMS,
+        securityGroups: [endpointDefaultSecurityGroup],
+      });
+      props.kmsKey.grantDecrypt(this.bastionHost.instance);
+    }
     const cfnBastionHost = this.bastionHost.instance.node.defaultChild as CfnInstance;
     cfnBastionHost.userData = Fn.base64(
       UserData.custom(
@@ -73,10 +92,6 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="userdata.txt"
 #!/bin/bash
-#mount -o remount,rw,nosuid,nodev,noexec,relatime,hidepid=2 /proc
-sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
 sudo mkdir -p /mnt/${props.name}-efs
 sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${props.efs.fileSystemId}.efs.${Aws.REGION}.amazonaws.com:/ /mnt/${props.name}-efs
 --//`,

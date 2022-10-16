@@ -16,9 +16,6 @@ const engines: BinaryType[] = [BinaryType.queryEngine, BinaryType.migrationEngin
 const os: OS = (process.env.OS as OS) ?? 'linux';
 const prismaVersion = process.env.PRISMA_VERSION ?? 'ee0282f44ff27043cee9ae3e404033e6e7ec1748';
 const prismaTarget: Platform = os === 'darwin' ? 'darwin-arm64' : 'linux-arm64-openssl-3.0.x';
-const litestreamVersion = '0.3.9';
-const litestreamTarget = os === 'darwin' ? 'darwin-amd64' : 'linux-arm64-static';
-const litestreamArchiveType: 'zip' | 'tar.gz' = os === 'darwin' ? 'zip' : 'tar.gz';
 const enginesJsonPath = join(destination, 'engines.json');
 
 const libExtensions: Record<OS, string> = {
@@ -78,20 +75,6 @@ const downloadPrisma = async () => {
   );
 };
 
-const downloadLitestream = async () => {
-  console.log('Downloading litestream', { litestreamVersion, litestreamTarget });
-  const downloadUrl = `https://github.com/benbjohnson/litestream/releases/download/v${litestreamVersion}/litestream-v${litestreamVersion}-${litestreamTarget}.${litestreamArchiveType}`;
-  const archivePath = join(buildDirectory, `litestream.${litestreamArchiveType}`);
-  await $`curl -L ${downloadUrl} -o ${archivePath}`;
-
-  console.log('Extracting archive');
-  if (litestreamArchiveType === 'tar.gz') {
-    await $`tar -xvf ${archivePath} -C ${destination}`;
-  } else {
-    await $`unzip ${archivePath} -d ${destination}`;
-  }
-};
-
 const build = async () => {
   if (await exists(buildDirectory)) {
     await rm(buildDirectory, {
@@ -112,8 +95,6 @@ const build = async () => {
         prismaVersion,
         engines,
         prismaTarget,
-        litestreamTarget,
-        litestreamVersion,
       });
       return;
     }
@@ -122,7 +103,6 @@ const build = async () => {
   }
 
   await downloadPrisma();
-  await downloadLitestream();
 
   console.log('Writing engines.json file');
   await writeFile(
@@ -132,10 +112,6 @@ const build = async () => {
         engines,
         target: prismaTarget,
         version: prismaVersion ?? null,
-      },
-      litestream: {
-        target: litestreamTarget,
-        version: litestreamVersion,
       },
     }),
   );

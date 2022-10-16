@@ -1,7 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { Request, Response } from './requestResponse';
+import { Request } from './requestResponse';
 import { createLogger } from './logger';
-import { getEnvironmentPersistenceConfig, getFileAdapter, getFileManager, useDatabase } from './database';
 import { getQueryEngine } from './queryEngine/queryEngine';
 import { errorLog, getOperationInfo, getRequestFromUnion, graphQlErrorResponse, toApiGatewayResponse } from './utils';
 import { routeQuery } from './queryRouter';
@@ -15,27 +14,19 @@ const handleRequest = async (writer: boolean, request: Request): Promise<APIGate
     return toApiGatewayResponse(graphQlErrorResponse('Cannot execute mutations in read-only mode'));
   }
 
-  const persistenceProps = getEnvironmentPersistenceConfig();
-  const fileManager = getFileManager(persistenceProps.databaseFilePath, getFileAdapter(writer, persistenceProps));
-  const queryEngine = getQueryEngine(persistenceProps.databaseFilePath);
+  const queryEngine = getQueryEngine(process.env.DATABASE_FILE_PATH!);
 
-  const response: Response = await useDatabase(
-    fileManager,
-    async (): Promise<Response> => {
-      try {
-        return await queryEngine.execute({
-          ...request,
-          path: request?.path?.toLowerCase() === '/sdl' ? '/sdl' : '/',
-        });
-      } catch (e: any) {
-        logger.error('Failed to proxy request', errorLog(e));
-        return graphQlErrorResponse(`Failed to proxy request: ${e?.message}`);
-      }
-    },
-    writer,
-  );
-
-  return toApiGatewayResponse(response);
+  try {
+    return toApiGatewayResponse(
+      await queryEngine.execute({
+        ...request,
+        path: request?.path?.toLowerCase() === '/sdl' ? '/sdl' : '/',
+      }),
+    );
+  } catch (e: any) {
+    logger.error('Failed to proxy request', errorLog(e));
+    return toApiGatewayResponse(graphQlErrorResponse(`Failed to proxy request: ${e?.message}`));
+  }
 };
 
 export const readerHandler = async (request: APIGatewayProxyEventV2 | Request): Promise<APIGatewayProxyResultV2> =>

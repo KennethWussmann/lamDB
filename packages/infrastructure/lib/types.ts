@@ -1,27 +1,7 @@
 import { HttpApiProps } from '@aws-cdk/aws-apigatewayv2-alpha';
-import { Merge, PersistenceType } from '@lamdb/lambda';
-import { Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { Duration } from 'aws-cdk-lib';
 import { EfsBastionHostProps } from './efsBastionHost';
 import { LamDBFunctionProps } from './lamDBFunction';
-
-export type LamDBS3PersistenceProps = {
-  /**
-   * Use Litestream for replication.
-   * If disabled uses plain S3 operations to download and upload database file.
-   * Important: Change requires replacement! Database may be empty after change.
-   * @default true
-   */
-  enableLitestream?: boolean;
-};
-
-export type LamDBEFSBastionHostProps = {
-  /**
-   * Also deploy a small tier EC2 instance to use as bastion host that can access the EFS.
-   * Great for debugging or maintenance, otherwise not necessary for operation.
-   * @default false
-   */
-  enabled: boolean;
-} & Pick<EfsBastionHostProps, 'kmsKey'>;
 
 export type LamDBEFSPersistenceProps = {
   /**
@@ -29,7 +9,7 @@ export type LamDBEFSPersistenceProps = {
    * Great for debugging or maintenance, otherwise not necessary for operation.
    * @default false
    */
-  bastionHost?: LamDBEFSBastionHostProps | boolean;
+  bastionHost?: Pick<EfsBastionHostProps, 'kmsKey'> | boolean;
   /**
    * Use AWS DataSync to synchronize with an S3 bucket.
    * Great for backups, debugging, maintenance, data recovery.
@@ -37,15 +17,6 @@ export type LamDBEFSPersistenceProps = {
    */
   enableS3Sync?: boolean;
 };
-
-export type LamDBPersistenceProps = {
-  type: PersistenceType;
-  /**
-   * RemovalPolicy of the choosen persistance layer.
-   * @default RETAIN
-   */
-  removalPolicy?: RemovalPolicy;
-} & (Merge<{ type: 's3' }, LamDBS3PersistenceProps> | Merge<{ type: 'efs' }, LamDBEFSPersistenceProps>);
 
 export type LamDBProps = {
   name: string;
@@ -85,9 +56,5 @@ export type LamDBProps = {
    * @default info
    */
   logLevel?: 'info' | 'debug' | 'error';
-  /**
-   * Control where and how the database will be persisted.
-   * @default S3 with Litestream
-   */
-  persistence?: LamDBPersistenceProps;
+  efs?: LamDBEFSPersistenceProps;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;

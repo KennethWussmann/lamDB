@@ -42,7 +42,7 @@ It's also a great serverful database option when you want a GraphQL API for your
 
 ### Is it production-ready?
 
-If you keep the limitations in mind, yes. LamDB uses Prisma, Litestream and AWS - software that is already very well production ready and battle tested. LamDB is actually only some glue code with little caching and retry logic.
+If you keep the limitations in mind, yes. LamDB uses Prisma and AWS - software that is already very well production ready and battle tested. LamDB is actually only some glue code with little caching and retry logic.
 
 ### How does auto-scaling work?
 

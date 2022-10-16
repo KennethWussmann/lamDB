@@ -10,7 +10,7 @@ import { AccessPoint, FileSystem } from 'aws-cdk-lib/aws-efs';
 import { join } from 'path';
 import { EfsBastionHost } from './efsBastionHost';
 import { GatewayVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { LamDBPersistenceProps, LamDBProps } from './types';
+import { LamDBProps } from './types';
 
 const efsMountPath = '/mnt/efs';
 
@@ -25,7 +25,6 @@ export class LamDB extends Construct {
 
   constructor(scope: Construct, id: string, private props: LamDBProps) {
     super(scope, id);
-    const persistenceProps = this.getPersistenceProps();
 
     this.engineLayer = new EngineLayer(this, 'PrismaEngineLayer');
 
@@ -35,11 +34,9 @@ export class LamDB extends Construct {
       versioned: true,
       accessControl: BucketAccessControl.PRIVATE,
       enforceSSL: true,
-      removalPolicy: persistenceProps.removalPolicy,
+      removalPolicy: RemovalPolicy.RETAIN,
     });
-    if (persistenceProps.type === 'efs') {
-      this.createEfs();
-    }
+    this.createEfs();
 
     this.api = new HttpApi(this, 'GraphQLApi', {
       apiName: `${props.name}-api`,
@@ -142,17 +139,6 @@ export class LamDB extends Construct {
     this.databaseStorageBucket?.grantReadWrite(fn);
   };
 
-  private getPersistenceProps = (): LamDBPersistenceProps =>
-    this.props.persistence ?? {
-      type: 's3',
-      enableLitestream: true,
-    };
-
-  private isLitestreamEnabled = () => {
-    const persistenceProps = this.getPersistenceProps();
-    return persistenceProps.type === 's3' && persistenceProps.enableLitestream;
-  };
-
   private createLambda = (
     id: string,
     props: LamDBFunctionProps,
@@ -162,11 +148,7 @@ export class LamDB extends Construct {
       environment: {
         LOG_LEVEL: this.props.logLevel ?? 'info',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',
-        ENABLE_RAW_QUERIES: this.props.enableRawQueries ? 'true' : 'false',
-        ENABLE_LITESTREAM: this.isLitestreamEnabled() ? 'true' : 'false',
-        PERSISTENCE_TYPE: this.getPersistenceProps().type,
-        DATABASE_FILE_PATH:
-          this.getPersistenceProps().type === 'efs' ? join(efsMountPath, 'database.db') : '/tmp/database.db',
+        DATABASE_FILE_PATH: join(efsMountPath, 'database.db'),
         ...additionalEnvironmentVariables,
       },
       bundling: {
@@ -186,10 +168,6 @@ export class LamDB extends Construct {
   };
 
   private createEfs = () => {
-    const persistenceProps = this.getPersistenceProps();
-    if (persistenceProps.type !== 'efs') {
-      return;
-    }
     this.vpc = new Vpc(this, 'Vpc', {
       vpcName: `${this.props.name}-vpc`,
       natGateways: 0,
@@ -201,7 +179,7 @@ export class LamDB extends Construct {
       },
     });
     this.databaseStorageFileSystem = new FileSystem(this, 'IndexFileSystem', {
-      removalPolicy: persistenceProps.removalPolicy ?? RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.RETAIN,
       encrypted: true,
       fileSystemName: this.props.name,
       vpc: this.vpc,
@@ -219,15 +197,13 @@ export class LamDB extends Construct {
       path: '/lambda',
     });
     if (
-      typeof persistenceProps.bastionHost === 'boolean'
-        ? persistenceProps.bastionHost
-        : persistenceProps.bastionHost?.enabled
+      typeof this.props.efs?.bastionHost === 'boolean' ? this.props.efs?.bastionHost : !!this.props.efs?.bastionHost
     ) {
       this.databaseStorageEfsBastionHost = new EfsBastionHost(this, 'EfsBastionHost', {
         name: this.props.name,
         vpc: this.vpc,
         efs: this.databaseStorageFileSystem,
-        kmsKey: typeof persistenceProps.bastionHost !== 'boolean' ? persistenceProps.bastionHost?.kmsKey : undefined,
+        kmsKey: typeof this.props.efs?.bastionHost !== 'boolean' ? this.props.efs?.bastionHost?.kmsKey : undefined,
         supportBucket: this.databaseStorageBucket,
       });
     }

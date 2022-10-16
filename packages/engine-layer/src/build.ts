@@ -2,7 +2,6 @@ import fetchEngine from '@prisma/fetch-engine';
 import getPlatform from '@prisma/get-platform';
 import { access, mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { $ } from 'zx';
 
 const { BinaryType, download } = fetchEngine;
 type Platform = getPlatform.Platform;

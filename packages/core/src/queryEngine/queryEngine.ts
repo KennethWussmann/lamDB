@@ -76,14 +76,10 @@ export class QueryEngine {
 }
 let queryEngine: QueryEngine | undefined;
 
-export const getQueryEngine = (databaseFilePath: string): QueryEngine => {
+export const getQueryEngine = (config: QueryEngineSettings): QueryEngine => {
   if (queryEngine) {
     return queryEngine;
   }
-  queryEngine = new QueryEngine({
-    databaseFilePath,
-    libraryPath: '/opt/libquery-engine.so.node',
-    prismaSchemaPath: './schema.prisma',
-  });
+  queryEngine = new QueryEngine(config);
   return queryEngine;
 };

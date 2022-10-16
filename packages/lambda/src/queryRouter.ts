@@ -1,5 +1,5 @@
-import { createLogger } from './logger';
-import { Request, Response } from './requestResponse';
+import { createLogger } from '../../core/src/logger';
+import { Request, Response } from '../../core/src/requestResponse';
 import { errorLog, fromApiGatewayResponse, getOperationInfo, graphQlErrorResponse } from './utils';
 import { Lambda } from '@aws-sdk/client-lambda';
 

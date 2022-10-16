@@ -1,4 +1,4 @@
-import { QueryEngine } from '@lamdb/lambda';
+import { QueryEngine } from '@lamdb/core';
 import { Configuration } from './configuration';
 import { startProxy } from './httpProxy';
 

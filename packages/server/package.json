@@ -6,7 +6,7 @@
     "start": "ts-node src/server.ts"
   },
   "dependencies": {
-    "@lamdb/lambda": "*",
+    "@lamdb/core": "*",
     "dotenv": "^16.0.3",
     "express": "^4.18.2"
   },

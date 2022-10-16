@@ -1,9 +1,7 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { Request } from './requestResponse';
-import { createLogger } from './logger';
-import { getQueryEngine } from './queryEngine/queryEngine';
 import { errorLog, getOperationInfo, getRequestFromUnion, graphQlErrorResponse, toApiGatewayResponse } from './utils';
 import { routeQuery } from './queryRouter';
+import { createLogger, Request, getQueryEngine } from '@lamdb/core';
 
 const logger = createLogger({ name: 'LambdaHandler' });
 
@@ -14,7 +12,11 @@ const handleRequest = async (writer: boolean, request: Request): Promise<APIGate
     return toApiGatewayResponse(graphQlErrorResponse('Cannot execute mutations in read-only mode'));
   }
 
-  const queryEngine = getQueryEngine(process.env.DATABASE_FILE_PATH!);
+  const queryEngine = getQueryEngine({
+    databaseFilePath: process.env.DATABASE_FILE_PATH!,
+    libraryPath: '/opt/libquery-engine.so.node',
+    prismaSchemaPath: './schema.prisma',
+  });
 
   try {
     return toApiGatewayResponse(
@@ -31,8 +33,10 @@ const handleRequest = async (writer: boolean, request: Request): Promise<APIGate
 
 export const readerHandler = async (request: APIGatewayProxyEventV2 | Request): Promise<APIGatewayProxyResultV2> =>
   await handleRequest(false, getRequestFromUnion(request));
+
 export const writerHandler = async (request: APIGatewayProxyEventV2 | Request): Promise<APIGatewayProxyResultV2> =>
   await handleRequest(true, getRequestFromUnion(request));
+
 export const proxyHandler = async (event: APIGatewayProxyEventV2 | Request): Promise<APIGatewayProxyResultV2> => {
   const readerFunctionArn = process.env.READER_FUNCTION_ARN;
   const writerFunctionArn = process.env.WRITER_FUNCTION_ARN;

@@ -1,4 +1,4 @@
-import { createLogger, QueryEngine } from '@lamdb/lambda';
+import { createLogger, QueryEngine } from '@lamdb/core';
 import express, { Request, Response } from 'express';
 import { Configuration } from './configuration';
 

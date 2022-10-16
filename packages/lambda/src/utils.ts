@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { access } from 'fs/promises';
-import { Request, requestSchema, Response } from './requestResponse';
+import { Request, requestSchema, Response } from '../../core/src/requestResponse';
 import { createHash } from 'crypto';
 import { isExecutableDefinitionNode, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql';
 export const exists = async (file: string) => {

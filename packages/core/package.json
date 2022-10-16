@@ -1,22 +1,25 @@
 {
-  "name": "@lamdb/lambda",
+  "name": "@lamdb/core",
   "version": "1.0.0",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
     "prepack": "npm run build",
-    "dev": "npm run build --watch",
     "build": "tsc",
     "test": "jest --maxWorkers=50% --passWithNoTests",
     "clean": "find test src -name '*.d.ts' -or -name '*.js' -or -name '*.map' | xargs rm",
     "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
   },
   "dependencies": {
-    "@lamdb/core": "*",
-    "@aws-sdk/client-lambda": "^3.188.0",
-    "@prisma/engine-core": "^4.4.0"
+    "@graphql-tools/load": "^7.7.7",
+    "@graphql-tools/merge": "^8.3.6",
+    "@graphql-tools/relay-operation-optimizer": "^6.5.6",
+    "@prisma/engine-core": "^4.4.0",
+    "graphql": "^16.6.0",
+    "node-fetch": "^2.6.7",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.107"
+    "@types/node-fetch": "^2.6.2"
   }
 }

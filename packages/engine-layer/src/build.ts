@@ -11,7 +11,7 @@ type OS = 'darwin' | 'linux';
 
 const destination = join(process.cwd(), 'dist');
 const buildDirectory = join(process.cwd(), 'build');
-const engines: BinaryType[] = [BinaryType.queryEngine, BinaryType.migrationEngine, BinaryType.libqueryEngine];
+const engines: BinaryType[] = [BinaryType.migrationEngine, BinaryType.libqueryEngine];
 const os: OS = (process.env.OS as OS) ?? 'linux';
 const prismaVersion = process.env.PRISMA_VERSION ?? 'ee0282f44ff27043cee9ae3e404033e6e7ec1748';
 const prismaTarget: Platform = os === 'darwin' ? 'darwin-arm64' : 'linux-arm64-openssl-3.0.x';
@@ -68,7 +68,7 @@ const downloadPrisma = async () => {
           destination,
           `${engineNames[engine] ?? engine}-${prismaTarget}${engineExtensions[engine] ? engineExtensions[engine] : ''}`,
         ),
-        join(destination, `${engine}${engineExtensions[engine] ? engineExtensions[engine] : ''}`),
+        join(destination, `${engine}${engine === BinaryType.libqueryEngine ? '.node' : ''}`),
       );
     }),
   );

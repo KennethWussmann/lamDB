@@ -4,7 +4,7 @@ import { startProxy } from './httpProxy';
 
 const start = async (configuration: Configuration = new Configuration()) => {
   const queryEngine = new QueryEngine({
-    libraryPath: configuration.queryEngineBinaryPath,
+    libraryPath: configuration.queryEngineLibraryPath,
     prismaSchemaPath: configuration.prismaSchemaPath,
     databaseFilePath: configuration.databasePath,
   });

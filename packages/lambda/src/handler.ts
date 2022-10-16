@@ -14,7 +14,7 @@ const handleRequest = async (writer: boolean, request: Request): Promise<APIGate
 
   const queryEngine = getQueryEngine({
     databaseFilePath: process.env.DATABASE_FILE_PATH!,
-    libraryPath: '/opt/libquery-engine.so.node',
+    libraryPath: '/opt/libquery-engine.node',
     prismaSchemaPath: './schema.prisma',
   });
 

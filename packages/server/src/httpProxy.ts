@@ -38,11 +38,7 @@ export const startProxy = (configuration: Configuration, queryEngine: QueryEngin
     }
   };
 
-  app.post('/', queryEngineProxy);
-  if (configuration.queryEngineEnablePlayground) {
-    app.get('/sdl', queryEngineProxy);
-    app.get('/', queryEngineProxy);
-  }
+  app.post('/graphql', queryEngineProxy);
 
   const server = app.listen(configuration.proxyPort, () => {
     logger.info(`HTTP proxy running at http://localhost:${configuration.proxyPort}`);

@@ -66,3 +66,21 @@ The docker image does not come with any authentication. Just add an API Gateway 
 ### Single-writer, are writes throttled?
 
 Yes, when the writer is busy, write requests will be retried for a configurable amount of time.
+
+### How can I improve response times?
+
+#### Keep database size small
+
+The network overhead of a large database can add up quickly in response times.
+
+#### Assign more memory
+
+Assigning more RAM will increase costs, but also CPU which is helpful when communicating with the database.
+
+#### Use the reader and writer directly
+
+The proxy `/graphql` endpoint is helpful to deal with throttles, but of course also adds up in the response times because it needs to also proxy traffic to the readers and writer.
+Usually discouraged, but you can of course also request the `/reader` and `/writer` directly. You then need to take care to only send read requests to readers and write requests only to the writer.
+Also keep in mind that there is only one writer. If it is busy currently, you'll get a 503 by API Gateway.
+
+You could even invoke the corresponding Lambdas directly to rule out API Gateway completely. This is also helpful for the opposite case, when you want to run long running operations.

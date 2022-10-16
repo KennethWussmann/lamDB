@@ -1,4 +1,4 @@
-import { exists } from '../fileUtils';
+import { exists } from '../utils';
 import { createLogger } from '../logger';
 import { FileAdapter } from './fileAdapter/fileAdapter';
 

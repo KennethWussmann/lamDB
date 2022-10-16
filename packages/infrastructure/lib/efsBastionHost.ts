@@ -41,7 +41,6 @@ export class EfsBastionHost extends Construct {
     });
     props.efs.connections.allowFrom(this.securityGroup, Port.tcp(2049), 'Allow NFS access from bastion host');
 
-    // TODO: Check if the endpoints are all necessary. SSM probably but all the others?
     const endpointDefaultSecurityGroup = new SecurityGroup(this, 'LamDBVpcEndpointDefaultSecurityGroup', {
       securityGroupName: `${props.name}-vpc-endpoint-default`,
       vpc: props.vpc,
@@ -50,10 +49,6 @@ export class EfsBastionHost extends Construct {
     endpointDefaultSecurityGroup.connections.allowFrom(this.securityGroup, Port.tcp(443));
     props.vpc.addInterfaceEndpoint('SSM', {
       service: InterfaceVpcEndpointAwsService.SSM,
-      securityGroups: [endpointDefaultSecurityGroup],
-    });
-    props.vpc.addInterfaceEndpoint('EC2Messages', {
-      service: InterfaceVpcEndpointAwsService.EC2_MESSAGES,
       securityGroups: [endpointDefaultSecurityGroup],
     });
     props.vpc.addInterfaceEndpoint('SSMMessages', {

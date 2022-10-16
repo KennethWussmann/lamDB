@@ -3,6 +3,8 @@ import { Response } from './requestResponse';
 import { createLogger } from './logger';
 import { getEnvironmentPersistenceConfig, getFileAdapter, getFileManager, useDatabase } from './database';
 import { getQueryEngine } from './queryEngine/queryEngine';
+import { fromApiGatwayRequest, graphQlErrorResponse, toApiGatewayResponse } from './utils';
+import { routeQuery } from './queryRouter';
 
 const logger = createLogger({ name: 'LambdaHandler' });
 
@@ -23,45 +25,30 @@ const handleRequest = async (
       queryEngine.initialize();
 
       try {
-        const response = await queryEngine.proxy({
+        return await queryEngine.proxy({
+          ...fromApiGatwayRequest(request),
           path: request.requestContext.http.path.toLowerCase() === '/sdl' ? '/sdl' : '/',
-          method: request.requestContext.http.method,
-          headers: Object.fromEntries(Object.entries(request.headers).map(([key, value]) => [key, value ?? ''])),
-          body: request.body,
         });
-        return response;
       } catch (e: any) {
         logger.error('Failed to proxy request', { error: e?.message, request });
-        return {
-          status: 400,
-          body: JSON.stringify({
-            data: null,
-            errors: [
-              {
-                message: `Failed to proxy request: ${e?.message}`,
-              },
-            ],
-          }),
-          headers: {
-            'content-type': 'application/json',
-          },
-        };
+        return graphQlErrorResponse(`Failed to proxy request: ${e?.message}`);
       }
     },
     uploadAfterWrite,
   );
 
-  return {
-    headers: response.headers,
-    body: response.body,
-    statusCode: response.status,
-  };
+  return toApiGatewayResponse(response);
 };
 
 export const readerHandler = async (request: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> =>
   await handleRequest(false, request);
 export const writerHandler = async (request: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> =>
   await handleRequest(true, request);
-export const proxyHandler = () => {
-  logger.debug('proxy');
+export const proxyHandler = async (request: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
+  const baseUrl = process.env.GRAPHQL_API_BASE_URL;
+  if (!baseUrl) {
+    throw new Error('Required environment variable GRAPHQL_API_BASE_URL not set');
+  }
+
+  return toApiGatewayResponse(await routeQuery(fromApiGatwayRequest(request), baseUrl));
 };

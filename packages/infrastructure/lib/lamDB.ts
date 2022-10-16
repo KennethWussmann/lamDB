@@ -155,8 +155,6 @@ export class LamDB extends Construct {
       },
       {
         CACHE_SECONDS: `${(this.props.readerCacheDuration ?? Duration.seconds(30)).toSeconds()}`,
-        DATABASE_FILE_PATH:
-          this.getPersistenceProps().type === 'efs' ? join(efsMountPath, 'reader.db') : '/tmp/database.db',
       },
     );
     const writer = this.createLambda(

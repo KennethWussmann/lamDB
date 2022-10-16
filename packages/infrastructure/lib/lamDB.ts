@@ -2,104 +2,15 @@ import { Aws, Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { Bucket, BucketAccessControl, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
-import { CorsHttpMethod, HttpApi, HttpApiProps, HttpMethod } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { CorsHttpMethod, HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import { EngineLayer } from './engineLayer';
 import { LayerVersion, FileSystem as LambdaFileSystem } from 'aws-cdk-lib/aws-lambda';
-import { HttpIamAuthorizer } from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
-import { Merge, PersistenceType } from '@lamdb/lambda';
 import { AccessPoint, FileSystem } from 'aws-cdk-lib/aws-efs';
 import { join } from 'path';
-import { EfsBastionHost, EfsBastionHostProps } from './efsBastionHost';
+import { EfsBastionHost } from './efsBastionHost';
 import { GatewayVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
-
-export type LamDBS3PersistenceProps = {
-  /**
-   * Use Litestream for replication.
-   * If disabled uses plain S3 operations to download and upload database file.
-   * Important: Change requires replacement! Database may be empty after change.
-   * @default true
-   */
-  enableLitestream?: boolean;
-};
-
-export type LamDBEFSBastionHostProps = {
-  /**
-   * Also deploy a small tier EC2 instance to use as bastion host that can access the EFS.
-   * Great for debugging or maintenance, otherwise not necessary for operation.
-   * @default false
-   */
-  enabled: boolean;
-} & Pick<EfsBastionHostProps, 'kmsKey'>;
-
-export type LamDBEFSPersistenceProps = {
-  /**
-   * Also deploy a small tier EC2 instance to use as bastion host that can access the EFS.
-   * Great for debugging or maintenance, otherwise not necessary for operation.
-   * @default false
-   */
-  bastionHost?: LamDBEFSBastionHostProps | boolean;
-  /**
-   * Use AWS DataSync to synchronize with an S3 bucket.
-   * Great for backups, debugging, maintenance, data recovery.
-   * @default false
-   */
-  enableS3Sync?: boolean;
-};
-
-export type LamDBPersistenceProps = {
-  type: PersistenceType;
-  /**
-   * RemovalPolicy of the choosen persistance layer.
-   * @default RETAIN
-   */
-  removalPolicy?: RemovalPolicy;
-} & (Merge<{ type: 's3' }, LamDBS3PersistenceProps> | Merge<{ type: 'efs' }, LamDBEFSPersistenceProps>);
-
-export type LamDBProps = {
-  name: string;
-  /**
-   * Path to the Prisma schema file
-   */
-  schemaPath: string;
-  /**
-   * Time a reader instance will cache a database file. Once downloaded the lambda won't download an updated file for the configured amount of time.
-   * Introduces drift between writer and reader for the sake of performance. Set to 0 to disable = always download fresh file.
-   * Readers don't upload database files.
-   * @default Duration.seconds(30)
-   */
-  readerCacheDuration?: Duration;
-  /**
-   * Time a writer instance will cache a database file. Usually a writer is the source of truth and does not need to download the database often.
-   * Introduces drift between writer and S3 for the sake of performance. Set to 0 to disable.
-   * Database files will always be uploaded at the end of a request.
-   * @default Duration.minutes(30)
-   */
-  writerCacheDuration?: Duration;
-  writerFunction: { entry: string } & Partial<LamDBFunctionProps>;
-  readerFunction?: { entry: string } & Partial<LamDBFunctionProps>;
-  proxyFunction?: { entry: string } & Partial<LamDBFunctionProps>;
-  /**
-   * Expose a GET /playground route on the writer to access a graphical user interface for the database
-   * @default false
-   */
-  enablePlayground?: boolean;
-  /**
-   * Expose additional GraphQL queries to execute raw SQL
-   * @default false
-   */
-  enableRawQueries?: boolean;
-  /**
-   * Log level of LamDB and subprocesses.
-   * @default info
-   */
-  logLevel?: 'info' | 'debug' | 'error';
-  /**
-   * Control where and how the database will be persisted.
-   * @default S3 with Litestream
-   */
-  persistence?: LamDBPersistenceProps;
-} & Pick<HttpApiProps, 'defaultAuthorizer'>;
+import { LamDBPersistenceProps, LamDBProps } from './types';
 
 const efsMountPath = '/mnt/efs';
 
@@ -151,6 +62,7 @@ export class LamDB extends Construct {
         handler: 'readerHandler',
         layers: [this.engineLayer],
         filesystem,
+        vpc: this.vpc,
         ...(props.readerFunction ?? props.writerFunction),
       },
       {
@@ -165,6 +77,7 @@ export class LamDB extends Construct {
         reservedConcurrentExecutions: 1,
         layers: [this.engineLayer],
         filesystem,
+        vpc: this.vpc,
         ...props.writerFunction,
       },
       {
@@ -172,11 +85,21 @@ export class LamDB extends Construct {
         CACHE_SECONDS: `${(this.props.writerCacheDuration ?? Duration.seconds(30)).toSeconds()}`,
       },
     );
-    const proxy = this.createLambda('ProxyFunction', {
-      functionName: `${props.name}-proxy`,
-      handler: 'proxyHandler',
-      ...(props.proxyFunction ?? props.writerFunction),
-    });
+    const proxy = this.createLambda(
+      'ProxyFunction',
+      {
+        functionName: `${props.name}-proxy`,
+        handler: 'proxyHandler',
+        timeout: Duration.minutes(5),
+        ...(props.proxyFunction ?? props.writerFunction),
+      },
+      {
+        WRITER_FUNCTION_ARN: writer.functionArn,
+        READER_FUNCTION_ARN: reader.functionArn,
+      },
+    );
+    reader.grantInvoke(proxy);
+    writer.grantInvoke(proxy);
 
     this.addApiRoutes(writer, reader, proxy);
   }
@@ -198,12 +121,12 @@ export class LamDB extends Construct {
       });
     }
 
-    const writerRoute = this.api.addRoutes({
+    this.api.addRoutes({
       integration: writerIntegration,
       path: '/writer',
       methods,
     });
-    const readerRoute = this.api.addRoutes({
+    this.api.addRoutes({
       integration: new HttpLambdaIntegration('ReaderIntegration', reader),
       path: '/reader',
       methods,
@@ -213,10 +136,6 @@ export class LamDB extends Construct {
       path: '/graphql',
       methods,
     });
-    if (this.props.defaultAuthorizer && this.props.defaultAuthorizer instanceof HttpIamAuthorizer) {
-      writerRoute[0].grantInvoke(proxy);
-      readerRoute[0].grantInvoke(proxy);
-    }
   };
 
   private grantGeneralLambdaPermissions = (fn: LamDBFunction) => {
@@ -242,7 +161,6 @@ export class LamDB extends Construct {
     const fn = new LamDBFunction(this, id, {
       environment: {
         LOG_LEVEL: this.props.logLevel ?? 'info',
-        GRAPHQL_API_BASE_URL: this.api.url ?? '',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',
         ENABLE_RAW_QUERIES: this.props.enableRawQueries ? 'true' : 'false',
         ENABLE_LITESTREAM: this.isLitestreamEnabled() ? 'true' : 'false',
@@ -251,7 +169,6 @@ export class LamDB extends Construct {
           this.getPersistenceProps().type === 'efs' ? join(efsMountPath, 'database.db') : '/tmp/database.db',
         ...additionalEnvironmentVariables,
       },
-      vpc: this.vpc,
       bundling: {
         commandHooks: {
           afterBundling: () => [],

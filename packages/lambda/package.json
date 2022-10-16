@@ -12,7 +12,8 @@
     "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.186.0",
+    "@aws-sdk/client-lambda": "^3.188.0",
+    "@aws-sdk/client-s3": "^3.188.0",
     "@graphql-tools/load": "^7.7.7",
     "@graphql-tools/merge": "^8.3.6",
     "@graphql-tools/relay-operation-optimizer": "^6.5.6",
@@ -21,7 +22,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.104",
+    "@types/aws-lambda": "^8.10.107",
     "@types/node-fetch": "^2.6.2"
   }
 }

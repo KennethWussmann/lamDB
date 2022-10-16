@@ -12,14 +12,14 @@
     "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
   },
   "devDependencies": {
-    "aws-cdk-lib": "^2.42.0",
-    "constructs": "^10.1.105"
+    "aws-cdk-lib": "^2.46.0",
+    "constructs": "^10.1.131"
   },
   "dependencies": {
-    "aws-cdk": "^2.42.0",
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.42.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.42.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.42.0-alpha.0",
+    "aws-cdk": "^2.46.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.46.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.46.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.46.0-alpha.0",
     "@lamdb/lambda": "*",
     "@lamdb/engine-layer": "*"
   }

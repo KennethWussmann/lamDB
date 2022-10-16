@@ -1,48 +1,13 @@
-import { isExecutableDefinitionNode, OperationTypeNode, parse, OperationDefinitionNode } from 'graphql';
-import fetch from 'node-fetch';
+import { createLogger } from './logger';
 import { Request, Response } from './requestResponse';
-import { graphQlErrorResponse } from './utils';
+import { errorLog, fromApiGatewayResponse, getOperationInfo, graphQlErrorResponse } from './utils';
+import { Lambda } from '@aws-sdk/client-lambda';
 
-const getOperationType = (request: Request): OperationTypeNode | undefined => {
-  if (!request.body) {
-    return undefined;
-  }
+const logger = createLogger({ name: 'QueryRouter' });
 
-  let parsedDocument;
-  try {
-    parsedDocument = JSON.parse(request.body);
-  } catch {
-    return undefined;
-  }
-
-  const document = parse(parsedDocument.query, {
-    noLocation: true,
-  });
-
-  const executableNodes = document.definitions.filter(isExecutableDefinitionNode);
-
-  if (executableNodes.length === 0) {
-    throw new Error('Document does not include executable nodes');
-  }
-
-  const operationNodes: OperationDefinitionNode[] = executableNodes
-    .filter((node: any) => !!node?.operation)
-    .map((node) => node as OperationDefinitionNode);
-
-  if (operationNodes.length === 0) {
-    throw new Error('Document does not include operation nodes');
-  }
-  if (operationNodes.length > 1) {
-    throw new Error('Document includes multiple operation nodes: Only one is supported');
-  }
-
-  const operationNode = operationNodes[0];
-
-  return operationNode.operation;
-};
-
-export const executeRequest = async (
-  url: string,
+export const invokeFunction = async (
+  lambdaClient: Lambda,
+  functionArn: string,
   request: Request,
   retry: boolean,
   retryAttempts = 3,
@@ -50,47 +15,64 @@ export const executeRequest = async (
   if (retryAttempts <= 0) {
     throw new Error('Request failed: Max retry attempts reached');
   }
+  logger.debug('Invoking lambda', { functionArn, request, retry, retryAttempts });
 
-  const response = await fetch(url, {
-    method: request.method,
-    headers: request.headers,
-  });
-
-  // retry when service unavailable
-  if (response.status === 503 && retry) {
-    return await executeRequest(url, request, retry, retryAttempts - 1);
+  try {
+    const result = await lambdaClient.invoke({
+      FunctionName: functionArn,
+      Payload: Buffer.from(JSON.stringify(request)),
+    });
+    if (result.Payload) {
+      return fromApiGatewayResponse(JSON.parse(Buffer.from(result.Payload).toString('utf8')));
+    } else {
+      throw new Error('Request failed: Failed to parse lambda response payload');
+    }
+  } catch (e: any) {
+    if (e?.name === 'TooManyRequestsException') {
+      logger.debug('Lambda invocation rate exceeded, retrying', { retryAttempts });
+      return invokeFunction(lambdaClient, functionArn, request, retry, retryAttempts - 1);
+    }
+    throw e;
   }
-
-  return {
-    status: response.status,
-    headers: Object.fromEntries(response.headers),
-    body: await response.text(),
-  };
 };
 
 export const routeQuery = async (
   request: Request,
-  baseUrl: string,
-  writerEndpoint = 'writer',
-  readerEndpoint = 'reader',
+  writerFunctionArn = 'writer',
+  readerFunctionArn = 'reader',
+  lambdaClient: Lambda = new Lambda({}),
 ): Promise<Response> => {
   try {
-    const operationType = getOperationType(request);
+    const operationInfo = getOperationInfo(request);
+    logger.debug('Parsed operation', { operationInfo });
 
-    if (!operationType) {
+    if (!operationInfo) {
       return graphQlErrorResponse(`Failed to route request: Could not determine GraphQL operation type`);
     }
 
-    if (operationType !== 'mutation' && operationType !== 'query') {
-      return graphQlErrorResponse(`Failed to route request: Unsupported operation type '${operationType}'`);
+    if (operationInfo.type !== 'mutation' && operationInfo.type !== 'query') {
+      return graphQlErrorResponse(`Failed to route request: Unsupported operation type '${operationInfo.type}'`);
     }
 
-    return await executeRequest(
-      `${baseUrl}${operationType === 'mutation' ? writerEndpoint : readerEndpoint}`,
-      request,
-      operationType === 'mutation',
+    return await invokeFunction(
+      lambdaClient,
+      operationInfo.type === 'mutation' ? writerFunctionArn : readerFunctionArn,
+      {
+        ...request,
+        headers: {
+          'content-type': 'application/json',
+          accept: 'application/json',
+          // Add extra headers to allow caching
+          'x-lamdb-router': 'true',
+          'x-lamdb-operation-type': operationInfo.type,
+          'x-lamdb-operation-name': operationInfo.name,
+          ...(operationInfo.hash ? { 'x-lamdb-operation-hash': operationInfo.hash } : {}),
+        },
+      },
+      operationInfo.type === 'mutation',
     );
   } catch (e: any) {
+    logger.debug('Failed to execute request', errorLog(e));
     return graphQlErrorResponse(`Failed to route request: ${e.message}`);
   }
 };

@@ -22,10 +22,8 @@ const handleRequest = async (writer: boolean, request: Request): Promise<APIGate
   const response: Response = await useDatabase(
     fileManager,
     async (): Promise<Response> => {
-      queryEngine.initialize();
-
       try {
-        return await queryEngine.proxy({
+        return await queryEngine.execute({
           ...request,
           path: request?.path?.toLowerCase() === '/sdl' ? '/sdl' : '/',
         });

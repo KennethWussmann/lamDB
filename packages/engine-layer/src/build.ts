@@ -12,14 +12,27 @@ type OS = 'darwin' | 'linux';
 
 const destination = join(process.cwd(), 'dist');
 const buildDirectory = join(process.cwd(), 'build');
-const engines: BinaryType[] = [BinaryType.queryEngine, BinaryType.migrationEngine];
+const engines: BinaryType[] = [BinaryType.queryEngine, BinaryType.migrationEngine, BinaryType.libqueryEngine];
 const os: OS = (process.env.OS as OS) ?? 'linux';
 const prismaVersion = process.env.PRISMA_VERSION ?? 'ee0282f44ff27043cee9ae3e404033e6e7ec1748';
-const prismaTarget: Platform = os === 'darwin' ? 'darwin' : 'linux-arm64-openssl-3.0.x';
+const prismaTarget: Platform = os === 'darwin' ? 'darwin-arm64' : 'linux-arm64-openssl-3.0.x';
 const litestreamVersion = '0.3.9';
 const litestreamTarget = os === 'darwin' ? 'darwin-amd64' : 'linux-arm64-static';
 const litestreamArchiveType: 'zip' | 'tar.gz' = os === 'darwin' ? 'zip' : 'tar.gz';
 const enginesJsonPath = join(destination, 'engines.json');
+
+const libExtensions: Record<OS, string> = {
+  darwin: 'dylib',
+  linux: 'so',
+};
+const libExtension = libExtensions[os];
+
+const engineNames: Partial<Record<BinaryType, string>> = {
+  [BinaryType.libqueryEngine]: 'libquery_engine',
+};
+const engineExtensions: Partial<Record<BinaryType, string>> = {
+  [BinaryType.libqueryEngine]: `.${libExtension}.node`,
+};
 
 const exists = async (file: string): Promise<boolean> => {
   try {
@@ -54,7 +67,13 @@ const downloadPrisma = async () => {
   console.log('Renaming binaries');
   await Promise.all(
     engines.map(async (engine) => {
-      await rename(join(destination, `${engine}-${prismaTarget}`), join(destination, `${engine}`));
+      await rename(
+        join(
+          destination,
+          `${engineNames[engine] ?? engine}-${prismaTarget}${engineExtensions[engine] ? engineExtensions[engine] : ''}`,
+        ),
+        join(destination, `${engine}${engineExtensions[engine] ? engineExtensions[engine] : ''}`),
+      );
     }),
   );
 };

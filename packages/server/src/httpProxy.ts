@@ -20,7 +20,7 @@ export const startProxy = (configuration: Configuration, queryEngine: QueryEngin
       body: req.method.toLowerCase() === 'post' ? JSON.stringify(req.body) : undefined,
     };
     try {
-      const proxyResponse = await queryEngine.proxy(proxyRequest);
+      const proxyResponse = await queryEngine.execute(proxyRequest);
 
       Object.entries(proxyResponse.headers).forEach(([key, value]) => res.setHeader(key, value));
       res.status(proxyResponse.status);

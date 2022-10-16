@@ -6,8 +6,6 @@ export type MiddlewareContext = {
   request: Request;
   queryEngine: QueryEngine;
   logger: Logger;
-  host: string;
-  port: number;
 };
 export type MiddlewareNextFunction = (context: MiddlewareContext) => Promise<Response>;
 export type QueryEngineProxyMiddleware = (

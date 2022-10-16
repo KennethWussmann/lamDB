@@ -17,6 +17,7 @@
     "@graphql-tools/load": "^7.7.7",
     "@graphql-tools/merge": "^8.3.6",
     "@graphql-tools/relay-operation-optimizer": "^6.5.6",
+    "@prisma/engine-core": "^4.4.0",
     "graphql": "^16.6.0",
     "node-fetch": "^2.6.7",
     "winston": "^3.8.2"

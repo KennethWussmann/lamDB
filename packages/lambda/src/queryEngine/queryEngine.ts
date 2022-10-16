@@ -1,154 +1,89 @@
+import { LibraryEngine } from '@prisma/engine-core';
+import { Library, QueryEngineInstance } from '@prisma/engine-core/dist/library/types/Library';
 import { buildSchema, GraphQLSchema } from 'graphql';
-import { ChildProcessMonitor } from '../childProcessMonitor';
 import { createLogger } from '../logger';
 import { Request, Response } from '../requestResponse';
-import { executeRequest } from './middlewares/executeRequest';
 import { interceptIntrospectionQuery } from './middlewares/interceptIntrospectionQuery';
-import { executeMiddlewares } from './middlewares/middleware';
+import { executeMiddlewares, MiddlewareContext } from './middlewares/middleware';
 import { optimizeOperation } from './middlewares/optimizeOperation';
-import { repairBody } from './middlewares/repairBody';
-import { repairHeaders } from './middlewares/repairHeaders';
 
 export type QueryEngineSettings = {
-  binaryPath: string;
+  libraryPath: string;
   prismaSchemaPath: string;
   databaseFilePath: string;
-  host?: string;
-  port?: number;
-  enableMetrics?: boolean;
-  enablePlayground?: boolean;
-  enableRawQueries?: boolean;
-  debug?: boolean;
 };
 
 export class QueryEngine {
-  private logger = createLogger({ name: 'QueryEngine' });
-  private host = this.settings.host ?? '0.0.0.0';
-  private port = this.settings.port ?? 8080;
   private graphQlSchema: GraphQLSchema | undefined;
-  private process: ChildProcessMonitor = new ChildProcessMonitor(
-    'QueryEngine',
-    this.settings.binaryPath,
-    (() => {
-      const args = [
-        '--datamodel-path',
-        this.settings.prismaSchemaPath,
-        '--port',
-        `${this.port}`,
-        '--host',
-        `${this.host}`,
-        '--log-queries',
-      ];
-      if (this.settings.debug) {
-        args.push('--debug');
-      }
-      if (this.settings.enableMetrics) {
-        args.push('--enable-metrics');
-      }
-      if (this.settings.enablePlayground) {
-        args.push('--enable-playground');
-      }
-      if (this.settings.enableRawQueries) {
-        args.push('--enable-raw-queries');
-      }
-      return args;
-    })(),
-    {
-      DATABASE_URL: `file:${this.settings.databaseFilePath}?pool_timeout=5`,
-    },
-    true,
-    (_, message: string) => message.includes('Fetched a connection from the pool'),
-    (level: string, message: string) => {
-      try {
-        const parsedMessage = JSON.stringify(message);
-        return [level, parsedMessage];
-      } catch {
-        return [level, message];
-      }
-    },
-  );
+  private engine: LibraryEngine;
 
-  constructor(private settings: QueryEngineSettings) {}
+  constructor(private settings: QueryEngineSettings) {
+    const databaseUrl = `file:${this.settings.databaseFilePath}?pool_timeout=5`;
+    // necessary fix, because prisma does not inherit the env config given below, see https://github.com/prisma/prisma/blob/96e7bcd82f7eb80d484aa174a697b0a037258d30/packages/engine-core/src/library/LibraryEngine.ts#L224
+    process.env.DATABASE_URL = databaseUrl;
+    this.engine = new LibraryEngine(
+      {
+        datamodelPath: this.settings.prismaSchemaPath,
+        env: {
+          ...Object.fromEntries(Object.entries(process.env).map(([key, value]) => [key, value ?? ''])),
+          DATABASE_URL: databaseUrl,
+        },
+        tracingConfig: {
+          enabled: false,
+          middleware: false,
+        },
+        cwd: __dirname,
+      },
+      {
+        loadLibrary: () => Promise.resolve(eval('require')(this.settings.libraryPath) as Library),
+      },
+    );
+  }
 
-  /**
-   * Start query engine if not running and wait until it's ready to receive requests
-   */
-  initialize = async (
-    onStop: (exitCode: number | undefined) => void = () => {
-      // no op
-    },
-  ) =>
-    await this.process.initialize((exitCode) => {
-      this.graphQlSchema = undefined;
-      onStop(exitCode);
-    });
-
-  /**
-   * Reset the local query engine state and stop the subprocess
-   */
-  stop = this.process.stop;
-
-  /**
-   * Get the query engine's GraphQL schema.
-   * Runs a proxy request to retrieve SDL and builds a [GraphQLSchema] from it.
-   * Returns cached values when requested once. Restart query engine to refresh schema.
-   * @returns GraphQLSchema
-   */
   getSchema = async (): Promise<GraphQLSchema> => {
     if (this.graphQlSchema) {
       return this.graphQlSchema;
     }
-    const response = await this.proxy({
-      method: 'GET',
-      path: '/sdl',
-    });
-    if (response.status !== 200 || !response.body) {
-      throw new Error('Failed to request SDL');
-    }
-    this.graphQlSchema = buildSchema(response.body);
+    await this.engine.start();
+
+    // hack to access the private QueryEngineInstance engine prop inside LibraryEngine
+    this.graphQlSchema = buildSchema(await ((this.engine as any).engine as QueryEngineInstance).sdlSchema());
     return this.graphQlSchema;
   };
 
-  /**
-   * Execute a GraphQL Operation or playground / SDL request.
-   * @param request GraphQL Request
-   * @returns query engine response
-   */
-  proxy = async (request: Request): Promise<Response> => {
-    if (!this.process.isReady()) {
-      this.logger.debug('Query engine is not ready to accept requests yet. Awaiting for it to become ready.');
-      await this.process.awaitReady();
-    }
+  execute = async (request: Request): Promise<Response> => {
     return await executeMiddlewares(
       {
         queryEngine: this,
         request,
-        host: this.host,
-        port: this.port,
         logger: createLogger({ name: 'QueryEngineMiddleware' }),
       },
-      [repairBody, repairHeaders, interceptIntrospectionQuery, optimizeOperation],
-      executeRequest,
+      [interceptIntrospectionQuery, optimizeOperation],
+      async (context: MiddlewareContext): Promise<Response> => {
+        const query = JSON.parse(context.request.body ?? '{}').query;
+        const res = await this.engine.request(query);
+        const response = {
+          headers: {
+            'content-type': 'application/json',
+          },
+          status: 200,
+          body: JSON.stringify(res.data),
+        };
+        return response;
+      },
     );
   };
 }
-
 let queryEngine: QueryEngine | undefined;
 
-export const getQueryEngine = (
-  databaseFilePath: string,
-  enablePlayground: boolean = process.env.ENABLE_PLAYGROUND === 'true',
-  enableRawQueries: boolean = process.env.ENABLE_RAW_QUERIES === 'true',
-): QueryEngine => {
+export const getQueryEngine = (databaseFilePath: string): QueryEngine => {
   if (queryEngine) {
     return queryEngine;
   }
   queryEngine = new QueryEngine({
     databaseFilePath,
-    binaryPath: '/opt/query-engine',
+    libraryPath: '/opt/libquery-engine.so.node',
     prismaSchemaPath: './schema.prisma',
-    enablePlayground,
-    enableRawQueries,
   });
   return queryEngine;
 };

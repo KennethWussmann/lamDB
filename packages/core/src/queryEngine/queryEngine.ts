@@ -41,6 +41,11 @@ export class QueryEngine {
     );
   }
 
+  getSdl = async (): Promise<string> => {
+    await this.engine.start();
+    return await ((this.engine as any).engine as QueryEngineInstance).sdlSchema();
+  };
+
   getSchema = async (): Promise<GraphQLSchema> => {
     if (this.graphQlSchema) {
       return this.graphQlSchema;
@@ -48,7 +53,7 @@ export class QueryEngine {
     await this.engine.start();
 
     // hack to access the private QueryEngineInstance engine prop inside LibraryEngine
-    this.graphQlSchema = buildSchema(await ((this.engine as any).engine as QueryEngineInstance).sdlSchema());
+    this.graphQlSchema = buildSchema(await this.getSdl());
     return this.graphQlSchema;
   };
 

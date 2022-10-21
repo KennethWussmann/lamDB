@@ -2,10 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "skipLibCheck": true,
-    "module": "esnext",
-    "target": "esnext",
-    "moduleResolution": "node"
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"]
 }

@@ -1,12 +1,10 @@
-import fetchEngine from '@prisma/fetch-engine';
-import platform from '@prisma/get-platform';
+import fetch from 'node-fetch';
+import { BinaryType, download } from '@prisma/fetch-engine';
+import { Platform, getos, getPlatform } from '@prisma/get-platform';
 import { access, mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
-import fetch from 'node-fetch';
 
-const { BinaryType, download } = fetchEngine;
-export type Platform = platform.Platform;
-type BinaryType = fetchEngine.BinaryType;
+export { BinaryType } from '@prisma/fetch-engine';
 
 const libExtensions: Partial<Record<NodeJS.Platform, string>> = {
   darwin: 'dylib',
@@ -34,8 +32,16 @@ const isCacheCompatible = async (enginesJsonPath: string, engines: BinaryType[],
   );
 };
 
-const downloadPrisma = async (destination: string, engines: BinaryType[], target: Platform, version: string) => {
-  const osPlatform: NodeJS.Platform = process.env.DETECT_PLATFORM ? (await platform.getos()).platform : 'linux';
+export const getEnginePath = (destination: string, engine: BinaryType): string =>
+  join(destination, `${engine}${engine === BinaryType.libqueryEngine ? '.node' : ''}`);
+
+const downloadPrisma = async (
+  destination: string,
+  engines: BinaryType[],
+  osPlatform: NodeJS.Platform,
+  target: Platform,
+  version: string,
+) => {
   const libExtension = libExtensions[osPlatform];
   const engineNames: Partial<Record<BinaryType, string>> = {
     [BinaryType.libqueryEngine]: 'libquery_engine',
@@ -59,7 +65,7 @@ const downloadPrisma = async (destination: string, engines: BinaryType[], target
           destination,
           `${engineNames[engine] ?? engine}-${target}${engineExtensions[engine] ? engineExtensions[engine] : ''}`,
         ),
-        join(destination, `${engine}${engine === BinaryType.libqueryEngine ? '.node' : ''}`),
+        getEnginePath(destination, engine),
       );
     }),
   );
@@ -99,7 +105,7 @@ export type BuildConfig = {
   destination?: string;
   buildDirectory?: string;
   defaultVersion?: string;
-  defaultPlatform?: Platform;
+  defaultPlatform?: Platform | 'detect';
   engines?: BinaryType[];
 };
 
@@ -111,7 +117,9 @@ export const buildEngines = async ({
   engines = [BinaryType.migrationEngine, BinaryType.libqueryEngine],
 }: BuildConfig = {}) => {
   const prismaVersion = process.env.PRISMA_VERSION ?? defaultVersion;
-  const prismaTarget: Platform = process.env.DETECT_PLATFORM ? await platform.getPlatform() : defaultPlatform;
+  const prismaTarget: Platform =
+    process.env.DETECT_PLATFORM || defaultPlatform === 'detect' ? await getPlatform() : defaultPlatform;
+  const osPlatform = process.env.DETECT_PLATFORM || defaultPlatform === 'detect' ? (await getos()).platform : 'linux';
   const enginesJsonPath = join(destination, 'engines.json');
 
   if (await exists(buildDirectory)) {
@@ -119,7 +127,11 @@ export const buildEngines = async ({
       recursive: true,
     });
   }
-  await mkdir(buildDirectory, { recursive: true });
+  try {
+    await mkdir(buildDirectory, { recursive: true });
+  } catch {
+    //
+  }
 
   if (await exists(destination)) {
     if (!(await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion))) {
@@ -140,8 +152,7 @@ export const buildEngines = async ({
     await mkdir(destination);
   }
 
-  await downloadPrisma(destination, engines, prismaTarget, prismaVersion);
-
+  await downloadPrisma(destination, engines, osPlatform, prismaTarget, prismaVersion);
   await downloadPrismaLicense(destination, prismaVersion);
 
   console.log('Writing engines.json file');
@@ -158,5 +169,3 @@ export const buildEngines = async ({
   );
   console.log('Done');
 };
-
-buildEngines().catch(console.error);

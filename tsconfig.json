@@ -14,7 +14,8 @@
     "types": ["node"],
     "lib": ["ES2022"],
     "esModuleInterop": true,
-    "outDir": "build"
+    "declaration": true,
+    "outDir": "./build"
   },
   "exclude": ["node_modules", "**/*.js", "**/*.d.ts"]
 }

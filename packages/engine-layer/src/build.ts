@@ -4,13 +4,8 @@ import { access, mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 
 const { BinaryType, download } = fetchEngine;
-type Platform = platform.Platform;
+export type Platform = platform.Platform;
 type BinaryType = fetchEngine.BinaryType;
-
-const destination = join(process.cwd(), 'dist');
-const buildDirectory = join(process.cwd(), 'build');
-const engines: BinaryType[] = [BinaryType.migrationEngine, BinaryType.libqueryEngine];
-const enginesJsonPath = join(destination, 'engines.json');
 
 const libExtensions: Partial<Record<NodeJS.Platform, string>> = {
   darwin: 'dylib',
@@ -26,7 +21,7 @@ const exists = async (file: string): Promise<boolean> => {
   }
 };
 
-const isCacheCompatible = async (target: Platform, version: string) => {
+const isCacheCompatible = async (enginesJsonPath: string, engines: BinaryType[], target: Platform, version: string) => {
   if (!(await exists(enginesJsonPath))) {
     return false;
   }
@@ -38,9 +33,9 @@ const isCacheCompatible = async (target: Platform, version: string) => {
   );
 };
 
-const downloadPrisma = async (target: Platform, version: string) => {
-  const os = await platform.getos();
-  const libExtension = libExtensions[os.platform];
+const downloadPrisma = async (destination: string, engines: BinaryType[], target: Platform, version: string) => {
+  const osPlatform: NodeJS.Platform = process.env.DETECT_PLATFORM ? (await platform.getos()).platform : 'linux';
+  const libExtension = libExtensions[osPlatform];
   const engineNames: Partial<Record<BinaryType, string>> = {
     [BinaryType.libqueryEngine]: 'libquery_engine',
   };
@@ -69,21 +64,34 @@ const downloadPrisma = async (target: Platform, version: string) => {
   );
 };
 
-export const build = async () => {
-  const prismaVersion = process.env.PRISMA_VERSION ?? 'ee0282f44ff27043cee9ae3e404033e6e7ec1748';
-  const prismaTarget: Platform = process.env.DETECT_PLATFORM
-    ? await platform.getPlatform()
-    : 'linux-arm64-openssl-3.0.x';
+export type BuildConfig = {
+  destination?: string;
+  buildDirectory?: string;
+  defaultVersion?: string;
+  defaultPlatform?: Platform;
+  engines?: BinaryType[];
+};
+
+export const buildEngines = async ({
+  destination = join(process.cwd(), 'dist'),
+  buildDirectory = join(process.cwd(), 'build'),
+  defaultVersion = 'ee0282f44ff27043cee9ae3e404033e6e7ec1748',
+  defaultPlatform = 'linux-arm64-openssl-3.0.x',
+  engines = [BinaryType.migrationEngine, BinaryType.libqueryEngine],
+}: BuildConfig = {}) => {
+  const prismaVersion = process.env.PRISMA_VERSION ?? defaultVersion;
+  const prismaTarget: Platform = process.env.DETECT_PLATFORM ? await platform.getPlatform() : defaultPlatform;
+  const enginesJsonPath = join(destination, 'engines.json');
 
   if (await exists(buildDirectory)) {
     await rm(buildDirectory, {
       recursive: true,
     });
   }
-  await mkdir(buildDirectory);
+  await mkdir(buildDirectory, { recursive: true });
 
   if (await exists(destination)) {
-    if (!(await isCacheCompatible(prismaTarget, prismaVersion))) {
+    if (!(await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion))) {
       console.log('Removing ./dist because downloaded binary is not compatible');
       await rm(destination, {
         recursive: true,
@@ -101,7 +109,7 @@ export const build = async () => {
     await mkdir(destination);
   }
 
-  await downloadPrisma(prismaTarget, prismaVersion);
+  await downloadPrisma(destination, engines, prismaTarget, prismaVersion);
 
   console.log('Writing engines.json file');
   await writeFile(
@@ -117,4 +125,4 @@ export const build = async () => {
   console.log('Done');
 };
 
-build().catch(console.error);
+buildEngines().catch(console.error);

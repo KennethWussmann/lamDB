@@ -38,9 +38,11 @@ export type LamDBProps = {
    * @default Duration.minutes(30)
    */
   writerCacheDuration?: Duration;
-  writerFunction: { entry: string } & Partial<LamDBFunctionProps>;
-  readerFunction?: { entry: string } & Partial<LamDBFunctionProps>;
-  proxyFunction?: { entry: string } & Partial<LamDBFunctionProps>;
+  /**
+   * Optionally overwrite properties of all lambdas.
+   * @default undefined
+   */
+  lambdaFunctionProps?: Partial<LamDBFunctionProps>;
   /**
    * Log level of LamDB and subprocesses.
    * @default info

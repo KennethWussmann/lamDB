@@ -29,7 +29,6 @@ export class LamDBApplication extends Construct {
       layers: [engineLayer],
       filesystem: fileSystem.lambdaFileSystem,
       vpc: fileSystem.vpc,
-      ...(props.readerFunction ?? props.writerFunction),
     });
     this.writer = this.createLambda(
       'WriterFunction',
@@ -40,7 +39,6 @@ export class LamDBApplication extends Construct {
         layers: [engineLayer],
         filesystem: fileSystem.lambdaFileSystem,
         vpc: fileSystem.vpc,
-        ...props.writerFunction,
       },
       {
         AUTO_MIGRATE: `${this.props.autoMigrate ?? false ? 'true' : 'false'}`,
@@ -55,7 +53,6 @@ export class LamDBApplication extends Construct {
         timeout: Duration.minutes(10),
         filesystem: fileSystem.lambdaFileSystem,
         vpc: fileSystem.vpc,
-        ...props.writerFunction,
       });
 
       new CfnOutput(this, 'lamdb-migrate-arn', {
@@ -69,7 +66,6 @@ export class LamDBApplication extends Construct {
         functionName: `${props.name}-proxy`,
         handler: 'proxyHandler',
         timeout: Duration.seconds(30),
-        ...(props.proxyFunction ?? props.writerFunction),
       },
       {
         WRITER_FUNCTION_ARN: this.writer.functionArn,

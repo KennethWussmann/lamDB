@@ -2,25 +2,22 @@
   "name": "@lamdb/infrastructure",
   "version": "1.0.0",
   "license": "ISC",
-  "main": "lib/index.ts",
-  "types": "lib/index.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "build": "tsc --build",
-    "diff": "cdk diff",
+    "build": "tsc && cp -r ../engine-layer/dist ./build/engine-layer",
     "test": "jest --maxWorkers=50% --passWithNoTests",
-    "clean": "find bin lib -name '*.d.ts' -or -name '*.js' -or -name '*.map' | xargs rm",
-    "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
+    "clean": "rm -rf ./build"
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.46.0",
     "constructs": "^10.1.131"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.46.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.46.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.46.0-alpha.0",
     "@lamdb/engine-layer": "*",
     "@lamdb/lambda": "*",
-    "aws-cdk": "^2.46.0"
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.46.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.46.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.46.0-alpha.0"
   }
 }

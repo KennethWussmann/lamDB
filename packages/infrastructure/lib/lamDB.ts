@@ -15,6 +15,7 @@ export class LamDB extends Construct {
 
   constructor(scope: Construct, id: string, props: LamDBProps) {
     super(scope, id);
+    console.log(process.cwd());
     this.storage = new LamDBStorage(this, 'Storage', props.name);
     this.fileSystem = new LamDBFileSystem(this, 'FileSystem', props, this.storage);
     this.application = new LamDBApplication(

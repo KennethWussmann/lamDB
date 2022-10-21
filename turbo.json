@@ -3,21 +3,7 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "src/**/*.js",
-        "src/**/*.d.ts",
-        "src/**/*.map",
-        "test/**/*.js",
-        "test/**/*.d.ts",
-        "test/**/*.map",
-        "lib/**/*.js",
-        "lib/**/*.d.ts",
-        "lib/**/*.map",
-        "bin/**/*.js",
-        "bin/**/*.d.ts",
-        "bin/**/*.map",
-        "dist/**"
-      ]
+      "outputs": ["dist/**", "buid/**"]
     },
     "test": {
       "dependsOn": ["^build"],

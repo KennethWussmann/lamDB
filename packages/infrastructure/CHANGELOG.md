@@ -1,5 +1,13 @@
 # @lamdb/infrastructure
 
+## 0.1.3
+
+### Patch Changes
+
+- 4c39189: Release
+- Updated dependencies [4c39189]
+  - @lamdb/lambda@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes

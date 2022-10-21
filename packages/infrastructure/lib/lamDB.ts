@@ -5,6 +5,7 @@ import { LamDBAPI } from './lamDBAPI';
 import { LamDBFileSystem } from './lamDBFileSystem';
 import { LamDBApplication } from './lamDBApplication';
 import { LamDBStorage } from './lamDBStorage';
+import { Tags } from 'aws-cdk-lib';
 
 export class LamDB extends Construct {
   public readonly api: LamDBAPI;
@@ -25,5 +26,7 @@ export class LamDB extends Construct {
       this.storage,
     );
     this.api = new LamDBAPI(this, 'GraphQLApi', props, this.application);
+
+    Tags.of(this).add('lamdb:name', props.name);
   }
 }

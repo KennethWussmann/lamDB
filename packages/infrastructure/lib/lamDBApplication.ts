@@ -1,4 +1,4 @@
-import { Duration } from 'aws-cdk-lib';
+import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { dirname, join } from 'path';
@@ -56,6 +56,11 @@ export class LamDBApplication extends Construct {
         filesystem: fileSystem.lambdaFileSystem,
         vpc: fileSystem.vpc,
         ...props.writerFunction,
+      });
+
+      new CfnOutput(this, 'lamdb-migrate-arn', {
+        value: this.migrate.functionArn,
+        exportName: `${props.name}-migrate-arn`,
       });
     }
     this.proxy = this.createLambda(

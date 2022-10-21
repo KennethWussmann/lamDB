@@ -1,5 +1,6 @@
 import { CorsHttpMethod, HttpApi, HttpMethod, IHttpRouteAuthorizer } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import { CfnOutput } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { LamDBApplication } from './lamDBApplication';
 
@@ -40,5 +41,12 @@ export class LamDBAPI extends HttpApi {
       path: '/graphql',
       methods,
     });
+
+    if (this.url) {
+      new CfnOutput(this, `${props.name}-url`, {
+        exportName: `${props.name}-url`,
+        value: this.url,
+      });
+    }
   }
 }

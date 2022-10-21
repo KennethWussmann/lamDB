@@ -10,11 +10,11 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.188.0",
+    "@aws-sdk/client-lambda": "^3.193.0",
     "@lamdb/core": "*",
-    "@prisma/engine-core": "^4.4.0"
+    "@prisma/engine-core": "^4.5.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.107"
+    "@types/aws-lambda": "^8.10.108"
   }
 }

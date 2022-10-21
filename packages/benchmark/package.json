@@ -1,6 +1,8 @@
 {
   "name": "@lamdb/benchmark",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
+  "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "test:load:read": "k6 run src/read-load-test.js --no-usage-report",
     "test:load:write": "k6 run src/write-load-test.js --no-usage-report"

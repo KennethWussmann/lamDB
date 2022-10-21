@@ -1,8 +1,8 @@
 {
   "name": "@lamdb/example",
-  "version": "1.0.0",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "version": "0.1.0",
+  "private": true,
+  "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "deploy": "npm run deploy:infra && echo \"Triggering migration ... \" && sleep 3 && npm run deploy:migrate",
     "deploy:infra": "cdk deploy --require-approval never",

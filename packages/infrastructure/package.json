@@ -1,9 +1,10 @@
 {
   "name": "@lamdb/infrastructure",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "license": "ISC",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "build": "tsc && cp -r ../engine-layer/dist ./build/engine-layer",
     "test": "jest --maxWorkers=50% --passWithNoTests",
@@ -11,10 +12,10 @@
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.46.0",
-    "constructs": "^10.1.131"
+    "constructs": "^10.1.131",
+    "@lamdb/engine-layer": "*"
   },
   "dependencies": {
-    "@lamdb/engine-layer": "*",
     "@lamdb/lambda": "*",
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.46.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.46.0-alpha.0",

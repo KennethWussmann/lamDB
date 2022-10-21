@@ -1,6 +1,8 @@
 {
   "name": "@lamdb/server",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "private": true,
+  "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "build": "tsc --noEmit && ncc build src/server.ts -o build",
     "start": "ts-node src/server.ts"

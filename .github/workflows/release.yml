@@ -11,11 +11,10 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/npm-install
-      - run: npm run lint
       - run: npm run build
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@v1

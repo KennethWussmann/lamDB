@@ -50,4 +50,10 @@ export type LamDBProps = {
    * @default undefined No token auth
    */
   apiTokens?: LamDBApiTokenAuthorizerTokenProps[];
+  /**
+   * Create API endpoints for POST /reader and POST /writer
+   * Usually they respond quicker than the default POST /proxy but users need to make sure to separate read/write actions themselves
+   * @default false
+   */
+  exposeReaderWriterEndpoints?: boolean;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;

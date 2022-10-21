@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@prisma/fetch-engine": "^4.4.0",
-    "@prisma/get-platform": "^4.5.0"
+    "@prisma/get-platform": "^4.5.0",
+    "node-fetch": "^3.2.10"
   }
 }

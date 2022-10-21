@@ -2,6 +2,7 @@ import fetchEngine from '@prisma/fetch-engine';
 import platform from '@prisma/get-platform';
 import { access, mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
+import fetch from 'node-fetch';
 
 const { BinaryType, download } = fetchEngine;
 export type Platform = platform.Platform;
@@ -64,6 +65,36 @@ const downloadPrisma = async (destination: string, engines: BinaryType[], target
   );
 };
 
+const getLicenseUrl = (version: string) => `https://raw.githubusercontent.com/prisma/prisma-engines/${version}/LICENSE`;
+
+const downloadPrismaLicense = async (destination: string, version: string) => {
+  const licenseUrl = getLicenseUrl(version);
+  const response = await fetch(licenseUrl, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to download license');
+  }
+
+  const licenseText = await response.text();
+
+  // ensure the license is still as expected before bundling it
+  if (!licenseText.includes('Apache License') || !licenseText.includes('Version 2.0')) {
+    throw new Error('Unexpected prisma-engines license');
+  }
+
+  await writeFile(join(destination, 'LICENSE'), licenseText, 'utf8');
+  await writeFile(
+    join(destination, 'COPYRIGHT'),
+    [
+      'The binary files provided in this directory are copyrighted by https://github.com/prisma/prisma-engines',
+      `License text provided via LICENSE file and can be found at ${licenseUrl}`,
+    ].join('\n'),
+    'utf8',
+  );
+};
+
 export type BuildConfig = {
   destination?: string;
   buildDirectory?: string;
@@ -111,11 +142,14 @@ export const buildEngines = async ({
 
   await downloadPrisma(destination, engines, prismaTarget, prismaVersion);
 
+  await downloadPrismaLicense(destination, prismaVersion);
+
   console.log('Writing engines.json file');
   await writeFile(
     enginesJsonPath,
     JSON.stringify({
       prisma: {
+        license: getLicenseUrl(prismaVersion),
         engines,
         target: prismaTarget,
         version: prismaVersion ?? null,

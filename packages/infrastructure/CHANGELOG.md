@@ -1,5 +1,13 @@
 # @lamdb/infrastructure
 
+## 0.1.2
+
+### Patch Changes
+
+- db8fb93: Release
+- Updated dependencies [db8fb93]
+  - @lamdb/lambda@0.1.2
+
 ## 0.1.1
 
 ### Patch Changes

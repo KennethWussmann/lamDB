@@ -6,16 +6,18 @@ import { LamDBFileSystem } from './lamDBFileSystem';
 import { LamDBApplication } from './lamDBApplication';
 import { LamDBStorage } from './lamDBStorage';
 import { Tags } from 'aws-cdk-lib';
+import { LamDBApiTokenAuthorizer } from './lamDBApiTokenAuthorizer';
+import { IGrantable } from 'aws-cdk-lib/aws-iam';
 
 export class LamDB extends Construct {
   public readonly api: LamDBAPI;
   public readonly fileSystem: LamDBFileSystem;
   public readonly application: LamDBApplication;
   public readonly storage: LamDBStorage;
+  public readonly authorizer: LamDBApiTokenAuthorizer | undefined;
 
   constructor(scope: Construct, id: string, props: LamDBProps) {
     super(scope, id);
-    console.log(process.cwd());
     this.storage = new LamDBStorage(this, 'Storage', props.name);
     this.fileSystem = new LamDBFileSystem(this, 'FileSystem', props, this.storage);
     this.application = new LamDBApplication(
@@ -26,7 +28,19 @@ export class LamDB extends Construct {
       this.fileSystem,
       this.storage,
     );
-    this.api = new LamDBAPI(this, 'GraphQLApi', props, this.application);
+    this.authorizer =
+      props.apiTokens && props.apiTokens?.length > 0
+        ? new LamDBApiTokenAuthorizer(this, 'ApiTokenAuthorizer', {
+            name: props.name,
+            tokens: props.apiTokens,
+            lambdaFunctionProps: props.lambdaFunctionProps,
+          })
+        : undefined;
+    this.api = new LamDBAPI(this, 'GraphQLApi', {
+      name: props.name,
+      application: this.application,
+      authorizer: this.authorizer?.authorizer,
+    });
 
     Tags.of(this).add('lamdb:name', props.name);
   }

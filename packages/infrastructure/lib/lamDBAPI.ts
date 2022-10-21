@@ -1,11 +1,16 @@
-import { CorsHttpMethod, HttpApi, HttpMethod } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { CorsHttpMethod, HttpApi, HttpMethod, IHttpRouteAuthorizer } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import { Construct } from 'constructs';
 import { LamDBApplication } from './lamDBApplication';
-import { LamDBProps } from './types';
+
+export type LamDBAPIProps = {
+  name: string;
+  application: LamDBApplication;
+  authorizer?: IHttpRouteAuthorizer;
+};
 
 export class LamDBAPI extends HttpApi {
-  constructor(scope: Construct, id: string, props: LamDBProps, application: LamDBApplication) {
+  constructor(scope: Construct, id: string, props: LamDBAPIProps) {
     super(scope, id, {
       apiName: `${props.name}-api`,
       corsPreflight: {
@@ -13,12 +18,12 @@ export class LamDBAPI extends HttpApi {
         allowMethods: [CorsHttpMethod.ANY],
         allowOrigins: ['*'],
       },
-      defaultAuthorizer: props.defaultAuthorizer,
+      defaultAuthorizer: props.authorizer,
     });
 
     const methods = [HttpMethod.POST, HttpMethod.OPTIONS];
 
-    const writerIntegration = new HttpLambdaIntegration('WriterIntegration', application.writer);
+    const writerIntegration = new HttpLambdaIntegration('WriterIntegration', props.application.writer);
 
     this.addRoutes({
       integration: writerIntegration,
@@ -26,12 +31,12 @@ export class LamDBAPI extends HttpApi {
       methods,
     });
     this.addRoutes({
-      integration: new HttpLambdaIntegration('ReaderIntegration', application.reader),
+      integration: new HttpLambdaIntegration('ReaderIntegration', props.application.reader),
       path: '/reader',
       methods,
     });
     this.addRoutes({
-      integration: new HttpLambdaIntegration('ProxyIntegration', application.proxy),
+      integration: new HttpLambdaIntegration('ProxyIntegration', props.application.proxy),
       path: '/graphql',
       methods,
     });

@@ -8,6 +8,7 @@ export type LamDBAPIProps = {
   name: string;
   application: LamDBApplication;
   authorizer?: IHttpRouteAuthorizer;
+  exposeReaderWriterEndpoints?: boolean;
 };
 
 export class LamDBAPI extends HttpApi {
@@ -24,18 +25,18 @@ export class LamDBAPI extends HttpApi {
 
     const methods = [HttpMethod.POST, HttpMethod.OPTIONS];
 
-    const writerIntegration = new HttpLambdaIntegration('WriterIntegration', props.application.writer);
-
-    this.addRoutes({
-      integration: writerIntegration,
-      path: '/writer',
-      methods,
-    });
-    this.addRoutes({
-      integration: new HttpLambdaIntegration('ReaderIntegration', props.application.reader),
-      path: '/reader',
-      methods,
-    });
+    if (props.exposeReaderWriterEndpoints) {
+      this.addRoutes({
+        integration: new HttpLambdaIntegration('WriterIntegration', props.application.writer),
+        path: '/writer',
+        methods,
+      });
+      this.addRoutes({
+        integration: new HttpLambdaIntegration('ReaderIntegration', props.application.reader),
+        path: '/reader',
+        methods,
+      });
+    }
     this.addRoutes({
       integration: new HttpLambdaIntegration('ProxyIntegration', props.application.proxy),
       path: '/graphql',

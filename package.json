@@ -12,6 +12,7 @@
     "build": "npx turbo run build",
     "test": "npx turbo run test",
     "clean": "rm -rf ./build && npx turbo run clean",
+    "publish": "npm run build && npx changeset publish",
     "lint": "eslint \"**/*.{ts,tsx}\" --ext .ts",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier . --write",

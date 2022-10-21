@@ -200,4 +200,3 @@ build/
 turborepo-cache/
 .cdk.staging
 cdk.out
-.npmrc

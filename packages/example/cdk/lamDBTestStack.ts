@@ -12,15 +12,10 @@ export class LamDBTestStack extends Stack {
     new LamDB(this, 'LamDBTest', {
       name: 'lamdb-test',
       schemaPath: join(__dirname, '../prisma/schema.prisma'),
-      enablePlayground: true,
-      enableRawQueries: true,
       writerFunction: {
         entry: join(__dirname, '../src/index.ts'),
       },
       logLevel: 'debug',
-      efs: {
-        bastionHost: true,
-      },
     });
   }
 }

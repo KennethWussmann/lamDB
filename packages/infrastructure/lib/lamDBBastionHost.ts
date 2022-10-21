@@ -28,7 +28,7 @@ export type EfsBastionHostProps = {
   supportBucket: IBucket;
 };
 
-export class EfsBastionHost extends Construct {
+export class LamDBBastionHost extends Construct {
   public readonly bastionHost: BastionHostLinux;
   public readonly securityGroup: SecurityGroup;
 
@@ -59,6 +59,7 @@ export class EfsBastionHost extends Construct {
       instanceName: `${props.name}-bastion`,
       vpc: props.vpc,
       securityGroup: this.securityGroup,
+      requireImdsv2: true,
     });
     props.supportBucket.grantReadWrite(this.bastionHost.instance);
     if (props.kmsKey) {

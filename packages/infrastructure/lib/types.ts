@@ -1,6 +1,6 @@
 import { HttpApiProps } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { Duration } from 'aws-cdk-lib';
-import { EfsBastionHostProps } from './efsBastionHost';
+import { EfsBastionHostProps } from './lamDBBastionHost';
 import { LamDBFunctionProps } from './lamDBFunction';
 
 export type LamDBEFSPersistenceProps = {
@@ -41,16 +41,6 @@ export type LamDBProps = {
   writerFunction: { entry: string } & Partial<LamDBFunctionProps>;
   readerFunction?: { entry: string } & Partial<LamDBFunctionProps>;
   proxyFunction?: { entry: string } & Partial<LamDBFunctionProps>;
-  /**
-   * Expose a GET /playground route on the writer to access a graphical user interface for the database
-   * @default false
-   */
-  enablePlayground?: boolean;
-  /**
-   * Expose additional GraphQL queries to execute raw SQL
-   * @default false
-   */
-  enableRawQueries?: boolean;
   /**
    * Log level of LamDB and subprocesses.
    * @default info

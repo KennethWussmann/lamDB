@@ -18,6 +18,9 @@ export class LamDBTestStack extends Stack {
         entry: join(__dirname, '../src/index.ts'),
       },
       logLevel: 'debug',
+      efs: {
+        bastionHost: true,
+      },
     });
   }
 }

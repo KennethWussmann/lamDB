@@ -57,4 +57,10 @@ export type LamDBProps = {
    */
   logLevel?: 'info' | 'debug' | 'error';
   efs?: LamDBEFSPersistenceProps;
+  /**
+   * Run the migration ad-hoc as soon as a writer request comes in.
+   * If disabled you'll have to trigger the migration lambda manually.
+   * @default false
+   */
+  autoMigrate?: boolean;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;

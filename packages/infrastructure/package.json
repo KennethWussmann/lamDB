@@ -16,11 +16,11 @@
     "constructs": "^10.1.131"
   },
   "dependencies": {
-    "aws-cdk": "^2.46.0",
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.46.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.46.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.46.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.46.0-alpha.0",
+    "@lamdb/engine-layer": "*",
     "@lamdb/lambda": "*",
-    "@lamdb/engine-layer": "*"
+    "aws-cdk": "^2.46.0"
   }
 }

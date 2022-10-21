@@ -3,6 +3,8 @@ import { config } from 'dotenv';
 config();
 export class Configuration {
   proxyPort = parseInt(assertEnv('PROXY_PORT', '4000'), 10);
+  migrationEngineBinaryPath = assertEnv('MIGRATION_ENGINE_BINARY_PATH');
+  migrationEngineForceMigration = assertEnv('MIGRATION_ENGINE_FORCE_MIGRATION', 'false');
   queryEngineLibraryPath = assertEnv('QUERY_ENGINE_LIBRARY_PATH');
   databasePath = assertEnv('DATABASE_PATH');
   prismaSchemaPath = assertEnv('PRISMA_SCHEMA_PATH');

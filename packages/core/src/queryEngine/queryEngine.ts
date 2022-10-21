@@ -3,6 +3,7 @@ import { Library, QueryEngineInstance } from '@prisma/engine-core/dist/library/t
 import { buildSchema, GraphQLSchema } from 'graphql';
 import { createLogger } from '../logger';
 import { Request, Response } from '../requestResponse';
+import { getDatabaseUrl } from '../utils';
 import { interceptIntrospectionQuery } from './middlewares/interceptIntrospectionQuery';
 import { executeMiddlewares, MiddlewareContext } from './middlewares/middleware';
 import { optimizeOperation } from './middlewares/optimizeOperation';
@@ -18,7 +19,7 @@ export class QueryEngine {
   private engine: LibraryEngine;
 
   constructor(private settings: QueryEngineSettings) {
-    const databaseUrl = `file:${this.settings.databaseFilePath}?pool_timeout=5`;
+    const databaseUrl = getDatabaseUrl(this.settings.databaseFilePath);
     // necessary fix, because prisma does not inherit the env config given below, see https://github.com/prisma/prisma/blob/96e7bcd82f7eb80d484aa174a697b0a037258d30/packages/engine-core/src/library/LibraryEngine.ts#L224
     process.env.DATABASE_URL = databaseUrl;
     this.engine = new LibraryEngine(

@@ -7,7 +7,7 @@ import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-al
 import { EngineLayer } from './engineLayer';
 import { LayerVersion, FileSystem as LambdaFileSystem } from 'aws-cdk-lib/aws-lambda';
 import { AccessPoint, FileSystem } from 'aws-cdk-lib/aws-efs';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { EfsBastionHost } from './efsBastionHost';
 import { GatewayVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { LamDBProps } from './types';
@@ -52,20 +52,14 @@ export class LamDB extends Construct {
       ? LambdaFileSystem.fromEfsAccessPoint(this.databaseStorageFileSystemAccessPoint, efsMountPath)
       : undefined;
 
-    const reader = this.createLambda(
-      'ReaderFunction',
-      {
-        functionName: `${props.name}-reader`,
-        handler: 'readerHandler',
-        layers: [this.engineLayer],
-        filesystem,
-        vpc: this.vpc,
-        ...(props.readerFunction ?? props.writerFunction),
-      },
-      {
-        CACHE_SECONDS: `${(this.props.readerCacheDuration ?? Duration.seconds(30)).toSeconds()}`,
-      },
-    );
+    const reader = this.createLambda('ReaderFunction', {
+      functionName: `${props.name}-reader`,
+      handler: 'readerHandler',
+      layers: [this.engineLayer],
+      filesystem,
+      vpc: this.vpc,
+      ...(props.readerFunction ?? props.writerFunction),
+    });
     const writer = this.createLambda(
       'WriterFunction',
       {
@@ -78,16 +72,27 @@ export class LamDB extends Construct {
         ...props.writerFunction,
       },
       {
-        ENABLE_PLAYGROUND: this.props.enablePlayground ? 'true' : 'false',
-        CACHE_SECONDS: `${(this.props.writerCacheDuration ?? Duration.seconds(30)).toSeconds()}`,
+        AUTO_MIGRATE: `${this.props.autoMigrate ?? false ? 'true' : 'false'}`,
       },
     );
+    if (!this.props.autoMigrate) {
+      this.createLambda('MigrateFunction', {
+        functionName: `${props.name}-migrate`,
+        handler: 'migrateHandler',
+        reservedConcurrentExecutions: 1,
+        layers: [this.engineLayer],
+        timeout: Duration.minutes(10),
+        filesystem,
+        vpc: this.vpc,
+        ...props.writerFunction,
+      });
+    }
     const proxy = this.createLambda(
       'ProxyFunction',
       {
         functionName: `${props.name}-proxy`,
         handler: 'proxyHandler',
-        timeout: Duration.minutes(5),
+        timeout: Duration.seconds(30),
         ...(props.proxyFunction ?? props.writerFunction),
       },
       {
@@ -158,6 +163,11 @@ export class LamDB extends Construct {
           beforeBundling: (_, outputDir: string) => [
             `echo "Copying prisma schema from ${this.props.schemaPath} to ${outputDir}"`,
             `cp ${this.props.schemaPath} ${outputDir}`,
+            `echo "Copying prisma migrations from ${join(
+              dirname(this.props.schemaPath),
+              'migrations',
+            )} to ${outputDir}"`,
+            `cp -r ${join(dirname(this.props.schemaPath), 'migrations')} ${outputDir}`,
           ],
         },
       },

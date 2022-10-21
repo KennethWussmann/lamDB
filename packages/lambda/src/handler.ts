@@ -1,9 +1,11 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { errorLog, getOperationInfo, getRequestFromUnion, graphQlErrorResponse, toApiGatewayResponse } from './utils';
+import { getOperationInfo, getRequestFromUnion, graphQlErrorResponse, toApiGatewayResponse } from './utils';
 import { routeQuery } from './queryRouter';
-import { createLogger, Request, getQueryEngine } from '@lamdb/core';
+import { createLogger, Request, getQueryEngine, errorLog, getMigrationEngine } from '@lamdb/core';
 
 const logger = createLogger({ name: 'LambdaHandler' });
+const databaseFilePath = process.env.DATABASE_FILE_PATH!;
+const prismaSchemaPath = './schema.prisma';
 
 const handleRequest = async (writer: boolean, request: Request): Promise<APIGatewayProxyResultV2> => {
   const operationInfo = getOperationInfo(request);
@@ -12,10 +14,14 @@ const handleRequest = async (writer: boolean, request: Request): Promise<APIGate
     return toApiGatewayResponse(graphQlErrorResponse('Cannot execute mutations in read-only mode'));
   }
 
+  if (writer && process.env.AUTO_MIGRATE?.toLowerCase() === 'true') {
+    await migrateHandler();
+  }
+
   const queryEngine = getQueryEngine({
-    databaseFilePath: process.env.DATABASE_FILE_PATH!,
+    databaseFilePath,
+    prismaSchemaPath,
     libraryPath: '/opt/libquery-engine.node',
-    prismaSchemaPath: './schema.prisma',
   });
 
   try {
@@ -55,3 +61,10 @@ export const proxyHandler = async (event: APIGatewayProxyEventV2 | Request): Pro
   logger.debug('Returning response', { response });
   return response;
 };
+
+export const migrateHandler = async (input: { force?: boolean } | undefined = undefined) =>
+  getMigrationEngine({
+    binaryPath: '/opt/migration-engine',
+    databaseFilePath,
+    prismaSchemaPath,
+  }).apply(process.env.FORCE_MIGRATION?.toLowerCase() === 'true' || input?.force === true);

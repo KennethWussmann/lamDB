@@ -1,16 +1,7 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { access } from 'fs/promises';
 import { Request, requestSchema, Response } from '../../core/src/requestResponse';
-import { createHash } from 'crypto';
 import { isExecutableDefinitionNode, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql';
-export const exists = async (file: string) => {
-  try {
-    await access(file);
-    return true;
-  } catch {
-    return false;
-  }
-};
+import { sha1Hash } from '@lamdb/core';
 
 export const graphQlErrorResponse = (message: string): Response => ({
   status: 400,
@@ -95,28 +86,6 @@ export const getOperationInfo = (
   return {
     name: parsedDocument.operationName ?? operationNodes[0].name ?? '',
     type: operationNodes[0].operation,
-    hash: request.body ? getOperationHash(request.body) : undefined,
-  };
-};
-
-/**
- * Generate a hash based on a GraphQL operation.
- * Useful for caching recurring operations.
- */
-export const getOperationHash = (operation: string): string => {
-  const hashsum = createHash('sha1');
-  hashsum.update(operation);
-  return hashsum.digest('hex').toString();
-};
-
-export const errorLog = (e: unknown): object => {
-  const error = e as Error;
-  return {
-    error: {
-      name: error.name,
-      message: error.message,
-      cause: error.cause,
-      stack: error.stack,
-    },
+    hash: request.body ? sha1Hash(request.body) : undefined,
   };
 };

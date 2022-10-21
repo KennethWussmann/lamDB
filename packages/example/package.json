@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@lamdb/infrastructure": "*",
-    "@lamdb/lambda": "*"
+    "@lamdb/lambda": "*",
+    "@prisma/client": "^4.4.0"
   }
 }

@@ -193,7 +193,6 @@ dist
 
 build/
 *.js
-*.d.ts
 *.map
 .env
 .turbo

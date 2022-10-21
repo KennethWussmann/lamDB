@@ -1,7 +1,8 @@
 import { createLogger } from '../../core/src/logger';
 import { Request, Response } from '../../core/src/requestResponse';
-import { errorLog, fromApiGatewayResponse, getOperationInfo, graphQlErrorResponse } from './utils';
+import { fromApiGatewayResponse, getOperationInfo, graphQlErrorResponse } from './utils';
 import { Lambda } from '@aws-sdk/client-lambda';
+import { errorLog } from '@lamdb/core';
 
 const logger = createLogger({ name: 'QueryRouter' });
 

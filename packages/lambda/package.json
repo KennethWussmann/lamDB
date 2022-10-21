@@ -12,8 +12,8 @@
     "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
   },
   "dependencies": {
-    "@lamdb/core": "*",
     "@aws-sdk/client-lambda": "^3.188.0",
+    "@lamdb/core": "*",
     "@prisma/engine-core": "^4.4.0"
   },
   "devDependencies": {

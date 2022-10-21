@@ -1,5 +1,5 @@
 import { HttpApiProps } from '@aws-cdk/aws-apigatewayv2-alpha';
-import { Duration } from 'aws-cdk-lib';
+import { LamDBApiTokenAuthorizerTokenProps } from './lamDBApiTokenAuthorizer';
 import { EfsBastionHostProps } from './lamDBBastionHost';
 import { LamDBFunctionProps } from './lamDBFunction';
 
@@ -25,20 +25,6 @@ export type LamDBProps = {
    */
   schemaPath: string;
   /**
-   * Time a reader instance will cache a database file. Once downloaded the lambda won't download an updated file for the configured amount of time.
-   * Introduces drift between writer and reader for the sake of performance. Set to 0 to disable = always download fresh file.
-   * Readers don't upload database files.
-   * @default Duration.seconds(30)
-   */
-  readerCacheDuration?: Duration;
-  /**
-   * Time a writer instance will cache a database file. Usually a writer is the source of truth and does not need to download the database often.
-   * Introduces drift between writer and S3 for the sake of performance. Set to 0 to disable.
-   * Database files will always be uploaded at the end of a request.
-   * @default Duration.minutes(30)
-   */
-  writerCacheDuration?: Duration;
-  /**
    * Optionally overwrite properties of all lambdas.
    * @default undefined
    */
@@ -48,6 +34,9 @@ export type LamDBProps = {
    * @default info
    */
   logLevel?: 'info' | 'debug' | 'error';
+  /**
+   * Further configure EFS specific settings
+   */
   efs?: LamDBEFSPersistenceProps;
   /**
    * Run the migration ad-hoc as soon as a writer request comes in.
@@ -55,4 +44,10 @@ export type LamDBProps = {
    * @default false
    */
   autoMigrate?: boolean;
+  /**
+   * Configure api tokens to enable token-based auth.
+   * Token-based auth is considered less secure and further delays requests to the request. Specify a rotation period whenever possible.
+   * @default undefined No token auth
+   */
+  apiTokens?: LamDBApiTokenAuthorizerTokenProps[];
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;

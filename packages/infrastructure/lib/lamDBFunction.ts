@@ -22,6 +22,7 @@ export class LamDBFunction extends NodejsFunction {
         sourceMap: true,
         target: 'node16',
         tsconfig: 'tsconfig.json',
+        forceDockerBundling: false,
         ...props.bundling,
       },
     });

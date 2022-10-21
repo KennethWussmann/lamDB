@@ -12,10 +12,10 @@
     "clean": "rm -rf ./build"
   },
   "devDependencies": {
-    "aws-cdk": "^2.46.0",
-    "aws-cdk-lib": "^2.46.0",
-    "constructs": "^10.1.131",
-    "prisma": "^4.4.0"
+    "aws-cdk": "^2.47.0",
+    "aws-cdk-lib": "^2.47.0",
+    "constructs": "^10.1.135",
+    "prisma": "^4.5.0"
   },
   "dependencies": {
     "@lamdb/infrastructure": "*"

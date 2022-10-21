@@ -1,5 +1,11 @@
 # @lamdb/core
 
+## 0.1.4
+
+### Patch Changes
+
+- 97cbe68: Replace wildcard versions in published packages
+
 ## 0.1.3
 
 ### Patch Changes

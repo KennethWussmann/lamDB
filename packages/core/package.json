@@ -1,15 +1,13 @@
 {
   "name": "@lamdb/core",
   "version": "0.1.0",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
-    "prepack": "npm run build",
     "build": "tsc",
     "test": "jest --maxWorkers=50% --passWithNoTests",
-    "clean": "rm -rf ./build",
-    "release": "npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version && npm publish"
+    "clean": "rm -rf ./dist"
   },
   "dependencies": {
     "@graphql-tools/load": "^7.7.7",

@@ -2,13 +2,13 @@
   "name": "@lamdb/infrastructure",
   "version": "0.1.0",
   "license": "ISC",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
-    "build": "tsc && cp -r ../engine-layer/dist ./build/engine-layer",
+    "build": "tsc && cp -r ../engine-layer/dist ./dist/engine-layer",
     "test": "jest --maxWorkers=50% --passWithNoTests",
-    "clean": "rm -rf ./build"
+    "clean": "rm -rf ./dist"
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.46.0",

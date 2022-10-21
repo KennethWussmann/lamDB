@@ -17,9 +17,7 @@ jobs:
       - uses: ./.github/actions/npm-install
       - run: npm run lint
       - run: npm run build
-      - run: npx changeset version
       - name: Create Release Pull Request or Publish to npm
-        id: changesets
         uses: changesets/action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

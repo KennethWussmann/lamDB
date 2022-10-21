@@ -7,7 +7,6 @@ import { LamDBApplication } from './lamDBApplication';
 import { LamDBStorage } from './lamDBStorage';
 import { Tags } from 'aws-cdk-lib';
 import { LamDBApiTokenAuthorizer } from './lamDBApiTokenAuthorizer';
-import { IGrantable } from 'aws-cdk-lib/aws-iam';
 
 export class LamDB extends Construct {
   public readonly api: LamDBAPI;

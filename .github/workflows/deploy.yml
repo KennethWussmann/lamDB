@@ -6,7 +6,7 @@ on:
 concurrency: deploy
 jobs:
   deploy:
-    runs-on: [self-hosted, linux, codebuild]
+    runs-on: [self-hosted, linux, lambda]
     permissions:
       id-token: write
       contents: read

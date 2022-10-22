@@ -6,7 +6,7 @@ on:
 
 jobs:
   update:
-    runs-on: [self-hosted, linux, codebuild]
+    runs-on: [self-hosted, linux, lambda]
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/npm-install

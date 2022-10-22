@@ -1,6 +1,8 @@
 {
   "name": "@lamdb/example",
   "version": "0.1.0",
+  "author": "Kenneth Wußmann",
+  "license": "MIT",
   "private": true,
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {

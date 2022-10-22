@@ -9,6 +9,7 @@ export { BinaryType } from '@prisma/fetch-engine';
 const libExtensions: Partial<Record<NodeJS.Platform, string>> = {
   darwin: 'dylib',
   linux: 'so',
+  win32: 'dll',
 };
 
 const exists = async (file: string): Promise<boolean> => {

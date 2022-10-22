@@ -17,6 +17,7 @@
     "clean": "rm -rf ./build"
   },
   "devDependencies": {
+    "@lamdb/infrastructure": "*",
     "@graphql-codegen/add": "^3.2.1",
     "@graphql-codegen/cli": "^2.13.7",
     "@graphql-codegen/typescript-graphql-request": "^4.5.7",
@@ -31,7 +32,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.194.0",
-    "@lamdb/infrastructure": "*",
     "graphql-request": "^5.0.0",
     "graphql-tag": "^2.12.6",
     "zod": "^3.19.1"

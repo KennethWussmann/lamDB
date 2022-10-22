@@ -45,15 +45,20 @@ export class LamDBApplication extends Construct {
       },
     );
     if (!this.props.autoMigrate) {
-      this.migrate = this.createLambda('MigrateFunction', {
-        functionName: `${props.name}-migrate`,
-        handler: 'migrateHandler',
-        reservedConcurrentExecutions: 1,
-        layers: [engineLayer],
-        timeout: Duration.minutes(10),
-        filesystem: fileSystem.lambdaFileSystem,
-        vpc: fileSystem.vpc,
-      });
+      this.migrate = this.createLambda(
+        'MigrateFunction',
+        {
+          functionName: `${props.name}-migrate`,
+          handler: 'migrateHandler',
+          reservedConcurrentExecutions: 1,
+          layers: [engineLayer],
+          timeout: Duration.minutes(10),
+          filesystem: fileSystem.lambdaFileSystem,
+          vpc: fileSystem.vpc,
+        },
+        {},
+        true,
+      );
 
       new CfnOutput(this, 'lamdb-migrate-arn', {
         value: this.migrate.functionArn,
@@ -80,6 +85,7 @@ export class LamDBApplication extends Construct {
     id: string,
     props: LamDBFunctionProps,
     additionalEnvironmentVariables: Record<string, string> = {},
+    includeMigrations = false,
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
       environment: {
@@ -95,11 +101,15 @@ export class LamDBApplication extends Construct {
           beforeBundling: (_, outputDir: string) => [
             `echo "Copying prisma schema from ${this.props.schemaPath} to ${outputDir}"`,
             `cp ${this.props.schemaPath} ${outputDir}`,
-            `echo "Copying prisma migrations from ${join(
-              dirname(this.props.schemaPath),
-              'migrations',
-            )} to ${outputDir}"`,
-            `cp -r ${join(dirname(this.props.schemaPath), 'migrations')} ${outputDir}`,
+            ...(includeMigrations
+              ? [
+                  `echo "Copying prisma migrations from ${join(
+                    dirname(this.props.schemaPath),
+                    'migrations',
+                  )} to ${outputDir}"`,
+                  `cp -r ${join(dirname(this.props.schemaPath), 'migrations')} ${outputDir}`,
+                ]
+              : []),
           ],
         },
       },

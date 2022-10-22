@@ -6,6 +6,7 @@
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "build": "tsc",
+    "dev": "tsc --watch",
     "test": "jest --maxWorkers=50% --passWithNoTests",
     "clean": "rm -rf ./dist"
   },

@@ -5,6 +5,7 @@ import { access, mkdir, readFile, rename, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 
 export { BinaryType } from '@prisma/fetch-engine';
+const version = '0362da9eebca54d94c8ef5edd3b2e90af99ba452';
 
 const libExtensions: Partial<Record<NodeJS.Platform, string>> = {
   darwin: 'dylib',
@@ -113,7 +114,7 @@ export type BuildConfig = {
 export const buildEngines = async ({
   destination = join(process.cwd(), 'dist'),
   buildDirectory = join(process.cwd(), 'build'),
-  defaultVersion = 'ee0282f44ff27043cee9ae3e404033e6e7ec1748',
+  defaultVersion = version,
   defaultPlatform = 'linux-arm64-openssl-3.0.x',
   engines = [BinaryType.migrationEngine, BinaryType.libqueryEngine],
 }: BuildConfig = {}) => {

@@ -3,7 +3,7 @@ import { basename, dirname, join } from 'path';
 import { createLogger } from '../logger';
 import { errorLog, exists, getDatabaseUrl, sha1Hash } from '../utils';
 import execa from 'execa';
-import { MigrationRequest, MigrationResponse } from './types';
+import { ApplyMigrationRequest, isRPCError, isRPCMigrationResult, RPCResponse, rpcResponse } from './types';
 
 type MigrationEngineConfig = {
   binaryPath: string;
@@ -13,6 +13,7 @@ type MigrationEngineConfig = {
 
 export class MigrationEngine {
   private logger = createLogger({ name: 'MigrationEngine' });
+  private messageId = 0;
   private migrationDone = false;
   private schemaHash: string | undefined;
   private previousSchemaHash: string | undefined;
@@ -21,6 +22,7 @@ export class MigrationEngine {
     dirname(this.config.databaseFilePath),
     `${basename(this.config.databaseFilePath)}.migration.lock`,
   );
+  private migrationsPath = join(dirname(this.config.prismaSchemaPath), 'migrations');
 
   constructor(private config: MigrationEngineConfig) {}
 
@@ -50,6 +52,10 @@ export class MigrationEngine {
 
   private requiresMigration = async () => {
     if (this.migrationDone) {
+      return false;
+    }
+    if (!(await exists(this.migrationsPath))) {
+      this.logger.warn('No migrations exist: Database may remain empty.');
       return false;
     }
     if (!(await exists(this.migrationLockFilePath))) {
@@ -90,32 +96,60 @@ export class MigrationEngine {
         env: {
           ...process.env,
           DATABASE_URL: getDatabaseUrl(this.config.databaseFilePath),
+          RUST_LOG: process.env.LOG_LEVEL ?? 'info',
         },
       });
-      const migrationRequest: MigrationRequest = {
-        id: 1,
+      const migrationRequest: ApplyMigrationRequest = {
+        id: this.messageId++,
         jsonrpc: '2.0',
-        method: 'schemaPush',
+        method: 'applyMigrations',
         params: {
-          force: true,
-          schema: await readFile(this.config.prismaSchemaPath, 'utf8'),
+          migrationsDirectoryPath: this.migrationsPath,
         },
       };
+      this.logger.debug('Executing migration egnine RPC request', { request: migrationRequest });
       migration.stdin?.write(`${JSON.stringify(migrationRequest)}\n`);
-      migration.stdin?.end();
 
       migration.stdout?.on('data', (chunk) => {
         const responseString = Buffer.from(chunk).toString();
         try {
-          const response: MigrationResponse = JSON.parse(responseString);
-          this.logger.debug('Received migration response', { response });
-          if (response.result?.executedSteps === 0) {
-            this.logger.info('No migration scripts required execution');
-          } else {
-            this.logger.info(`Executed ${response.result?.executedSteps ?? 0} migrations`);
+          this.logger.debug('Received migration response', { responseString });
+          const response: RPCResponse = rpcResponse.parse(JSON.parse(responseString));
+
+          if (isRPCError(response)) {
+            this.logger.error(response.error.data.message, {
+              code: response.error.code,
+              error_code: response.error.data.error_code,
+            });
+            migration?.kill(1);
+            return;
           }
-          this.migrationDone = true;
-          migration?.kill('SIGTERM');
+          if (isRPCMigrationResult(response)) {
+            const appliedMigrationNames = response.result.appliedMigrationNames;
+            if (!appliedMigrationNames || appliedMigrationNames.length === 0) {
+              this.logger.info('No migration scripts required execution');
+            } else {
+              this.logger.info(
+                `Executed ${appliedMigrationNames.length} migration${appliedMigrationNames.length !== 1 ? 's' : ''}`,
+                { appliedMigrationNames },
+              );
+            }
+            this.migrationDone = true;
+            migration?.kill('SIGTERM');
+            return;
+          }
+          if (response.method === 'print') {
+            this.logger.info(response.params.content);
+            // ACK message, very important, engine will wait for it
+            migration?.stdin?.write(
+              `${JSON.stringify({
+                id: response.id,
+                jsonrpc: '2.0',
+                result: {},
+              })}\n`,
+            );
+            return;
+          }
         } catch (e) {
           this.logger.error('Received invalid migration response', { error: errorLog(e), response: responseString });
           migration?.kill(1);

@@ -13,6 +13,7 @@ export class LamDBTestStack extends Stack {
       name: 'lamdb-test',
       schemaPath: join(__dirname, '../prisma/schema.prisma'),
       logLevel: 'debug',
+      exposeReaderWriterEndpoints: true,
       apiTokens: [
         {
           name: 'developer',

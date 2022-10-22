@@ -1,7 +1,56 @@
-import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer';
-import { GraphQLSchema, parse, print } from 'graphql';
+import { optimizeDocuments as inlineFragments } from '@graphql-tools/relay-operation-optimizer';
+import {
+  astFromValue,
+  DocumentNode,
+  GraphQLInputType,
+  GraphQLSchema,
+  GraphQLType,
+  parse,
+  print,
+  typeFromAST,
+  VariableDefinitionNode,
+  VariableNode,
+  visit,
+} from 'graphql';
 import { Response } from '../../requestResponse';
 import { MiddlewareContext, MiddlewareNextFunction, QueryEngineProxyMiddleware } from './middleware';
+
+const inlineVariables = (
+  schema: GraphQLSchema,
+  variables: Record<string, unknown>,
+  document: DocumentNode,
+): DocumentNode => {
+  if (Object.keys(variables).length === 0) {
+    return document;
+  }
+  const variableDefinitions: Record<string, GraphQLType> = {};
+  return visit(document, {
+    VariableDefinition: (node: VariableDefinitionNode) => {
+      const type = typeFromAST(schema, node.type);
+      if (type) {
+        variableDefinitions[node.variable.name.value] = type;
+      }
+      return null;
+    },
+    Variable: (node: VariableNode) =>
+      astFromValue(variables[node.name.value], variableDefinitions[node.name.value] as GraphQLInputType),
+  });
+};
+
+const optimizeDocument = (
+  schema: GraphQLSchema,
+  variables: Record<string, unknown>,
+  document: DocumentNode,
+): DocumentNode =>
+  inlineVariables(
+    schema,
+    variables,
+    inlineFragments(schema, [document], {
+      includeFragments: false,
+      assumeValid: true,
+      noLocation: true,
+    })[0],
+  );
 
 const optimize = (schema: GraphQLSchema, document: string) => {
   const parsedDocument = JSON.parse(document);
@@ -9,19 +58,13 @@ const optimize = (schema: GraphQLSchema, document: string) => {
     operationName: parsedDocument.operationName,
     variables: parsedDocument.variables,
     query: print(
-      optimizeDocuments(
+      optimizeDocument(
         schema,
-        [
-          parse(parsedDocument.query, {
-            noLocation: true,
-          }),
-        ],
-        {
-          includeFragments: false,
-          assumeValid: true,
+        parsedDocument?.variables ?? {},
+        parse(parsedDocument.query, {
           noLocation: true,
-        },
-      )[0],
+        }),
+      ),
     ),
   });
 };

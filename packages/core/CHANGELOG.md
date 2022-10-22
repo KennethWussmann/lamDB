@@ -1,5 +1,13 @@
 # @lamdb/core
 
+## 0.1.5
+
+### Patch Changes
+
+- b192e1b: Add more realistic example application
+- b192e1b: Fix applying migrations
+- 7a3e8b6: Support operation variables by automatically inlining them before execution
+
 ## 0.1.4
 
 ### Patch Changes

@@ -3,18 +3,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String
-  name  String?
-  posts Post[]
-}
-
-model Post {
-  id          Int      @id @default(autoincrement())
+model Article {
+  id          Int     @id @default(autoincrement())
+  url         String
   title       String
-  content     String?
-  publishedAt DateTime @default(now())
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    Int
+  subtitle    String?
+  publication String
+  readingTime Int
+  claps       Int
+  responses   Int
 }

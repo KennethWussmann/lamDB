@@ -15,6 +15,7 @@ export type QueryEngineSettings = {
 };
 
 export class QueryEngine {
+  private logger = createLogger({ name: 'QueryEngine' });
   private graphQlSchema: GraphQLSchema | undefined;
   private engine: LibraryEngine;
 
@@ -67,6 +68,7 @@ export class QueryEngine {
       [interceptIntrospectionQuery, optimizeOperation],
       async (context: MiddlewareContext): Promise<Response> => {
         const query = JSON.parse(context.request.body ?? '{}').query;
+        this.logger.debug('Executing query', { query });
         const res = await this.engine.request(query);
         const response = {
           headers: {

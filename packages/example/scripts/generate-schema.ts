@@ -8,7 +8,7 @@ import { dirname, join } from 'path';
 import { writeFile } from 'fs/promises';
 
 (async () => {
-  const databaseFilePath = join(__dirname, '..', 'prisma', 'dev.db');
+  const databaseFilePath = join(__dirname, '..', 'prisma', 'database.db');
   const prismaSchemaPath = join(__dirname, '..', 'prisma', 'schema.prisma');
   const engineDestination = join(__dirname, '..', 'build');
 

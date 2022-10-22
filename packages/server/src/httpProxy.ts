@@ -1,6 +1,7 @@
 import { createLogger, QueryEngine } from '@lamdb/core';
 import express, { Request, Response } from 'express';
 import { Configuration } from './configuration';
+import cors from 'cors';
 
 const logger = createLogger({ name: 'HttpProxy' });
 
@@ -8,6 +9,10 @@ export const startProxy = (configuration: Configuration, queryEngine: QueryEngin
   const app = express();
 
   app.use(express.json());
+
+  if (configuration.allowCors) {
+    app.use(cors());
+  }
 
   const queryEngineProxy = async (req: Request, res: Response) => {
     const headers = Object.fromEntries(

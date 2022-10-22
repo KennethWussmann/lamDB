@@ -1,7 +1,7 @@
 schema: prisma/schema.graphql
 documents: 'src/**/*.graphql'
 generates:
-  src/sdk.ts:
+  src/graphql/sdk.ts:
     plugins:
       - add:
           content: '/* eslint-disable */'

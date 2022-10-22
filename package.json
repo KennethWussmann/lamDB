@@ -10,6 +10,7 @@
     "dev": "npx turbo run dev",
     "deploy": "npx turbo run deploy",
     "build": "npx turbo run build",
+    "codegen": "npx turbo run codegen",
     "test": "npx turbo run test",
     "clean": "rm -rf ./build && npx turbo run clean",
     "publish": "npm run build && npm run replace-wildcard-versions && npx changeset publish",

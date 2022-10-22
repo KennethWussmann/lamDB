@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`optimizeOperation middleware inlines fragment and removes fragment definition 1`] = `
+{
+  "body": "{"operationName":"TestOperation","variables":{},"query":"query findAll {\\n  findManyArticle {\\n    id\\n    url\\n    title\\n    subtitle\\n    publication\\n    claps\\n    responses\\n  }\\n}"}",
+  "method": "POST",
+}
+`;
+
+exports[`optimizeOperation middleware inlines operation variables and removes variable definitions 1`] = `
+{
+  "body": "{"operationName":"TestOperation","variables":{},"query":"query findArticles {\\n  findManyArticle(where: {title: {contains: \\"Something\\"}}) {\\n    id\\n    url\\n    title\\n    subtitle\\n    publication\\n    claps\\n    responses\\n  }\\n}"}",
+  "method": "POST",
+}
+`;
+
+exports[`optimizeOperation middleware inlines operation variables and removes variable definitions 2`] = `
+{
+  "body": "{"operationName":"TestOperation","variables":{},"query":"query findArticles {\\n  findManyArticle(where: {title: {contains: \\"Something\\"}}) {\\n    id\\n    url\\n    title\\n    subtitle\\n    publication\\n    claps\\n    responses\\n  }\\n}"}",
+  "method": "POST",
+}
+`;
+
+exports[`optimizeOperation middleware inlines operation variables and removes variable definitions 3`] = `
+{
+  "body": "{"operationName":"TestOperation","variables":{},"query":"query findArticles {\\n  findManyArticle(where: {title: {contains: \\"Something\\"}}, skip: 1) {\\n    id\\n    url\\n    title\\n    subtitle\\n    publication\\n    claps\\n    responses\\n  }\\n}"}",
+  "method": "POST",
+}
+`;

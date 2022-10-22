@@ -35,6 +35,10 @@ const inlineVariables = (
     },
     Argument: (node: ArgumentNode) => {
       if (node.value.kind === Kind.VARIABLE) {
+        if (!variables[node.value.name.value]) {
+          // if supplied variables does not contain this variable, remove immediately
+          return null;
+        }
         const type = astFromValue(
           variables[node.value.name.value],
           variableDefinitions[node.value.name.value] as GraphQLInputType,
@@ -70,7 +74,7 @@ const optimize = (schema: GraphQLSchema, document: string) => {
   const parsedDocument = JSON.parse(document);
   return JSON.stringify({
     operationName: parsedDocument.operationName,
-    variables: parsedDocument.variables,
+    variables: {},
     query: print(
       optimizeDocument(
         schema,

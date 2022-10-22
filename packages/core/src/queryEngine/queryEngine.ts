@@ -59,6 +59,7 @@ export class QueryEngine {
   };
 
   execute = async (request: Request): Promise<Response> => {
+    this.logger.debug('Starting middlewares', { request });
     return await executeMiddlewares(
       {
         queryEngine: this,
@@ -67,8 +68,9 @@ export class QueryEngine {
       },
       [interceptIntrospectionQuery, optimizeOperation],
       async (context: MiddlewareContext): Promise<Response> => {
-        const query = JSON.parse(context.request.body ?? '{}').query;
-        this.logger.debug('Executing query', { query });
+        const operation = JSON.parse(context.request.body ?? '{}');
+        const query = operation.query;
+        this.logger.debug('Executing query', { operation });
         const res = await this.engine.request(query);
         const response = {
           headers: {

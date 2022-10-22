@@ -1,5 +1,15 @@
 # @lamdb/lambda
 
+## 0.1.5
+
+### Patch Changes
+
+- 6dd1125: Add support for API token-based auth
+- Updated dependencies [b192e1b]
+- Updated dependencies [b192e1b]
+- Updated dependencies [7a3e8b6]
+  - @lamdb/core@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @lamdb/infrastructure
 
+## 0.1.5
+
+### Patch Changes
+
+- 6dd1125: Add support for API token-based auth
+- d0a4388: Hide reader and writer endpoint by default
+- 459d765: Export api gateway url as cloudformation output
+- Updated dependencies [6dd1125]
+  - @lamdb/lambda@0.1.5
+
 ## 0.1.4
 
 ### Patch Changes

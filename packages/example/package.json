@@ -8,16 +8,30 @@
     "deploy:infra": "cdk deploy --require-approval never",
     "deploy:migrate": "aws lambda invoke --function-name lamdb-test-migrate --log-type Tail /dev/null --output json --query 'LogResult' | tr -d '\"' | base64 -d",
     "migrate:dev": "prisma migrate dev",
+    "codegen": "npm run codegen:schema && npm run codegen:sdk",
+    "codegen:schema": "ts-node scripts/generate-schema.ts",
+    "codegen:sdk": "graphql-codegen",
     "build": "tsc",
     "clean": "rm -rf ./build"
   },
   "devDependencies": {
+    "@graphql-codegen/add": "^3.2.1",
+    "@graphql-codegen/cli": "^2.13.7",
+    "@graphql-codegen/typescript-graphql-request": "^4.5.7",
+    "@graphql-codegen/typescript-operations": "^2.5.5",
+    "@types/aws-lambda": "^8.10.108",
     "aws-cdk": "^2.47.0",
     "aws-cdk-lib": "^2.47.0",
     "constructs": "^10.1.135",
-    "prisma": "^4.5.0"
+    "prisma": "^4.5.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.47.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.47.0-alpha.0"
   },
   "dependencies": {
-    "@lamdb/infrastructure": "*"
+    "@aws-sdk/client-secrets-manager": "^3.194.0",
+    "@lamdb/infrastructure": "*",
+    "graphql-request": "^5.0.0",
+    "graphql-tag": "^2.12.6",
+    "zod": "^3.19.1"
   }
 }

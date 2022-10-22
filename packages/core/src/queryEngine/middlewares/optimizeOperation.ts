@@ -1,15 +1,16 @@
 import { optimizeDocuments as inlineFragments } from '@graphql-tools/relay-operation-optimizer';
 import {
+  ArgumentNode,
   astFromValue,
   DocumentNode,
   GraphQLInputType,
   GraphQLSchema,
   GraphQLType,
+  Kind,
   parse,
   print,
   typeFromAST,
   VariableDefinitionNode,
-  VariableNode,
   visit,
 } from 'graphql';
 import { Response } from '../../requestResponse';
@@ -32,8 +33,21 @@ const inlineVariables = (
       }
       return null;
     },
-    Variable: (node: VariableNode) =>
-      astFromValue(variables[node.name.value], variableDefinitions[node.name.value] as GraphQLInputType),
+    Argument: (node: ArgumentNode) => {
+      if (node.value.kind === Kind.VARIABLE) {
+        const type = astFromValue(
+          variables[node.value.name.value],
+          variableDefinitions[node.value.name.value] as GraphQLInputType,
+        );
+        if (type?.kind === Kind.NULL) {
+          // query engine does not like when nullable arguments actually are written out with null.
+          // in case it's a variable and it's value is null, remove argument entirely.
+          return null;
+        }
+        return { ...node, value: type };
+      }
+      return node;
+    },
   });
 };
 

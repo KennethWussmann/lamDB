@@ -9,7 +9,7 @@ const start = async (configuration: Configuration = new Configuration()) => {
     databaseFilePath: configuration.databasePath,
   });
 
-  await migrationEngine.apply(configuration.migrationEngineForceMigration.toLowerCase() === 'true');
+  await migrationEngine.apply(configuration.migrationEngineForceMigration);
 
   const queryEngine = new QueryEngine({
     libraryPath: configuration.queryEngineLibraryPath,

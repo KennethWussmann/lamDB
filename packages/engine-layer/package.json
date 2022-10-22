@@ -4,15 +4,15 @@
   "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
-  "type": "module",
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
-    "build": "ts-node --esm src/build.ts",
+    "build": "ts-node src/run.ts",
     "clean": "rm -rf ./dist ./build"
   },
   "devDependencies": {
     "@prisma/fetch-engine": "^4.5.0",
     "@prisma/get-platform": "^4.5.0",
-    "node-fetch": "^3.2.10"
+    "@types/node-fetch": "^2.6.2",
+    "node-fetch": "2.6.7"
   }
 }

@@ -1,6 +1,8 @@
 {
   "name": "@lamdb/core",
   "version": "0.1.5",
+  "author": "Kenneth Wußmann",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/KennethWussmann/lamDB",

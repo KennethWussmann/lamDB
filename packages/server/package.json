@@ -2,6 +2,8 @@
   "name": "@lamdb/server",
   "version": "0.1.0",
   "private": true,
+  "author": "Kenneth Wußmann",
+  "license": "MIT",
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "build": "tsc --noEmit && ncc build src/server.ts -o build",

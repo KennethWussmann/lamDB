@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`migrationEngine applies migrations to fresh database 1`] = `
+exports[`migrationEngine applies migrations to fresh database and trying to reapply is skipped 1`] = `
 [
   "20221022090016_configure_wal",
   "20221022090018_create_article_table",

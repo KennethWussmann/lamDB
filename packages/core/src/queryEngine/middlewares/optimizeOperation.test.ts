@@ -32,6 +32,22 @@ query findArticles(
     responses
   }
 }`;
+const findArticleByIdQuery = `
+query findArticle(
+  $id: Int!
+) {
+  findUniqueArticle(
+    where: { id: $id }
+  ) {
+    id
+    url
+    title
+    subtitle
+    publication
+    claps
+    responses
+  }
+}`;
 
 describe('optimizeOperation middleware', () => {
   beforeEach(() => {
@@ -45,6 +61,8 @@ describe('optimizeOperation middleware', () => {
     [findArticlesQuery, { where: { title: { contains: 'Something' } } }],
     [findArticlesQuery, { where: { title: { contains: 'Something' } }, order: null, cursor: null }],
     [findArticlesQuery, { where: { title: { contains: 'Something' } }, order: null, skip: 1 }],
+    // TODO: Variables are only partially supported. You can only pass entire input vars
+    [findArticleByIdQuery, { id: 1 }],
   ])('inlines operation variables and removes variable definitions', async (query, variables) => {
     const next = jest.fn();
 

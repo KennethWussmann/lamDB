@@ -1,3 +1,4 @@
+import { testQuery } from '../../../test/testOperation';
 import { getTestQueryEngine } from '../../../test/testQueryEngine';
 import { operationToRequest } from '../../../test/utils';
 import { createLogger } from '../../logger';
@@ -20,18 +21,7 @@ describe('interceptIntrospectionQuery middleware', () => {
     const response = await interceptIntrospectionQuery(
       {
         ...context,
-        request: operationToRequest(
-          `
-          query TestOperation {
-            # the operation itself doesn't matter, we'll generate one
-            findManyArticle {
-              id
-            }
-          }
-          `,
-          {},
-          'IntrospectionQuery',
-        ),
+        request: operationToRequest(testQuery, {}, 'IntrospectionQuery'),
       },
       next,
     );

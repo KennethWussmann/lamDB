@@ -7,6 +7,9 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+env:
+  FORCE_COLOR: 1
+
 jobs:
   release:
     runs-on: ubuntu-latest

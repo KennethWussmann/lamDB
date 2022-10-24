@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`middleware executes middlewares in order 1`] = `
+{
+  "body": "Test Body for request POST /test/two",
+  "headers": {
+    "content-type": "application/json",
+  },
+  "status": 201,
+}
+`;

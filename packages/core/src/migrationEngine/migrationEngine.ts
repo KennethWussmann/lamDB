@@ -76,18 +76,19 @@ export class MigrationEngine {
    * Check if migration is necessary using a lockfile. If lockfile is in sync with current schema, nothing will be applied.
    * If lockfile is out of sync with schema, the schema will be tried to apply using Prisma migration engine. Migration engine might still decide that nothing needs execution.
    * @param force Skip checksum lockfile check and try to apply anyways
-   * @returns
+   * @returns array of applied migration names
    */
-  apply = async (force = false) => {
+  apply = async (force = false): Promise<string[]> => {
     if (!force && !(await this.requiresMigration())) {
       this.logger.debug('Not running migration: Database already up-to-date');
-      return;
+      return [];
     }
     // optimistically lock the migration, to avoid another parallel migraiton
     await this.updateMigrationLockFile();
 
     this.logger.info('Executing migration', { schemaHash: this.schemaHash });
 
+    let appliedMigrationNames: string[] | undefined;
     let migration: execa.ExecaChildProcess<string> | undefined;
     try {
       // Not using @prisma/migrate here because the published package is broken a lot and not accessible in a typesafe way.
@@ -125,7 +126,7 @@ export class MigrationEngine {
             return;
           }
           if (isRPCMigrationResult(response)) {
-            const appliedMigrationNames = response.result.appliedMigrationNames;
+            appliedMigrationNames = response.result.appliedMigrationNames;
             if (!appliedMigrationNames || appliedMigrationNames.length === 0) {
               this.logger.info('No migration scripts required execution');
             } else {
@@ -166,6 +167,7 @@ export class MigrationEngine {
     } finally {
       migration?.kill();
     }
+    return appliedMigrationNames ?? [];
   };
 }
 

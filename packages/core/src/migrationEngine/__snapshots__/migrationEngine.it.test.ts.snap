@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`migrationEngine applies migrations to fresh database 1`] = `
+[
+  "20221022090016_configure_wal",
+  "20221022090018_create_article_table",
+  "20221022104024_import_data",
+]
+`;

@@ -9,8 +9,12 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "npm run build -- --watch",
-    "test": "jest --maxWorkers=50% --passWithNoTests",
+    "test": "jest --maxWorkers=50%",
+    "test:it": "npm run test -- .it.test",
     "clean": "rm -rf ./dist"
+  },
+  "devDependencies": {
+    "@lamdb/engine-layer": "*"
   },
   "dependencies": {
     "@graphql-tools/load": "^7.7.7",

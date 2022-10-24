@@ -9,8 +9,9 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "npm run build -- --watch",
-    "test": "jest --maxWorkers=50%",
-    "test:it": "npm run test -- .it.test",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:integration": "jest --runInBand --selectProjects integration",
+    "test:unit": "jest --maxWorkers=50% --selectProjects unit",
     "clean": "rm -rf ./dist"
   },
   "devDependencies": {

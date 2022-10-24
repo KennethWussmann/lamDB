@@ -35,6 +35,7 @@ export class QueryEngine {
           middleware: false,
         },
         cwd: __dirname,
+        logQueries: process.env.LOG_LEVEL === 'debug',
       },
       {
         loadLibrary: () => Promise.resolve(eval('require')(this.settings.libraryPath) as Library),

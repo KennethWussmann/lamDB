@@ -1,4 +1,4 @@
-import { createLogger, QueryEngine } from '@lamdb/core';
+import { createLogger, errorLog, QueryEngine } from '@lamdb/core';
 import express, { Request, Response } from 'express';
 import { Configuration } from './configuration';
 import cors from 'cors';
@@ -31,6 +31,7 @@ export const startProxy = (configuration: Configuration, queryEngine: QueryEngin
       res.status(proxyResponse.status);
       res.send(proxyResponse.body);
     } catch (e: any) {
+      logger.error('Failed to proxy request', errorLog(e));
       res.status(400);
       res.json({
         data: null,

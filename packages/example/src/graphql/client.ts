@@ -23,7 +23,7 @@ export const getClient = async (
     return sdk;
   }
   sdk = getSdk(
-    new GraphQLClient(`${baseUrl}/graphql`, {
+    new GraphQLClient(`${baseUrl}/reader`, {
       headers: {
         Authorization: await getApiToken(apiTokenSecretId),
       },

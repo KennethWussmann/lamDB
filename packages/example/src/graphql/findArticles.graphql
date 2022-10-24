@@ -13,6 +13,5 @@ query findArticles(
     subtitle
     publication
     claps
-    responses
   }
 }

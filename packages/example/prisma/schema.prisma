@@ -9,7 +9,6 @@ model Article {
   title       String
   subtitle    String?
   publication String
-  readingTime Int
-  claps       Int
-  responses   Int
+  readingTime Int?
+  claps       Int?
 }

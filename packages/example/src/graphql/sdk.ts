@@ -39,11 +39,10 @@ export type AggregateArticle = {
 
 export type Article = {
   __typename?: 'Article';
-  claps: Scalars['Int'];
+  claps?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
   publication: Scalars['String'];
-  readingTime: Scalars['Int'];
-  responses: Scalars['Int'];
+  readingTime?: Maybe<Scalars['Int']>;
   subtitle?: Maybe<Scalars['String']>;
   title: Scalars['String'];
   url: Scalars['String'];
@@ -54,14 +53,12 @@ export type ArticleAvgAggregateOutputType = {
   claps?: Maybe<Scalars['Float']>;
   id?: Maybe<Scalars['Float']>;
   readingTime?: Maybe<Scalars['Float']>;
-  responses?: Maybe<Scalars['Float']>;
 };
 
 export type ArticleAvgOrderByAggregateInput = {
   claps?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
 };
 
 export type ArticleCountAggregateOutputType = {
@@ -71,7 +68,6 @@ export type ArticleCountAggregateOutputType = {
   id: Scalars['Int'];
   publication: Scalars['Int'];
   readingTime: Scalars['Int'];
-  responses: Scalars['Int'];
   subtitle: Scalars['Int'];
   title: Scalars['Int'];
   url: Scalars['Int'];
@@ -82,17 +78,15 @@ export type ArticleCountOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   publication?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
   subtitle?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;
   url?: InputMaybe<SortOrder>;
 };
 
 export type ArticleCreateInput = {
-  claps: Scalars['Int'];
+  claps?: InputMaybe<Scalars['Int']>;
   publication: Scalars['String'];
-  readingTime: Scalars['Int'];
-  responses: Scalars['Int'];
+  readingTime?: InputMaybe<Scalars['Int']>;
   subtitle?: InputMaybe<Scalars['String']>;
   title: Scalars['String'];
   url: Scalars['String'];
@@ -105,11 +99,10 @@ export type ArticleGroupByOutputType = {
   _max?: Maybe<ArticleMaxAggregateOutputType>;
   _min?: Maybe<ArticleMinAggregateOutputType>;
   _sum?: Maybe<ArticleSumAggregateOutputType>;
-  claps: Scalars['Int'];
+  claps?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
   publication: Scalars['String'];
-  readingTime: Scalars['Int'];
-  responses: Scalars['Int'];
+  readingTime?: Maybe<Scalars['Int']>;
   subtitle?: Maybe<Scalars['String']>;
   title: Scalars['String'];
   url: Scalars['String'];
@@ -121,7 +114,6 @@ export type ArticleMaxAggregateOutputType = {
   id?: Maybe<Scalars['Int']>;
   publication?: Maybe<Scalars['String']>;
   readingTime?: Maybe<Scalars['Int']>;
-  responses?: Maybe<Scalars['Int']>;
   subtitle?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
@@ -132,7 +124,6 @@ export type ArticleMaxOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   publication?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
   subtitle?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;
   url?: InputMaybe<SortOrder>;
@@ -144,7 +135,6 @@ export type ArticleMinAggregateOutputType = {
   id?: Maybe<Scalars['Int']>;
   publication?: Maybe<Scalars['String']>;
   readingTime?: Maybe<Scalars['Int']>;
-  responses?: Maybe<Scalars['Int']>;
   subtitle?: Maybe<Scalars['String']>;
   title?: Maybe<Scalars['String']>;
   url?: Maybe<Scalars['String']>;
@@ -155,7 +145,6 @@ export type ArticleMinOrderByAggregateInput = {
   id?: InputMaybe<SortOrder>;
   publication?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
   subtitle?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;
   url?: InputMaybe<SortOrder>;
@@ -171,7 +160,6 @@ export type ArticleOrderByWithAggregationInput = {
   id?: InputMaybe<SortOrder>;
   publication?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
   subtitle?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;
   url?: InputMaybe<SortOrder>;
@@ -182,7 +170,6 @@ export type ArticleOrderByWithRelationInput = {
   id?: InputMaybe<SortOrder>;
   publication?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
   subtitle?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;
   url?: InputMaybe<SortOrder>;
@@ -193,7 +180,6 @@ export enum ArticleScalarFieldEnum {
   Id = 'id',
   Publication = 'publication',
   ReadingTime = 'readingTime',
-  Responses = 'responses',
   Subtitle = 'subtitle',
   Title = 'title',
   Url = 'url',
@@ -203,11 +189,10 @@ export type ArticleScalarWhereWithAggregatesInput = {
   AND?: InputMaybe<ArticleScalarWhereWithAggregatesInput>;
   NOT?: InputMaybe<ArticleScalarWhereWithAggregatesInput>;
   OR?: InputMaybe<Array<InputMaybe<ArticleScalarWhereWithAggregatesInput>>>;
-  claps?: InputMaybe<IntWithAggregatesFilter>;
+  claps?: InputMaybe<IntNullableWithAggregatesFilter>;
   id?: InputMaybe<IntWithAggregatesFilter>;
   publication?: InputMaybe<StringWithAggregatesFilter>;
-  readingTime?: InputMaybe<IntWithAggregatesFilter>;
-  responses?: InputMaybe<IntWithAggregatesFilter>;
+  readingTime?: InputMaybe<IntNullableWithAggregatesFilter>;
   subtitle?: InputMaybe<StringNullableWithAggregatesFilter>;
   title?: InputMaybe<StringWithAggregatesFilter>;
   url?: InputMaybe<StringWithAggregatesFilter>;
@@ -218,31 +203,27 @@ export type ArticleSumAggregateOutputType = {
   claps?: Maybe<Scalars['Int']>;
   id?: Maybe<Scalars['Int']>;
   readingTime?: Maybe<Scalars['Int']>;
-  responses?: Maybe<Scalars['Int']>;
 };
 
 export type ArticleSumOrderByAggregateInput = {
   claps?: InputMaybe<SortOrder>;
   id?: InputMaybe<SortOrder>;
   readingTime?: InputMaybe<SortOrder>;
-  responses?: InputMaybe<SortOrder>;
 };
 
 export type ArticleUpdateInput = {
-  claps?: InputMaybe<IntFieldUpdateOperationsInput>;
+  claps?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   publication?: InputMaybe<StringFieldUpdateOperationsInput>;
-  readingTime?: InputMaybe<IntFieldUpdateOperationsInput>;
-  responses?: InputMaybe<IntFieldUpdateOperationsInput>;
+  readingTime?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   subtitle?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   title?: InputMaybe<StringFieldUpdateOperationsInput>;
   url?: InputMaybe<StringFieldUpdateOperationsInput>;
 };
 
 export type ArticleUpdateManyMutationInput = {
-  claps?: InputMaybe<IntFieldUpdateOperationsInput>;
+  claps?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   publication?: InputMaybe<StringFieldUpdateOperationsInput>;
-  readingTime?: InputMaybe<IntFieldUpdateOperationsInput>;
-  responses?: InputMaybe<IntFieldUpdateOperationsInput>;
+  readingTime?: InputMaybe<NullableIntFieldUpdateOperationsInput>;
   subtitle?: InputMaybe<NullableStringFieldUpdateOperationsInput>;
   title?: InputMaybe<StringFieldUpdateOperationsInput>;
   url?: InputMaybe<StringFieldUpdateOperationsInput>;
@@ -252,11 +233,10 @@ export type ArticleWhereInput = {
   AND?: InputMaybe<ArticleWhereInput>;
   NOT?: InputMaybe<ArticleWhereInput>;
   OR?: InputMaybe<Array<InputMaybe<ArticleWhereInput>>>;
-  claps?: InputMaybe<IntFilter>;
+  claps?: InputMaybe<IntNullableFilter>;
   id?: InputMaybe<IntFilter>;
   publication?: InputMaybe<StringFilter>;
-  readingTime?: InputMaybe<IntFilter>;
-  responses?: InputMaybe<IntFilter>;
+  readingTime?: InputMaybe<IntNullableFilter>;
   subtitle?: InputMaybe<StringNullableFilter>;
   title?: InputMaybe<StringFilter>;
   url?: InputMaybe<StringFilter>;
@@ -264,14 +244,6 @@ export type ArticleWhereInput = {
 
 export type ArticleWhereUniqueInput = {
   id?: InputMaybe<Scalars['Int']>;
-};
-
-export type IntFieldUpdateOperationsInput = {
-  decrement?: InputMaybe<Scalars['Int']>;
-  divide?: InputMaybe<Scalars['Int']>;
-  increment?: InputMaybe<Scalars['Int']>;
-  multiply?: InputMaybe<Scalars['Int']>;
-  set?: InputMaybe<Scalars['Int']>;
 };
 
 export type IntFilter = {
@@ -282,6 +254,33 @@ export type IntFilter = {
   lt?: InputMaybe<Scalars['Int']>;
   lte?: InputMaybe<Scalars['Int']>;
   not?: InputMaybe<NestedIntFilter>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+};
+
+export type IntNullableFilter = {
+  equals?: InputMaybe<Scalars['Int']>;
+  gt?: InputMaybe<Scalars['Int']>;
+  gte?: InputMaybe<Scalars['Int']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  lt?: InputMaybe<Scalars['Int']>;
+  lte?: InputMaybe<Scalars['Int']>;
+  not?: InputMaybe<NestedIntNullableFilter>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+};
+
+export type IntNullableWithAggregatesFilter = {
+  _avg?: InputMaybe<NestedFloatNullableFilter>;
+  _count?: InputMaybe<NestedIntNullableFilter>;
+  _max?: InputMaybe<NestedIntNullableFilter>;
+  _min?: InputMaybe<NestedIntNullableFilter>;
+  _sum?: InputMaybe<NestedIntNullableFilter>;
+  equals?: InputMaybe<Scalars['Int']>;
+  gt?: InputMaybe<Scalars['Int']>;
+  gte?: InputMaybe<Scalars['Int']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  lt?: InputMaybe<Scalars['Int']>;
+  lte?: InputMaybe<Scalars['Int']>;
+  not?: InputMaybe<NestedIntNullableWithAggregatesFilter>;
   notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
 };
 
@@ -362,6 +361,17 @@ export type NestedFloatFilter = {
   notIn?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
 };
 
+export type NestedFloatNullableFilter = {
+  equals?: InputMaybe<Scalars['Float']>;
+  gt?: InputMaybe<Scalars['Float']>;
+  gte?: InputMaybe<Scalars['Float']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+  lt?: InputMaybe<Scalars['Float']>;
+  lte?: InputMaybe<Scalars['Float']>;
+  not?: InputMaybe<NestedFloatNullableFilter>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Float']>>>;
+};
+
 export type NestedIntFilter = {
   equals?: InputMaybe<Scalars['Int']>;
   gt?: InputMaybe<Scalars['Int']>;
@@ -381,6 +391,22 @@ export type NestedIntNullableFilter = {
   lt?: InputMaybe<Scalars['Int']>;
   lte?: InputMaybe<Scalars['Int']>;
   not?: InputMaybe<NestedIntNullableFilter>;
+  notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+};
+
+export type NestedIntNullableWithAggregatesFilter = {
+  _avg?: InputMaybe<NestedFloatNullableFilter>;
+  _count?: InputMaybe<NestedIntNullableFilter>;
+  _max?: InputMaybe<NestedIntNullableFilter>;
+  _min?: InputMaybe<NestedIntNullableFilter>;
+  _sum?: InputMaybe<NestedIntNullableFilter>;
+  equals?: InputMaybe<Scalars['Int']>;
+  gt?: InputMaybe<Scalars['Int']>;
+  gte?: InputMaybe<Scalars['Int']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
+  lt?: InputMaybe<Scalars['Int']>;
+  lte?: InputMaybe<Scalars['Int']>;
+  not?: InputMaybe<NestedIntNullableWithAggregatesFilter>;
   notIn?: InputMaybe<Array<InputMaybe<Scalars['Int']>>>;
 };
 
@@ -460,6 +486,14 @@ export type NestedStringWithAggregatesFilter = {
   not?: InputMaybe<NestedStringWithAggregatesFilter>;
   notIn?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   startsWith?: InputMaybe<Scalars['String']>;
+};
+
+export type NullableIntFieldUpdateOperationsInput = {
+  decrement?: InputMaybe<Scalars['Int']>;
+  divide?: InputMaybe<Scalars['Int']>;
+  increment?: InputMaybe<Scalars['Int']>;
+  multiply?: InputMaybe<Scalars['Int']>;
+  set?: InputMaybe<Scalars['Int']>;
 };
 
 export type NullableStringFieldUpdateOperationsInput = {
@@ -605,8 +639,7 @@ export type FindArticlesQuery = {
     title: string;
     subtitle?: string | null;
     publication: string;
-    claps: number;
-    responses: number;
+    claps?: number | null;
   } | null>;
 };
 
@@ -626,7 +659,6 @@ export const FindArticlesDocument = gql`
       subtitle
       publication
       claps
-      responses
     }
   }
 `;

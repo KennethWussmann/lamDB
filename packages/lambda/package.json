@@ -12,8 +12,8 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "@aws-sdk/client-lambda": "^3.193.0",
-    "@aws-sdk/client-secrets-manager": "^3.193.0",
+    "@aws-sdk/client-lambda": "^3.196.0",
+    "@aws-sdk/client-secrets-manager": "^3.196.0",
     "@lamdb/core": "*",
     "@prisma/engine-core": "^4.5.0"
   },

@@ -124,20 +124,9 @@ export const buildEngines = async ({
   const osPlatform = process.env.DETECT_PLATFORM || defaultPlatform === 'detect' ? (await getos()).platform : 'linux';
   const enginesJsonPath = join(destination, 'engines.json');
 
-  if (await exists(buildDirectory)) {
-    await rm(buildDirectory, {
-      recursive: true,
-    });
-  }
-  try {
-    await mkdir(buildDirectory, { recursive: true });
-  } catch {
-    //
-  }
-
   if (await exists(destination)) {
     if (!(await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion))) {
-      console.log('Removing ./dist because downloaded binary is not compatible');
+      console.log('Removing cache because desired binary is not compatible');
       await rm(destination, {
         recursive: true,
       });
@@ -152,6 +141,18 @@ export const buildEngines = async ({
     }
   } else {
     await mkdir(destination);
+  }
+
+  if (await exists(buildDirectory)) {
+    console.log('Deleting existing build directory', buildDirectory);
+    await rm(buildDirectory, {
+      recursive: true,
+    });
+  }
+  try {
+    await mkdir(buildDirectory, { recursive: true });
+  } catch {
+    //
   }
 
   await downloadPrisma(destination, engines, osPlatform, prismaTarget, prismaVersion);

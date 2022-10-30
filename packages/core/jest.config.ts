@@ -12,5 +12,14 @@ module.exports = {
       testMatch: ['<rootDir>/**/*.test.ts'],
       testPathIgnorePatterns: ['it.test.ts'],
     },
+    {
+      testEnvironment: 'node',
+      preset: 'ts-jest',
+      coveragePathIgnorePatterns: ['/node_modules/', '/test/'],
+      displayName: 'integration',
+      testMatch: ['<rootDir>/**/*.it.test.ts'],
+      setupFilesAfterEnv: ['<rootDir>/test/setupIntegrationTest.ts'],
+      setupFiles: ['<rootDir>/test/setupEngines.ts'],
+    },
   ],
 };

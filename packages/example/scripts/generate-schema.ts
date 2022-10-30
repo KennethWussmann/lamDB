@@ -26,4 +26,4 @@ import { writeFile } from 'fs/promises';
   }).getSdl();
 
   await writeFile(join(dirname(prismaSchemaPath), 'schema.graphql'), sdl, 'utf8');
-})();
+})().catch(console.error);

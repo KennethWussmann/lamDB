@@ -1,17 +1,7 @@
-import { BinaryType, buildEngines } from '@lamdb/engine-layer';
 import { rm } from 'fs/promises';
 import { join } from 'path';
 import { exists } from '../src';
-import { binaryPath, prismaPath } from './binaryPaths';
-
-beforeAll(async () => {
-  await buildEngines({
-    destination: binaryPath,
-    buildDirectory: binaryPath,
-    defaultPlatform: 'detect',
-    engines: [BinaryType.libqueryEngine, BinaryType.migrationEngine],
-  });
-}, 30000);
+import { prismaPath } from './binaryPaths';
 
 beforeEach(async () => {
   const removed: string[] = [];

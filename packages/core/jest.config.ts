@@ -19,6 +19,7 @@ module.exports = {
       displayName: 'integration',
       testMatch: ['<rootDir>/**/*.it.test.ts'],
       setupFilesAfterEnv: ['<rootDir>/test/setupIntegrationTest.ts'],
+      setupFiles: ['<rootDir>/test/setupEngines.ts'],
     },
   ],
 };

@@ -12,14 +12,14 @@
     "clean": "rm -rf ./dist"
   },
   "devDependencies": {
-    "aws-cdk-lib": "^2.47.0",
-    "constructs": "^10.1.135",
+    "aws-cdk-lib": "^2.49.0",
+    "constructs": "^10.1.144",
     "@lamdb/engine-layer": "*"
   },
   "dependencies": {
     "@lamdb/lambda": "*",
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.47.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.47.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.47.0-alpha.0"
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.49.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.49.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.49.0-alpha.0"
   }
 }

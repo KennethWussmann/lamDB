@@ -19,19 +19,19 @@
   "devDependencies": {
     "@lamdb/infrastructure": "*",
     "@graphql-codegen/add": "^3.2.1",
-    "@graphql-codegen/cli": "^2.13.7",
+    "@graphql-codegen/cli": "^2.13.8",
     "@graphql-codegen/typescript-graphql-request": "^4.5.7",
     "@graphql-codegen/typescript-operations": "^2.5.5",
     "@types/aws-lambda": "^8.10.108",
-    "aws-cdk": "^2.47.0",
-    "aws-cdk-lib": "^2.47.0",
-    "constructs": "^10.1.140",
+    "aws-cdk": "^2.49.0",
+    "aws-cdk-lib": "^2.49.0",
+    "constructs": "^10.1.144",
     "prisma": "^4.5.0",
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.47.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.47.0-alpha.0"
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.49.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.49.0-alpha.0"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.196.0",
+    "@aws-sdk/client-secrets-manager": "^3.199.0",
     "graphql-request": "^5.0.0",
     "graphql-tag": "^2.12.6",
     "zod": "^3.19.1"

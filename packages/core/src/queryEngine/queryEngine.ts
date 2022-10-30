@@ -3,7 +3,7 @@ import { Library, QueryEngineInstance } from '@prisma/engine-core/dist/library/t
 import { buildSchema, GraphQLSchema } from 'graphql';
 import { createLogger } from '../logger';
 import { Request, Response } from '../requestResponse';
-import { getDatabaseUrl } from '../utils';
+import { exists, getDatabaseUrl } from '../utils';
 import { interceptIntrospectionQuery } from './middlewares/interceptIntrospectionQuery';
 import { executeMiddlewares, MiddlewareContext } from './middlewares/middleware';
 import { optimizeOperation } from './middlewares/optimizeOperation';
@@ -37,7 +37,16 @@ export class QueryEngine {
         cwd: __dirname,
       },
       {
-        loadLibrary: () => Promise.resolve(eval('require')(this.settings.libraryPath) as Library),
+        loadLibrary: async () => {
+          const { libraryPath } = this.settings;
+          if (!(await exists(libraryPath))) {
+            this.logger.error('Failed to load query engine node library. Library does not exist at given path', {
+              libraryPath,
+            });
+            throw new Error(`Library does not exist: ${libraryPath}`);
+          }
+          return eval('require')(libraryPath) as Library;
+        },
       },
     );
   }

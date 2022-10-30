@@ -9,10 +9,11 @@ export const operationDocumentNodeToRequest = (
 export const operationToRequest = (
   operation: string,
   variables: Record<string, unknown> | undefined = undefined,
+  operationName = 'TestOperation',
 ): Request => ({
   method: 'POST',
   body: JSON.stringify({
-    operationName: 'TestOperation',
+    operationName,
     query: operation,
     variables,
   }),

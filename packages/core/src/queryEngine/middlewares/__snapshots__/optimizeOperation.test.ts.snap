@@ -27,3 +27,10 @@ exports[`optimizeOperation middleware inlines operation variables and removes va
   "method": "POST",
 }
 `;
+
+exports[`optimizeOperation middleware inlines operation variables and removes variable definitions 4`] = `
+{
+  "body": "{"operationName":"TestOperation","variables":{},"query":"query findArticle {\\n  findUniqueArticle(where: {id: $id}) {\\n    id\\n    url\\n    title\\n    subtitle\\n    publication\\n    claps\\n    responses\\n  }\\n}"}",
+  "method": "POST",
+}
+`;

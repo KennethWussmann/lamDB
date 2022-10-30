@@ -11,7 +11,7 @@ beforeAll(async () => {
     defaultPlatform: 'detect',
     engines: [BinaryType.libqueryEngine, BinaryType.migrationEngine],
   });
-}, 10000);
+}, 30000);
 
 beforeEach(async () => {
   const removed: string[] = [];

@@ -27,6 +27,12 @@ const isCacheCompatible = async (enginesJsonPath: string, engines: BinaryType[],
     return false;
   }
   const cacheTarget = JSON.parse(await readFile(enginesJsonPath, 'utf8'));
+  console.log(
+    'Cache compatibility check',
+    cacheTarget.prisma.target === target,
+    engines.every((engine) => cacheTarget.prisma.engines.includes(engine)),
+    cacheTarget.prisma.version === version,
+  );
   return (
     cacheTarget.prisma.target === target &&
     engines.every((engine) => cacheTarget.prisma.engines.includes(engine)) &&

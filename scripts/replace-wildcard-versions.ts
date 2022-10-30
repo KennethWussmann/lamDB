@@ -42,4 +42,4 @@ const replaceWildcards = (
       ])
       .map(([path, pkg]) => writeFile(path, JSON.stringify(pkg, null, 2), 'utf8')),
   );
-})();
+})().catch(console.error);

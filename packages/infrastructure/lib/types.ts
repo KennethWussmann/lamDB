@@ -39,12 +39,6 @@ export type LamDBProps = {
    */
   efs?: LamDBEFSPersistenceProps;
   /**
-   * Run the migration ad-hoc as soon as a writer request comes in.
-   * If disabled you'll have to trigger the migration lambda manually.
-   * @default false
-   */
-  autoMigrate?: boolean;
-  /**
    * Configure api tokens to enable token-based auth.
    * Token-based auth is considered less secure and further delays requests to the request. Specify a rotation period whenever possible.
    * @default undefined No token auth

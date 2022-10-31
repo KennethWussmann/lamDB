@@ -1,7 +1,6 @@
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { Request, requestSchema, Response } from '../../core/src/requestResponse';
 import { isExecutableDefinitionNode, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql';
-import { sha1Hash } from '@lamdb/core';
+import { Request, Response, sha1Hash } from '@lamdb/core';
+import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 
 export const graphQlErrorResponse = (message: string): Response => ({
   status: 400,
@@ -18,35 +17,19 @@ export const graphQlErrorResponse = (message: string): Response => ({
   },
 });
 
-export const toApiGatewayResponse = (response: Response): APIGatewayProxyResultV2 => ({
-  statusCode: response.status,
-  body: response.body,
-  headers: response.headers,
-  isBase64Encoded: false,
+export const fromExpressRequest = (expressRequest: ExpressRequest): Request => ({
+  method: expressRequest.method,
+  body: JSON.stringify(expressRequest.body),
+  headers: Object.fromEntries(
+    Object.entries(expressRequest.headers).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value ?? '']),
+  ),
+  path: expressRequest.path,
 });
 
-export const fromApiGatwayRequest = (request: APIGatewayProxyEventV2): Request => ({
-  path: request.requestContext.http.path,
-  method: request.requestContext.http.method,
-  headers: Object.fromEntries(Object.entries(request.headers).map(([key, value]) => [key, value ?? ''])),
-  body: request.body,
-});
-
-export const fromApiGatewayResponse = (response: APIGatewayProxyStructuredResultV2): Response => ({
-  status: response.statusCode ?? 0,
-  body: response.body,
-  headers: response.headers
-    ? Object.fromEntries(Object.entries(response.headers).map(([key, value]) => [key, value.toString()]))
-    : {},
-});
-
-export const getRequestFromUnion = (request: APIGatewayProxyEventV2 | Request): Request => {
-  const result = requestSchema.safeParse(request);
-  if (result.success) {
-    return result.data;
-  } else {
-    return fromApiGatwayRequest(request as APIGatewayProxyEventV2);
-  }
+export const applyToExpressResponse = (response: Response, expressResponse: ExpressResponse) => {
+  Object.entries(response.headers).forEach(([key, value]) => expressResponse.setHeader(key, value));
+  expressResponse.status(response.status);
+  expressResponse.send(response.body);
 };
 
 export const getOperationInfo = (
@@ -89,6 +72,3 @@ export const getOperationInfo = (
     hash: request.body ? sha1Hash(request.body) : undefined,
   };
 };
-
-export const isRequest = (request: APIGatewayProxyEventV2 | Request): request is Request =>
-  !!(request as Request)?.method;

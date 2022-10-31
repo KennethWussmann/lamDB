@@ -83,7 +83,10 @@ export class LamDBApplication extends Construct {
       environment: {
         LOG_LEVEL: this.props.logLevel ?? 'info',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',
-        DATABASE_FILE_PATH: join(this.fileSystem.efsMountPath, 'database.db'),
+        DATABASE_PATH: join(this.fileSystem.efsMountPath, 'database.db'),
+        QUERY_ENGINE_LIBRARY_PATH: '/opt/libquery-engine.node',
+        MIGRATION_ENGINE_BINARY_PATH: '/opt/migration-engine',
+        PRISMA_SCHEMA_PATH: './schema.prisma',
         ...additionalEnvironmentVariables,
       },
       bundling: {

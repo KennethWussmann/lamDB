@@ -8,7 +8,8 @@
   "scripts": {
     "build": "tsc --noEmit && ncc build src/server.ts -o build",
     "start": "ts-node src/server.ts",
-    "dev": "ts-node-dev src/server.ts"
+    "dev": "ts-node-dev src/server.ts",
+    "clean": "rm -rf build"
   },
   "dependencies": {
     "@lamdb/core": "*",

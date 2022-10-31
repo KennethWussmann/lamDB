@@ -19,7 +19,7 @@ export const graphQlErrorResponse = (message: string): Response => ({
 
 export const fromExpressRequest = (expressRequest: ExpressRequest): Request => ({
   method: expressRequest.method,
-  body: expressRequest.body,
+  body: JSON.stringify(expressRequest.body),
   headers: Object.fromEntries(
     Object.entries(expressRequest.headers).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value ?? '']),
   ),

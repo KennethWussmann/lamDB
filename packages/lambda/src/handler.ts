@@ -2,13 +2,11 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Callback, Context, Han
 import { getRequestFromUnion, isRequest, toApiGatewayResponse } from './utils';
 import { routeQuery } from './queryRouter';
 import { createLogger, Request } from '@lamdb/core';
-import { getLamDBService } from '@lamdb/api-router/dist/lamDBService';
-import { LamDBConfiguration } from '@lamdb/api-router';
+import { getLamDBService, LamDBConfiguration } from '@lamdb/api-router';
 import serverlessExpress from '@vendia/serverless-express';
 import express from 'express';
 
 const logger = createLogger({ name: 'LambdaHandler' });
-const service = getLamDBService(new LamDBConfiguration());
 const app = express();
 
 export const readerHandler = async (
@@ -16,6 +14,7 @@ export const readerHandler = async (
   context: Context,
   callback: Callback<APIGatewayProxyResultV2>,
 ): Promise<APIGatewayProxyResultV2> => {
+  const service = getLamDBService(new LamDBConfiguration());
   if (isRequest(request)) {
     return toApiGatewayResponse(await service.execute(request));
   }
@@ -29,6 +28,7 @@ export const writerHandler: Handler = async (
   context: Context,
   callback: Callback<APIGatewayProxyResultV2>,
 ): Promise<APIGatewayProxyResultV2> => {
+  const service = getLamDBService(new LamDBConfiguration());
   if (isRequest(request)) {
     return toApiGatewayResponse(await service.execute(request));
   }
@@ -57,5 +57,6 @@ export const proxyHandler = async (event: APIGatewayProxyEventV2 | Request): Pro
 };
 
 export const migrateHandler = async () => {
+  const service = getLamDBService(new LamDBConfiguration());
   await service.migrate();
 };

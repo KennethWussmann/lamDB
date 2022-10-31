@@ -11,7 +11,7 @@ export class LamDBApplication extends Construct {
   public readonly reader: LamDBFunction;
   public readonly writer: LamDBFunction;
   public readonly proxy: LamDBFunction;
-  public readonly migrate: LamDBFunction | undefined;
+  public readonly migrate: LamDBFunction;
 
   constructor(
     scope: Construct,
@@ -30,41 +30,33 @@ export class LamDBApplication extends Construct {
       filesystem: fileSystem.lambdaFileSystem,
       vpc: fileSystem.vpc,
     });
-    this.writer = this.createLambda(
-      'WriterFunction',
+    this.writer = this.createLambda('WriterFunction', {
+      functionName: `${props.name}-writer`,
+      handler: 'writerHandler',
+      reservedConcurrentExecutions: 1,
+      layers: [engineLayer],
+      filesystem: fileSystem.lambdaFileSystem,
+      vpc: fileSystem.vpc,
+    });
+    this.migrate = this.createLambda(
+      'MigrateFunction',
       {
-        functionName: `${props.name}-writer`,
-        handler: 'writerHandler',
+        functionName: `${props.name}-migrate`,
+        handler: 'migrateHandler',
         reservedConcurrentExecutions: 1,
         layers: [engineLayer],
+        timeout: Duration.minutes(10),
         filesystem: fileSystem.lambdaFileSystem,
         vpc: fileSystem.vpc,
       },
-      {
-        AUTO_MIGRATE: `${this.props.autoMigrate ?? false ? 'true' : 'false'}`,
-      },
+      {},
+      true,
     );
-    if (!this.props.autoMigrate) {
-      this.migrate = this.createLambda(
-        'MigrateFunction',
-        {
-          functionName: `${props.name}-migrate`,
-          handler: 'migrateHandler',
-          reservedConcurrentExecutions: 1,
-          layers: [engineLayer],
-          timeout: Duration.minutes(10),
-          filesystem: fileSystem.lambdaFileSystem,
-          vpc: fileSystem.vpc,
-        },
-        {},
-        true,
-      );
 
-      new CfnOutput(this, 'lamdb-migrate-arn', {
-        value: this.migrate.functionArn,
-        exportName: `${props.name}-migrate-arn`,
-      });
-    }
+    new CfnOutput(this, 'lamdb-migrate-arn', {
+      value: this.migrate.functionArn,
+      exportName: `${props.name}-migrate-arn`,
+    });
     this.proxy = this.createLambda(
       'ProxyFunction',
       {

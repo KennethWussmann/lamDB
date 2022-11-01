@@ -2,6 +2,9 @@
 
 ## Deploy
 
+No matter how you deploy, it's very important to enable WAL mode on the SQLite afterwards.
+Please [read here](operation.md#enable-wal-mode) how to do this, after initial setup.
+
 ### Using AWS
 
 1. [Setup a TypeScript CDK project](https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-typescript.html)
@@ -109,3 +112,7 @@ curl --request POST \
 ```
 
 This would potentially be enough to query and mutate your LamDB, but of course can be improved by proper GraphQL tools of your choosen programming language. Here is a great [overview of GraphQL tools](https://graphql.org/code/).
+
+## Migration, Backup, Restore
+
+For more operational tasks read further in the [operation guide](operation.md).

@@ -89,7 +89,6 @@ input ArticleWhereInput {
   publication: StringFilter
   readingTime: IntFilter
   claps: IntFilter
-  responses: IntFilter
 }
 
 enum SortOrder {
@@ -105,7 +104,6 @@ input ArticleOrderByWithRelationInput {
   publication: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
 }
 
 input ArticleWhereUniqueInput {
@@ -120,7 +118,6 @@ enum ArticleScalarFieldEnum {
   publication
   readingTime
   claps
-  responses
 }
 
 type Article {
@@ -131,7 +128,6 @@ type Article {
   publication: String!
   readingTime: Int!
   claps: Int!
-  responses: Int!
 }
 
 type ArticleCountAggregateOutputType {
@@ -142,7 +138,6 @@ type ArticleCountAggregateOutputType {
   publication: Int!
   readingTime: Int!
   claps: Int!
-  responses: Int!
   _all: Int!
 }
 
@@ -150,14 +145,12 @@ type ArticleAvgAggregateOutputType {
   id: Float
   readingTime: Float
   claps: Float
-  responses: Float
 }
 
 type ArticleSumAggregateOutputType {
   id: Int
   readingTime: Int
   claps: Int
-  responses: Int
 }
 
 type ArticleMinAggregateOutputType {
@@ -168,7 +161,6 @@ type ArticleMinAggregateOutputType {
   publication: String
   readingTime: Int
   claps: Int
-  responses: Int
 }
 
 type ArticleMaxAggregateOutputType {
@@ -179,7 +171,6 @@ type ArticleMaxAggregateOutputType {
   publication: String
   readingTime: Int
   claps: Int
-  responses: Int
 }
 
 type AggregateArticle {
@@ -198,14 +189,12 @@ input ArticleCountOrderByAggregateInput {
   publication: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
 }
 
 input ArticleAvgOrderByAggregateInput {
   id: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
 }
 
 input ArticleMaxOrderByAggregateInput {
@@ -216,7 +205,6 @@ input ArticleMaxOrderByAggregateInput {
   publication: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
 }
 
 input ArticleMinOrderByAggregateInput {
@@ -227,14 +215,12 @@ input ArticleMinOrderByAggregateInput {
   publication: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
 }
 
 input ArticleSumOrderByAggregateInput {
   id: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
 }
 
 input ArticleOrderByWithAggregationInput {
@@ -245,7 +231,6 @@ input ArticleOrderByWithAggregationInput {
   publication: SortOrder
   readingTime: SortOrder
   claps: SortOrder
-  responses: SortOrder
   _count: ArticleCountOrderByAggregateInput
   _avg: ArticleAvgOrderByAggregateInput
   _max: ArticleMaxOrderByAggregateInput
@@ -386,7 +371,6 @@ input ArticleScalarWhereWithAggregatesInput {
   publication: StringWithAggregatesFilter
   readingTime: IntWithAggregatesFilter
   claps: IntWithAggregatesFilter
-  responses: IntWithAggregatesFilter
 }
 
 type ArticleGroupByOutputType {
@@ -397,7 +381,6 @@ type ArticleGroupByOutputType {
   publication: String!
   readingTime: Int!
   claps: Int!
-  responses: Int!
   _count: ArticleCountAggregateOutputType
   _avg: ArticleAvgAggregateOutputType
   _sum: ArticleSumAggregateOutputType
@@ -447,7 +430,6 @@ input ArticleCreateInput {
   publication: String!
   readingTime: Int!
   claps: Int!
-  responses: Int!
 }
 
 input StringFieldUpdateOperationsInput {
@@ -473,7 +455,6 @@ input ArticleUpdateInput {
   publication: StringFieldUpdateOperationsInput
   readingTime: IntFieldUpdateOperationsInput
   claps: IntFieldUpdateOperationsInput
-  responses: IntFieldUpdateOperationsInput
 }
 
 input ArticleUpdateManyMutationInput {
@@ -483,7 +464,6 @@ input ArticleUpdateManyMutationInput {
   publication: StringFieldUpdateOperationsInput
   readingTime: IntFieldUpdateOperationsInput
   claps: IntFieldUpdateOperationsInput
-  responses: IntFieldUpdateOperationsInput
 }
 
 type AffectedRowsOutput {

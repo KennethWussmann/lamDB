@@ -9,33 +9,24 @@ import express from 'express';
 const logger = createLogger({ name: 'LambdaHandler' });
 const app = express();
 
-export const readerHandler = async (
-  request: APIGatewayProxyEventV2 | Request,
-  context: Context,
-  callback: Callback<APIGatewayProxyResultV2>,
-): Promise<APIGatewayProxyResultV2> => {
-  const service = getLamDBService(new LamDBConfiguration());
-  if (isRequest(request)) {
-    return toApiGatewayResponse(await service.execute(request));
-  }
-  return serverlessExpress({
-    app,
-  })(request, context, callback);
-};
+const handleRequest =
+  (endpointType: 'reader' | 'writer' | 'proxy'): Handler =>
+  async (
+    request: APIGatewayProxyEventV2 | Request,
+    context: Context,
+    callback: Callback<APIGatewayProxyResultV2>,
+  ): Promise<APIGatewayProxyResultV2> => {
+    const service = getLamDBService(new LamDBConfiguration());
+    if (isRequest(request)) {
+      return toApiGatewayResponse(await service.execute(request, endpointType));
+    }
+    return serverlessExpress({
+      app,
+    })(request, context, callback);
+  };
 
-export const writerHandler: Handler = async (
-  request: APIGatewayProxyEventV2 | Request,
-  context: Context,
-  callback: Callback<APIGatewayProxyResultV2>,
-): Promise<APIGatewayProxyResultV2> => {
-  const service = getLamDBService(new LamDBConfiguration());
-  if (isRequest(request)) {
-    return toApiGatewayResponse(await service.execute(request));
-  }
-  return serverlessExpress({
-    app,
-  })(request, context, callback);
-};
+export const readerHandler: Handler = handleRequest('reader');
+export const writerHandler: Handler = handleRequest('writer');
 
 export const proxyHandler = async (event: APIGatewayProxyEventV2 | Request): Promise<APIGatewayProxyResultV2> => {
   const readerFunctionArn = process.env.READER_FUNCTION_ARN;

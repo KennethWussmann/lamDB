@@ -29,7 +29,6 @@ query findArticles(
     subtitle
     publication
     claps
-    responses
   }
 }`;
 const findArticleByIdQuery = `
@@ -45,7 +44,6 @@ query findArticle(
     subtitle
     publication
     claps
-    responses
   }
 }`;
 
@@ -95,7 +93,6 @@ describe('optimizeOperation middleware', () => {
             subtitle
             publication
             claps
-            responses
           }
           query findAll {
             findManyArticle {

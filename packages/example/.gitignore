@@ -1,3 +1,2 @@
 prisma/*.db
 prisma/*.db*
-prisma/schema.graphql

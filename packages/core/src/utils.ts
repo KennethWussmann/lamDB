@@ -28,4 +28,5 @@ export const errorLog = (e: unknown): object => {
   };
 };
 
-export const getDatabaseUrl = (databaseFilePath: string) => `file:${databaseFilePath}?pool_timeout=5`;
+export const getDatabaseUrl = (databaseFilePath: string) =>
+  `file:${databaseFilePath}?pool_timeout=3&connection_limit=1`;

@@ -10,12 +10,14 @@ export class LamDBTestStack extends Stack {
       stackName: `${name}-test`,
     });
 
+    const schemaPath = join(__dirname, '../prisma/schema.prisma');
+
     // This is all what's needed to deploy a new serverless relation database using LamDB
     const lamDB = new LamDB(this, 'LamDBTest', {
       // Give a unique name to name and identify the infrastructure
       name: 'lamdb-test',
       // Provide the path to our example Prisma schema
-      schemaPath: join(__dirname, '../prisma/schema.prisma'),
+      schemaPath,
       // Optional: Using token based authentication and rotate token every 14 days
       apiTokens: [
         {
@@ -29,6 +31,6 @@ export class LamDBTestStack extends Stack {
     });
 
     // Additional infrastructure for this specific example application
-    new ExampleApplication(this, 'ExampleApplication', lamDB);
+    new ExampleApplication(this, 'ExampleApplication', schemaPath, lamDB);
   }
 }

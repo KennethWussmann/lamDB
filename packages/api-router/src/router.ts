@@ -29,6 +29,10 @@ export const lamDBRouter = ({ configuration, lamDBService: service }: RouterConf
     applyToExpressResponse(await service.execute(fromExpressRequest(req), 'proxy'), res);
   });
 
+  router.post('/:clientVersion/:schemaHash/graphql', async (req, res) => {
+    applyToExpressResponse(await service.execute(fromExpressRequest(req), 'proxy'), res);
+  });
+
   router.post('/migrate', async (_, res) => {
     const appliedMigrations = await service.migrate(configuration.migrationEngineForceMigration);
 

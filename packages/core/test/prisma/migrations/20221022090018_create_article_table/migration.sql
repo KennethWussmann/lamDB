@@ -6,6 +6,5 @@ CREATE TABLE "Article" (
     "subtitle" TEXT,
     "publication" TEXT NOT NULL,
     "readingTime" INTEGER NOT NULL,
-    "claps" INTEGER NOT NULL,
-    "responses" INTEGER NOT NULL
+    "claps" INTEGER NOT NULL
 );

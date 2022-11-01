@@ -11,5 +11,4 @@ model Article {
   publication String
   readingTime Int
   claps       Int
-  responses   Int
 }

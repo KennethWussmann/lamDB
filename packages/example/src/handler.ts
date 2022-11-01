@@ -1,7 +1,7 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client/edge';
-import { setDatabaseUrl } from './auth';
+import { getDatabaseUrl } from './auth';
 
 const requestSchema = z.object({
   query: z.string(),
@@ -11,17 +11,19 @@ const requestSchema = z.object({
  * This is an example Lambda Handler that integrates with our LamDB to search for Medium articles in our database.
  */
 export const search = async (event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> => {
-  // use LamDB connection string
-  await setDatabaseUrl();
+  // Retrieve the database url with the API token
+  const databaseUrl = await getDatabaseUrl();
 
   // Create a normal PrismaClient
-  const prisma = new PrismaClient();
+  const prisma = new PrismaClient({
+    datasources: { db: { url: databaseUrl } },
+  });
 
   try {
-    // safely parse request body
+    // Safely parse request body
     const request = requestSchema.parse(event.body ? JSON.parse(event.body) : {});
 
-    // Looks a lot like Prisma Client, but is a normal generated GraphQL SDK
+    // Use the Prisma client to fetch articles from lamDB
     const articles = await prisma.article.findMany({
       where: {
         title: {
@@ -30,7 +32,7 @@ export const search = async (event: APIGatewayProxyEventV2): Promise<APIGatewayP
       },
     });
 
-    // return succesful response with articles found
+    // Return succesful response with articles found
     return {
       statusCode: 200,
       body: JSON.stringify(
@@ -44,7 +46,7 @@ export const search = async (event: APIGatewayProxyEventV2): Promise<APIGatewayP
     };
   } catch (e) {
     console.error('Request failed', e);
-    // return error if request body was invalid
+    // Return error if request body was invalid
     return {
       statusCode: 400,
       body: JSON.stringify({

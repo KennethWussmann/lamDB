@@ -26,7 +26,7 @@ export class ExampleApplication extends Construct {
       functionName: 'lamdb-example-search',
       entry: join(__dirname, '..', 'src', 'index.ts'),
       handler: 'search',
-      memorySize: 1024,
+      memorySize: 1024 * 4,
       runtime: Runtime.NODEJS_16_X,
       timeout: Duration.seconds(30),
       logRetention: RetentionDays.ONE_DAY,

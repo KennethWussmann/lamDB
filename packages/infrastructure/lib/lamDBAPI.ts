@@ -42,6 +42,12 @@ export class LamDBAPI extends HttpApi {
       path: '/graphql',
       methods,
     });
+    // redirect dataproxy requests to the same proxy lambda as /graphql. They are compatible and the same.
+    this.addRoutes({
+      integration: new HttpLambdaIntegration('DataProxyIntegration', props.application.proxy),
+      path: '/{clientId}/{schemaHash}/graphql',
+      methods,
+    });
 
     if (this.url) {
       new CfnOutput(this, `${props.name}-url`, {

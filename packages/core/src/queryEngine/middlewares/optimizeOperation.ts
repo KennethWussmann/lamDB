@@ -7,6 +7,7 @@ import {
   GraphQLSchema,
   GraphQLType,
   Kind,
+  OperationDefinitionNode,
   parse,
   print,
   typeFromAST,
@@ -14,6 +15,7 @@ import {
   visit,
 } from 'graphql';
 import { Response } from '../../requestResponse';
+import { sha1Hash } from '../../utils';
 import { MiddlewareContext, MiddlewareNextFunction, QueryEngineProxyMiddleware } from './middleware';
 
 const inlineVariables = (
@@ -55,6 +57,25 @@ const inlineVariables = (
   });
 };
 
+const generateOperationName = (document: DocumentNode) => {
+  return visit(document, {
+    OperationDefinition: (node: OperationDefinitionNode) => {
+      if (!node.name) {
+        // Prisma client does not supply operation names, but the relay optimizer requires one
+        return {
+          ...node,
+          name: {
+            kind: Kind.NAME,
+            // Operation names have to start with letters, so we prepend query, mutation, subscription
+            value: `${node.operation}_${sha1Hash(print(node)).substring(0, 8)}`,
+          },
+        };
+      }
+      return node;
+    },
+  });
+};
+
 const optimizeDocument = (
   schema: GraphQLSchema,
   variables: Record<string, unknown>,
@@ -63,7 +84,7 @@ const optimizeDocument = (
   inlineVariables(
     schema,
     variables,
-    inlineFragments(schema, [document], {
+    inlineFragments(schema, [generateOperationName(document)], {
       includeFragments: false,
       assumeValid: true,
       noLocation: true,

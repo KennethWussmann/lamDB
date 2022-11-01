@@ -11,11 +11,25 @@
 - **Auto-scaling:** Running on AWS Lambda and scaling like you're used to
 - **Cluster:** Single-writer, multi-reader cluster by default
 - **Simple backups:** S3 versioned buckets for perfect backup and restore procedures
-- **GraphQL API:** Easily accessible from any programming language and platform
 - **True serverless:** Pay-as-you-go and scaling with your needs
-- **Docker image:** Great for integration tests, run lamDB in a Docker container
+- **Supports `@prisma/client`:** Use Prisma's client as if it would be any ordinary database
+- **GraphQL API:** Easily accessible from any programming language and platform
+- **Made with Prisma:** LamDB uses Prisma's query, migration engines and internal packages to provide the API
 - **Made for AWS:** Leveraging all benefits of AWS, simple deployment using CDK
-- **Made with Prisma:** LamDB uses Prisma's query and migration engine to provide the API
+- **Docker image:** Great for integration tests, run lamDB in a Docker container
+
+## Getting started
+
+Deploying lamDB is done in 3 easy steps. Read the [getting started guide](docs/getting-started.md).
+
+## Honourable mentions
+
+Thanks to the following related projects:
+
+- [Prisma](https://www.prisma.io/): LamDB is using large parts of their internal APIs, engines and packages to make lamDB even possible
+- [wundergraph/wunderbase](https://github.com/wundergraph/wunderbase): LamDB is largely inspired by the concept of using Prisma's tools
+
+Please don't contact the Prisma team with any issues related to lamDB. Consider opening an issue in lamDB if you need help.
 
 ## FAQ
 

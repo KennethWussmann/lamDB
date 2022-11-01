@@ -13,7 +13,7 @@ import { RetentionDays } from 'aws-cdk-lib/aws-logs';
  * This is not strictly necessary but there to showcase an example integration of LamDB into serverless applications.
  */
 export class ExampleApplication extends Construct {
-  constructor(scope: Construct, id: string, lamDB: LamDB) {
+  constructor(scope: Construct, id: string, schemaPath: string, lamDB: LamDB) {
     super(scope, id);
 
     // Use the first best API token secret, or throw an error if there are none
@@ -34,6 +34,25 @@ export class ExampleApplication extends Construct {
         // Get the api gateway url of the lamDB instance
         LAMDB_BASE_URL: lamDB.api.url ?? '',
         LAMDB_API_TOKEN_SECRET_ID: apiTokenSecret.secretArn,
+      },
+      bundling: {
+        // use locally installed esbuild
+        forceDockerBundling: false,
+        // using prisma client on Lambda using CDK is somewhat special
+        // refer to https://dev.to/prisma/bundling-prisma-with-the-cdk-using-aws-lambda-nodejs-2lkd
+        nodeModules: ['@prisma/client', 'prisma'],
+        commandHooks: {
+          beforeBundling: () => [],
+          beforeInstall: (_: string, outputDir: string) => [
+            `echo "Copying prisma schema from ${schemaPath} to ${outputDir}"`,
+            `cp ${schemaPath} ${outputDir}`,
+          ],
+          afterBundling: (_: string, outputDir: string) => [
+            `cd ${outputDir}`,
+            `npx prisma generate --data-proxy`,
+            `rm -rf node_modules/@prisma/engines`,
+          ],
+        },
       },
     });
 

@@ -8,6 +8,8 @@ const logger = createLogger({ name: 'Server' });
 
 const start = async (config = new LamDBConfiguration()) => {
   const service = getLamDBService(config);
+  await service.migrate();
+
   const router = lamDBRouter({ configuration: config, lamDBService: service });
   const app = express();
 

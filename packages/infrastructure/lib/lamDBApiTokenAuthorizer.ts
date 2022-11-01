@@ -35,12 +35,14 @@ export class LamDBApiTokenAuthorizer extends Construct {
     this.rotationFunction = new LamDBFunction(this, 'ApiTokenRotationFunction', {
       functionName: `${props.name}-api-token-rotation`,
       handler: 'apiTokenRotation',
+      memorySize: 1024,
       ...props.lambdaFunctionProps,
     });
 
     this.authorizerFunction = new LamDBFunction(this, 'ApiTokenAuthorizerFunction', {
       functionName: `${props.name}-api-token-authorizer`,
       handler: 'apiTokenAuthorizer',
+      memorySize: 1024,
       ...props.lambdaFunctionProps,
       environment: {
         SECRET_PREFIX: secretPrefix,

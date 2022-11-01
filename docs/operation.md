@@ -65,9 +65,30 @@ curl --request POST --url http://localhost:4000/migrate
 
 ## Backup
 
-Backing up lamDB is as easy as it can get on AWS.
+Backing up lamDB is as easy as it can get on AWS. When enabled AWS DataSync will be used to periodically upload database files from the EFS to S3. The S3 bucket is versioned to keep track of file changes. You can later download any version of the database needed.
 
-TODO: Document how DataSync works with versioned S3 Bucket
+A lamDB file system usually contains the following files:
+
+- `database.db` - The actual database file
+- `database.db-shm` - [Temporary file by SQLite WAL](https://www.sqlite.org/tempfiles.html)
+- `database.db-wal` - [Temporary file by SQLite WAL](https://www.sqlite.org/tempfiles.html)
+- `database.db.migration.lock` - LamDB file to avoid triggering paralell migrations. Can be removed to retrigger migrations.
+
+1. Enable S3 sync
+
+```typescript
+new LamDB(this, 'MyLamDB', {
+  // ...
+  // Add the following setting to your existing lamDB
+  efs: {
+    enableS3Sync: true,
+  },
+});
+```
+
+2. Deploy changes. DataSync will no upload files to the S3 bucket `s3://<ACCOUNT-ID>-<LAMDB-INSTANCE-NAME>-database`
+
+> S3 Sync is disabled by default, because it adds complexity for simple setups and of course also costs.
 
 ## Restore a backup
 
@@ -75,14 +96,25 @@ Given that we have the database files backed up and ready for restore in the S3 
 
 > Please ensure no new data is written to the database, while restoring a backup, to avoid data-loss.
 
-TODO: Document enabling EC2 bastion host
+1. Enable the bastion host for your lamDB instance:
+
+```typescript
+new LamDB(this, 'MyLamDB', {
+  // ...
+  // Add the following setting to your existing lamDB
+  efs: {
+    bastionHost: true,
+  },
+});
+```
+
+2. Deploy the changes
+3. [Connect to the newly deployed EC2 instance using the AWS Console](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/session-manager.html)
 
 On the bastion host just execute the AWS CLI command to sync the databases files from the S3 bucket to the mounted EFS.
 
 ```shell
-sudo aws s3 sync s3://<ACCOUNT-ID>-<LAMDB-INSTANCE-NAME>-database /mnt/efs/lambda
+sudo aws s3 sync s3://<ACCOUNT-ID>-<LAMDB-INSTANCE-NAME>-database mnt/<LAMDB-INSTANCE-NAME>-efs/lambda/
 ```
-
-TODO: Verify /mnt/efs/lambda path
 
 You may need to adjust the file permissions afterwards to ensure the ec2-user has read and write permission again.

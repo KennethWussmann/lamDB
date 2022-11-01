@@ -19,7 +19,6 @@ export const createArticle = (
   data: Record<string, unknown> = {
     data: {
       claps: 100,
-      responses: 50,
       readingTime: 365,
       url: 'https://example.com',
       title: 'Example article',
@@ -42,7 +41,6 @@ export const createArticle = (
         subtitle
         publication
         claps
-        responses
       }
     }`,
     data,
@@ -64,7 +62,6 @@ export const findArticle = (id = 1): Request =>
         subtitle
         publication
         claps
-        responses
       }
     }
     `,

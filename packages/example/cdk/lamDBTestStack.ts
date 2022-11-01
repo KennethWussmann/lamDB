@@ -28,6 +28,10 @@ export class LamDBTestStack extends Stack {
       // Optional: Define some logging level for debugging and add reader/writer endpoints for testing
       logLevel: 'debug',
       exposeReaderWriterEndpoints: true,
+      efs: {
+        bastionHost: true,
+        enableS3Sync: true,
+      },
     });
 
     // Additional infrastructure for this specific example application

@@ -1,6 +1,5 @@
 import { LamDB } from '@lamdb/infrastructure';
 import { Duration, Stack } from 'aws-cdk-lib';
-import { Schedule } from 'aws-cdk-lib/aws-events';
 import { Construct } from 'constructs';
 import { join } from 'path';
 import { ExampleApplication } from './exampleApplication';

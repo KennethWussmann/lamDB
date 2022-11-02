@@ -163,6 +163,7 @@ export class MigrationEngine {
       if (e?.signal !== 'SIGTERM') {
         await this.rollbackMigrationLockFile();
         this.logger.error('Failed to apply migrations', errorLog(e));
+        throw new Error('Failed to apply migrations');
       }
     } finally {
       migration?.kill();

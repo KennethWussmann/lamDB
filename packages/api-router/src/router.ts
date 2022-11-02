@@ -3,6 +3,7 @@ import cors from 'cors';
 import { LamDBService } from './lamDBService';
 import { LamDBConfiguration } from './configuration';
 import { applyToExpressResponse, fromExpressRequest } from './utils';
+import { errorLog } from '@lamdb/core';
 
 export type RouterConfig = {
   configuration: LamDBConfiguration;
@@ -34,13 +35,21 @@ export const lamDBRouter = ({ configuration, lamDBService: service }: RouterConf
   });
 
   router.post('/migrate', async (_, res) => {
-    const appliedMigrations = await service.migrate(configuration.migrationEngineForceMigration);
+    try {
+      const appliedMigrations = await service.migrate();
 
-    res.status(200);
-    res.json({
-      success: true,
-      data: { appliedMigrations },
-    });
+      res.status(200);
+      res.json({
+        success: true,
+        data: { appliedMigrations },
+      });
+    } catch (e) {
+      res.status(500);
+      res.json({
+        success: false,
+        data: errorLog(e),
+      });
+    }
   });
 
   return router;

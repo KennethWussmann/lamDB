@@ -1,5 +1,17 @@
 # @lamdb/infrastructure
 
+## 0.1.6
+
+### Patch Changes
+
+- ade63a3: Specify MIT license
+- 4ea3ba5: Bump dependency versions
+- 7c9b0f9: Add support for syncing EFS data to S3
+- Updated dependencies [ade63a3]
+- Updated dependencies [4ea3ba5]
+- Updated dependencies [5f766a7]
+  - @lamdb/lambda@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes

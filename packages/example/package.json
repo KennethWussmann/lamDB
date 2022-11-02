@@ -15,17 +15,17 @@
     "clean": "rm -rf ./build"
   },
   "devDependencies": {
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.49.0-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.49.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.50.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.50.0-alpha.0",
     "@lamdb/infrastructure": "*",
     "@types/aws-lambda": "^8.10.108",
-    "aws-cdk": "^2.49.0",
-    "aws-cdk-lib": "^2.49.0",
-    "constructs": "^10.1.144",
+    "aws-cdk": "^2.50.0",
+    "aws-cdk-lib": "^2.50.0",
+    "constructs": "^10.1.147",
     "prisma": "^4.5.0"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.199.0",
+    "@aws-sdk/client-secrets-manager": "^3.201.0",
     "@prisma/client": "^4.5.0",
     "esbuild": "^0.15.12",
     "zod": "^3.19.1"

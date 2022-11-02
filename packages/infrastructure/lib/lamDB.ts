@@ -7,6 +7,7 @@ import { LamDBApplication } from './lamDBApplication';
 import { LamDBStorage } from './lamDBStorage';
 import { Tags } from 'aws-cdk-lib';
 import { LamDBApiTokenAuthorizer } from './lamDBApiTokenAuthorizer';
+import { LamDBDataSync } from './lamDBDataSync';
 
 export class LamDB extends Construct {
   public readonly api: LamDBAPI;
@@ -14,6 +15,7 @@ export class LamDB extends Construct {
   public readonly application: LamDBApplication;
   public readonly storage: LamDBStorage;
   public readonly authorizer: LamDBApiTokenAuthorizer | undefined;
+  public readonly dataSync: LamDBDataSync | undefined;
 
   constructor(scope: Construct, id: string, props: LamDBProps) {
     super(scope, id);
@@ -40,6 +42,21 @@ export class LamDB extends Construct {
       application: this.application,
       authorizer: this.authorizer?.authorizer,
     });
+
+    if (props.efs?.s3Sync) {
+      if (typeof props.efs.s3Sync === 'boolean' ? props.efs.s3Sync : !!props.efs.s3Sync) {
+        this.dataSync = new LamDBDataSync(
+          this,
+          'DataSync',
+          {
+            name: props.name,
+            scheduleExpression: typeof props.efs.s3Sync === 'boolean' ? undefined : props.efs.s3Sync.scheduleExpression,
+          },
+          this.fileSystem,
+          this.storage,
+        );
+      }
+    }
 
     Tags.of(this).add('lamdb:name', props.name);
   }

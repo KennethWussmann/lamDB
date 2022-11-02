@@ -81,14 +81,21 @@ new LamDB(this, 'MyLamDB', {
   // ...
   // Add the following setting to your existing lamDB
   efs: {
-    enableS3Sync: true,
+    // If the default settings are fine, just true is enough
+    //s3Sync: true,
+    // But we can specify more settings
+    s3Sync: {
+      // By default it's syncing hourly, let's define daily
+      scheduleExpression: Schedule.rate(Duration.days(1)),
+    },
   },
 });
 ```
 
-2. Deploy changes. DataSync will no upload files to the S3 bucket `s3://<ACCOUNT-ID>-<LAMDB-INSTANCE-NAME>-database`
+2. Deploy the changes. DataSync will now upload files to the S3 bucket `s3://<ACCOUNT-ID>-<LAMDB-INSTANCE-NAME>-database/efs`
 
-> S3 Sync is disabled by default, because it adds complexity for simple setups and of course also costs.
+> S3 Sync is disabled by default, because it adds complexity for simple setups and of course also adds costs.
+> By using S3 LifecycleRules the data retention can be tweaked further to avoid too many versions being preserved.
 
 ## Restore a backup
 

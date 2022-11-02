@@ -1,4 +1,5 @@
 import { HttpApiProps } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { Schedule } from 'aws-cdk-lib/aws-events';
 import { LamDBApiTokenAuthorizerTokenProps } from './lamDBApiTokenAuthorizer';
 import { EfsBastionHostProps } from './lamDBBastionHost';
 import { LamDBFunctionProps } from './lamDBFunction';
@@ -6,9 +7,9 @@ import { LamDBFunctionProps } from './lamDBFunction';
 export type LamDBDataSyncProps = {
   /**
    * Cron expression when to execute the sync task
-   * @default 0 * * * *
+   * @default hourly
    */
-  scheduleExpression?: string;
+  scheduleExpression?: Schedule;
 };
 
 export type LamDBEFSPersistenceProps = {

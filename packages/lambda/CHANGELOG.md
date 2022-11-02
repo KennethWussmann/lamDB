@@ -1,5 +1,19 @@
 # @lamdb/lambda
 
+## 0.1.6
+
+### Patch Changes
+
+- ade63a3: Specify MIT license
+- 4ea3ba5: Bump dependency versions
+- 5f766a7: Abstract API into new api-router package
+- Updated dependencies [ade63a3]
+- Updated dependencies [5efd8ed]
+- Updated dependencies [5f766a7]
+- Updated dependencies [d576918]
+  - @lamdb/core@0.1.6
+  - @lamdb/api-router@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @lamdb/core
 
+## 0.1.6
+
+### Patch Changes
+
+- ade63a3: Specify MIT license
+- 5efd8ed: Fix operation variable inlining and add tests
+- d576918: Support prisma dataproxy protocol and use official prisma client in example
+
 ## 0.1.5
 
 ### Patch Changes

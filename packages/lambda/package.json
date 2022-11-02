@@ -15,8 +15,8 @@
     "@lamdb/core": "*",
     "@lamdb/api-router": "*",
     "@vendia/serverless-express": "^4.10.1",
-    "@aws-sdk/client-lambda": "^3.199.0",
-    "@aws-sdk/client-secrets-manager": "^3.199.0"
+    "@aws-sdk/client-lambda": "^3.201.0",
+    "@aws-sdk/client-secrets-manager": "^3.201.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.108"

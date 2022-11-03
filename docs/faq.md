@@ -90,3 +90,24 @@ Usually discouraged, but you can of course also request the `/reader` and `/writ
 Also keep in mind that there is only one writer. If it is busy currently, you'll get a 503 by API Gateway.
 
 You could even invoke the corresponding Lambdas directly to rule out API Gateway completely. This is also helpful for the opposite case, when you want to run long running operations.
+
+### Provisioned concurrency
+
+By defining provisioned concurrency, cold starts can be improved and latency reduced. This will cost more, but can help to improve performance in certain scenarios and request patterns. [This blog post can help](https://aws.amazon.com/fr/blogs/compute/creating-low-latency-high-volume-apis-with-provisioned-concurrency/) to investigate and improve performance using provisioned concurrency.
+
+Given there should always only be one writing lambda at a time, the max concurrency is set to 1 by default. Defining a provisioned concurrency schedule does not make sense for the writer lambda, only for readers.
+
+This can be done via CDK like this:
+
+```typescript
+const lamDB = new LamDB(...);
+const readerTarget = lamDB.application.reader.addAlias('prd').addAutoScaling({ minCapacity: 1, maxCapacity: 50 });
+readerTarget.scaleOnSchedule('ScaleUpInTheMorning', {
+  schedule: Schedule.cron({ hour: '8', minute: '0' }),
+  minCapacity: 20,
+});
+readerTarget.scaleOnSchedule('ScaleDownAtNight', {
+  schedule: Schedule.cron({ hour: '20', minute: '0' }),
+  maxCapacity: 20,
+});
+```

@@ -1,5 +1,5 @@
 import { Aws, RemovalPolicy } from 'aws-cdk-lib';
-import { Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
+import { BlockPublicAccess, Bucket, BucketAccessControl } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 export class LamDBStorage extends Bucket {
@@ -8,6 +8,7 @@ export class LamDBStorage extends Bucket {
       bucketName: `${Aws.ACCOUNT_ID}-${name}-database`,
       publicReadAccess: false,
       versioned: true,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       accessControl: BucketAccessControl.PRIVATE,
       enforceSSL: true,
       removalPolicy: RemovalPolicy.RETAIN,

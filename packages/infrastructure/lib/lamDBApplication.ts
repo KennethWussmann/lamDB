@@ -23,14 +23,14 @@ export class LamDBApplication extends Construct {
   ) {
     super(scope, id);
 
-    this.reader = this.createLambda('ReaderFunction', {
+    this.reader = this.createLambda('ReaderFunction', 'readerWriter', {
       functionName: `${props.name}-reader`,
       handler: 'readerHandler',
       layers: [engineLayer],
       filesystem: fileSystem.lambdaFileSystem,
       vpc: fileSystem.vpc,
     });
-    this.writer = this.createLambda('WriterFunction', {
+    this.writer = this.createLambda('WriterFunction', 'readerWriter', {
       functionName: `${props.name}-writer`,
       handler: 'writerHandler',
       reservedConcurrentExecutions: 1,
@@ -40,6 +40,7 @@ export class LamDBApplication extends Construct {
     });
     this.migrate = this.createLambda(
       'MigrateFunction',
+      'migrate',
       {
         functionName: `${props.name}-migrate`,
         handler: 'migrateHandler',
@@ -59,6 +60,7 @@ export class LamDBApplication extends Construct {
     });
     this.proxy = this.createLambda(
       'ProxyFunction',
+      'proxy',
       {
         functionName: `${props.name}-proxy`,
         handler: 'proxyHandler',
@@ -75,11 +77,13 @@ export class LamDBApplication extends Construct {
 
   private createLambda = (
     id: string,
+    handler: string,
     props: LamDBFunctionProps,
     additionalEnvironmentVariables: Record<string, string> = {},
     includeMigrations = false,
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
+      entry: join(__dirname, 'lambda', `${handler}.js`),
       environment: {
         LOG_LEVEL: this.props.logLevel ?? 'info',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',

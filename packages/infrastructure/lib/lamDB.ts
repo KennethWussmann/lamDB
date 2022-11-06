@@ -41,6 +41,8 @@ export class LamDB extends Construct {
       name: props.name,
       application: this.application,
       authorizer: this.authorizer?.authorizer,
+      exposeReaderWriterEndpoints: props.exposeReaderWriterEndpoints,
+      accessLogging: props.accessLogging,
     });
 
     if (props.efs?.s3Sync) {

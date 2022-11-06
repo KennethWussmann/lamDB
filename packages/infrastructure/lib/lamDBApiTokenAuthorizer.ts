@@ -4,6 +4,7 @@ import { Annotations, CfnOutput, Duration } from 'aws-cdk-lib';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
+import { join } from 'path';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
 
 export type LamDBApiTokenAuthorizerTokenProps = {
@@ -35,14 +36,20 @@ export class LamDBApiTokenAuthorizer extends Construct {
     this.rotationFunction = new LamDBFunction(this, 'ApiTokenRotationFunction', {
       functionName: `${props.name}-api-token-rotation`,
       handler: 'apiTokenRotation',
-      memorySize: 1024,
+      memorySize: 512,
+      entry: join(__dirname, 'lambda', 'authorizer.js'),
       ...props.lambdaFunctionProps,
+      environment: {
+        SECRET_PREFIX: secretPrefix,
+        ...props.lambdaFunctionProps?.environment,
+      },
     });
 
     this.authorizerFunction = new LamDBFunction(this, 'ApiTokenAuthorizerFunction', {
       functionName: `${props.name}-api-token-authorizer`,
       handler: 'apiTokenAuthorizer',
       memorySize: 1024,
+      entry: join(__dirname, 'lambda', 'authorizer.js'),
       ...props.lambdaFunctionProps,
       environment: {
         SECRET_PREFIX: secretPrefix,

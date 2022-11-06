@@ -101,13 +101,9 @@ This can be done via CDK like this:
 
 ```typescript
 const lamDB = new LamDB(...);
-const readerTarget = lamDB.application.reader.addAlias('prd').addAutoScaling({ minCapacity: 1, maxCapacity: 50 });
-readerTarget.scaleOnSchedule('ScaleUpInTheMorning', {
-  schedule: Schedule.cron({ hour: '8', minute: '0' }),
-  minCapacity: 20,
-});
-readerTarget.scaleOnSchedule('ScaleDownAtNight', {
-  schedule: Schedule.cron({ hour: '20', minute: '0' }),
-  maxCapacity: 20,
+new Alias(this, 'ReaderPrd', {
+  version: lamDB.application.reader.currentVersion,
+  aliasName: 'reader-prd',
+  provisionedConcurrentExecutions: 10,
 });
 ```

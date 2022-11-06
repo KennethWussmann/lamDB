@@ -44,6 +44,11 @@ export type LamDBProps = {
    */
   logLevel?: 'info' | 'debug' | 'error';
   /**
+   * Enable API Gateway access logging
+   * @default false
+   */
+  accessLogging?: boolean;
+  /**
    * Further configure EFS specific settings
    */
   efs?: LamDBEFSPersistenceProps;

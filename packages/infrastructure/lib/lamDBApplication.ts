@@ -1,16 +1,20 @@
 import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { Alias, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { dirname, join } from 'path';
 import { LamDBEngineLayer } from './lamDBEngineLayer';
 import { LamDBFileSystem } from './lamDBFileSystem';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
-import { LamDBProps } from './types';
+import { LambdaFunctionType, LamDBProps } from './types';
 
 export class LamDBApplication extends Construct {
   public readonly reader: LamDBFunction;
+  public readonly readerAlias: Alias | undefined;
   public readonly writer: LamDBFunction;
+  public readonly writerAlias: Alias | undefined;
   public readonly proxy: LamDBFunction;
+  public readonly proxyAlias: Alias | undefined;
   public readonly migrate: LamDBFunction;
 
   constructor(
@@ -23,14 +27,14 @@ export class LamDBApplication extends Construct {
   ) {
     super(scope, id);
 
-    this.reader = this.createLambda('ReaderFunction', 'readerWriter', {
+    this.reader = this.createLambda('reader', 'ReaderFunction', 'readerWriter', {
       functionName: `${props.name}-reader`,
       handler: 'readerHandler',
       layers: [engineLayer],
       filesystem: fileSystem.lambdaFileSystem,
       vpc: fileSystem.vpc,
     });
-    this.writer = this.createLambda('WriterFunction', 'readerWriter', {
+    this.writer = this.createLambda('writer', 'WriterFunction', 'readerWriter', {
       functionName: `${props.name}-writer`,
       handler: 'writerHandler',
       reservedConcurrentExecutions: 1,
@@ -39,6 +43,7 @@ export class LamDBApplication extends Construct {
       vpc: fileSystem.vpc,
     });
     this.migrate = this.createLambda(
+      'migrate',
       'MigrateFunction',
       'migrate',
       {
@@ -53,12 +58,8 @@ export class LamDBApplication extends Construct {
       {},
       true,
     );
-
-    new CfnOutput(this, 'lamdb-migrate-arn', {
-      value: this.migrate.functionArn,
-      exportName: `${props.name}-migrate-arn`,
-    });
     this.proxy = this.createLambda(
+      'proxy',
       'ProxyFunction',
       'proxy',
       {
@@ -73,9 +74,37 @@ export class LamDBApplication extends Construct {
     );
     this.reader.grantInvoke(this.proxy);
     this.writer.grantInvoke(this.proxy);
+
+    if (props.lambda?.provisionedConcurreny?.writer) {
+      this.writerAlias = new Alias(this, 'WriterAlias', {
+        aliasName: 'writer',
+        version: this.writer.currentVersion,
+        provisionedConcurrentExecutions: props.lambda.provisionedConcurreny.writer,
+      });
+    }
+    if (props.lambda?.provisionedConcurreny?.reader) {
+      this.readerAlias = new Alias(this, 'ReaderAlias', {
+        aliasName: 'reader',
+        version: this.reader.currentVersion,
+        provisionedConcurrentExecutions: props.lambda.provisionedConcurreny.reader,
+      });
+    }
+    if (props.lambda?.provisionedConcurreny?.proxy) {
+      this.proxyAlias = new Alias(this, 'ProxyAlias', {
+        aliasName: 'proxy',
+        version: this.proxy.currentVersion,
+        provisionedConcurrentExecutions: props.lambda.provisionedConcurreny.proxy,
+      });
+    }
+
+    new CfnOutput(this, 'lamdb-migrate-arn', {
+      value: this.migrate.functionArn,
+      exportName: `${props.name}-migrate-arn`,
+    });
   }
 
   private createLambda = (
+    type: LambdaFunctionType,
     id: string,
     handler: string,
     props: LamDBFunctionProps,
@@ -84,6 +113,9 @@ export class LamDBApplication extends Construct {
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
       entry: join(__dirname, 'lambda', `${handler}.js`),
+      tracing: this.props.tracing ? Tracing.ACTIVE : undefined,
+      ...props,
+      ...this.props.lambda?.overwrites?.[type],
       environment: {
         LOG_LEVEL: this.props.logLevel ?? 'info',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',
@@ -91,7 +123,9 @@ export class LamDBApplication extends Construct {
         QUERY_ENGINE_LIBRARY_PATH: '/opt/libquery-engine.node',
         MIGRATION_ENGINE_BINARY_PATH: '/opt/migration-engine',
         PRISMA_SCHEMA_PATH: './schema.prisma',
+        DISABLE_OPERATION_OPTIMIZATION: this.props.operationOptimization === false ? 'true' : 'false',
         ...additionalEnvironmentVariables,
+        ...this.props.lambda?.overwrites?.[type]?.environment,
       },
       bundling: {
         commandHooks: {
@@ -110,9 +144,10 @@ export class LamDBApplication extends Construct {
                 ]
               : []),
           ],
+          ...this.props.lambda?.overwrites?.[type]?.bundling?.commandHooks,
         },
+        ...this.props.lambda?.overwrites?.[type]?.bundling,
       },
-      ...props,
     });
     return fn;
   };

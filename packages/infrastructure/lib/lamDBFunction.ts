@@ -1,4 +1,4 @@
-import { Runtime, Architecture } from 'aws-cdk-lib/aws-lambda';
+import { Runtime, Architecture, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { Duration } from 'aws-cdk-lib';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -11,7 +11,7 @@ export class LamDBFunction extends NodejsFunction {
   constructor(scope: Construct, id: string, props: LamDBFunctionProps) {
     super(scope, `LamDBFunction${id}`, {
       runtime: Runtime.NODEJS_16_X,
-      memorySize: 1024 * 4,
+      memorySize: 1024 * 2,
       timeout: Duration.seconds(5),
       architecture: Architecture.ARM_64,
       logRetention: RetentionDays.ONE_WEEK,
@@ -23,6 +23,11 @@ export class LamDBFunction extends NodejsFunction {
         tsconfig: 'tsconfig.json',
         forceDockerBundling: false,
         ...props.bundling,
+      },
+      environment: {
+        ENABLE_TRACING: props.tracing === Tracing.ACTIVE ? 'true' : 'false',
+        NODE_OPTIONS: '--enable-source-maps',
+        ...props.environment,
       },
     });
   }

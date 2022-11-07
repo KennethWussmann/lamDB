@@ -2,10 +2,12 @@ import { IHttpRouteAuthorizer } from '@aws-cdk/aws-apigatewayv2-alpha';
 import { HttpLambdaAuthorizer, HttpLambdaResponseType } from '@aws-cdk/aws-apigatewayv2-authorizers-alpha';
 import { Annotations, CfnOutput, Duration } from 'aws-cdk-lib';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Tracing } from 'aws-cdk-lib/aws-lambda';
 import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 import { join } from 'path';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
+import { LambdaFunctionType } from './types';
 
 export type LamDBApiTokenAuthorizerTokenProps = {
   name: string;
@@ -15,7 +17,8 @@ export type LamDBApiTokenAuthorizerTokenProps = {
 export type LamDBApiTokenAuthorizerProps = {
   name: string;
   tokens: LamDBApiTokenAuthorizerTokenProps[];
-  lambdaFunctionProps?: Partial<LamDBFunctionProps>;
+  lambdaFunctionProps?: Partial<Record<LambdaFunctionType, Partial<LamDBFunctionProps>>>;
+  tracing?: boolean;
 };
 
 export class LamDBApiTokenAuthorizer extends Construct {
@@ -30,30 +33,32 @@ export class LamDBApiTokenAuthorizer extends Construct {
       Annotations.of(this).addError('Cannot create api token authorizer: Given token array is empty');
       process.exit(1);
     }
-
+    const tracing = props.tracing ? Tracing.ACTIVE : undefined;
     const secretPrefix = `/${props.name}/api-token/`;
 
     this.rotationFunction = new LamDBFunction(this, 'ApiTokenRotationFunction', {
       functionName: `${props.name}-api-token-rotation`,
       handler: 'apiTokenRotation',
-      memorySize: 512,
+      memorySize: 128,
+      tracing,
       entry: join(__dirname, 'lambda', 'authorizer.js'),
-      ...props.lambdaFunctionProps,
+      ...props.lambdaFunctionProps?.['token-rotation'],
       environment: {
         SECRET_PREFIX: secretPrefix,
-        ...props.lambdaFunctionProps?.environment,
+        ...props.lambdaFunctionProps?.['token-rotation']?.environment,
       },
     });
 
     this.authorizerFunction = new LamDBFunction(this, 'ApiTokenAuthorizerFunction', {
       functionName: `${props.name}-api-token-authorizer`,
       handler: 'apiTokenAuthorizer',
-      memorySize: 1024,
+      memorySize: 512,
+      tracing,
       entry: join(__dirname, 'lambda', 'authorizer.js'),
-      ...props.lambdaFunctionProps,
+      ...props.lambdaFunctionProps?.authorizer,
       environment: {
         SECRET_PREFIX: secretPrefix,
-        ...props.lambdaFunctionProps?.environment,
+        ...props.lambdaFunctionProps?.authorizer?.environment,
       },
     });
     this.authorizerFunction.addToRolePolicy(

@@ -3,7 +3,8 @@ import { Library, QueryEngineInstance } from '@prisma/engine-core/dist/library/t
 import { buildSchema, GraphQLSchema } from 'graphql';
 import { createLogger } from '../logger';
 import { Request, Response } from '../requestResponse';
-import { exists, getDatabaseUrl } from '../utils';
+import { tracer } from '../tracer';
+import { errorLog, exists, getDatabaseUrl } from '../utils';
 import { interceptIntrospectionQuery } from './middlewares/interceptIntrospectionQuery';
 import { executeMiddlewares, MiddlewareContext } from './middlewares/middleware';
 import { optimizeOperation } from './middlewares/optimizeOperation';
@@ -12,6 +13,7 @@ export type QueryEngineSettings = {
   libraryPath: string;
   prismaSchemaPath: string;
   databaseFilePath: string;
+  disableOperationOptimization?: boolean;
 };
 
 export class QueryEngine {
@@ -51,47 +53,70 @@ export class QueryEngine {
     );
   }
 
-  getSdl = async (): Promise<string> => {
+  @tracer.captureMethod()
+  private async startEngine() {
     await this.engine.start();
-    return await ((this.engine as any).engine as QueryEngineInstance).sdlSchema();
-  };
+  }
 
-  getSchema = async (): Promise<GraphQLSchema> => {
+  @tracer.captureMethod({ captureResponse: false })
+  async getSdl(): Promise<string> {
+    await this.startEngine();
+    return await ((this.engine as any).engine as QueryEngineInstance).sdlSchema();
+  }
+
+  @tracer.captureMethod({ captureResponse: false })
+  async getSchema(): Promise<GraphQLSchema> {
     if (this.graphQlSchema) {
       return this.graphQlSchema;
     }
-    await this.engine.start();
+    await this.startEngine();
 
     // hack to access the private QueryEngineInstance engine prop inside LibraryEngine
     this.graphQlSchema = buildSchema(await this.getSdl());
     return this.graphQlSchema;
-  };
+  }
 
-  execute = async (request: Request): Promise<Response> => {
-    this.logger.debug('Starting middlewares', { request });
+  @tracer.captureMethod({ captureResponse: false })
+  private async executeRequest(context: MiddlewareContext): Promise<Response> {
+    try {
+      const operation = JSON.parse(context.request.body ?? '{}');
+      const query = operation.query;
+      this.logger.debug('Executing operation', { operation });
+      const res = await this.engine.request(query);
+      const response = {
+        headers: {
+          'content-type': 'application/json',
+        },
+        status: 200,
+        body: JSON.stringify(res.data),
+      };
+
+      return response;
+    } catch (e) {
+      this.logger.error('Failed to execute engine request', { ...errorLog(e), request: context.request });
+      throw e;
+    }
+  }
+
+  @tracer.captureMethod({ captureResponse: false })
+  async execute(request: Request): Promise<Response> {
+    this.logger.debug('Handling request', {
+      request,
+      operationOptimization: !this.settings.disableOperationOptimization,
+    });
+    tracer.getSegment().addMetadata('operationOptimization', !this.settings.disableOperationOptimization);
     return await executeMiddlewares(
       {
         queryEngine: this,
         request,
         logger: createLogger({ name: 'QueryEngineMiddleware' }),
       },
-      [interceptIntrospectionQuery, optimizeOperation],
-      async (context: MiddlewareContext): Promise<Response> => {
-        const operation = JSON.parse(context.request.body ?? '{}');
-        const query = operation.query;
-        this.logger.debug('Executing query', { operation });
-        const res = await this.engine.request(query);
-        const response = {
-          headers: {
-            'content-type': 'application/json',
-          },
-          status: 200,
-          body: JSON.stringify(res.data),
-        };
-        return response;
-      },
+      this.settings.disableOperationOptimization
+        ? [interceptIntrospectionQuery]
+        : [interceptIntrospectionQuery, optimizeOperation],
+      this.executeRequest.bind(this),
     );
-  };
+  }
 }
 let queryEngine: QueryEngine | undefined;
 

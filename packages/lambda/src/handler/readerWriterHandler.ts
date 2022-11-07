@@ -1,20 +1,27 @@
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Callback, Context, Handler } from 'aws-lambda';
+import { APIGatewayProxyEventV2, Context, Handler } from 'aws-lambda';
 import { isRequest, toApiGatewayResponse } from '../utils';
-import { Request } from '@lamdb/core';
+import { Request, tracer } from '@lamdb/core';
 import { defaultApplicationContext } from '../applicationContext';
 
-const handleRequest =
-  (endpointType: 'reader' | 'writer', { serverlessExpressHandler, service } = defaultApplicationContext): Handler =>
-  async (
-    request: APIGatewayProxyEventV2 | Request,
-    context: Context,
-    callback: Callback<APIGatewayProxyResultV2>,
-  ): Promise<APIGatewayProxyResultV2> => {
-    if (isRequest(request)) {
-      return toApiGatewayResponse(await service.execute(request, endpointType));
-    }
-    return serverlessExpressHandler(request, context, callback);
-  };
+class ReaderWriterHandler {
+  constructor(private endpointType: 'reader' | 'writer') {}
 
-export const readerHandler: Handler = handleRequest('reader');
-export const writerHandler: Handler = handleRequest('writer');
+  @tracer.captureLambdaHandler({ captureResponse: false })
+  async handler(request: APIGatewayProxyEventV2 | Request, context: Context) {
+    tracer.getSegment().addMetadata('initType', process.env.AWS_LAMBDA_INITIALIZATION_TYPE);
+    const { service, serverlessExpressHandler } = defaultApplicationContext;
+
+    if (isRequest(request)) {
+      return toApiGatewayResponse(await service.execute(request, this.endpointType));
+    }
+    return serverlessExpressHandler(request, context, () => {
+      //
+    });
+  }
+}
+
+const readerClass = new ReaderWriterHandler('reader');
+const writerClass = new ReaderWriterHandler('writer');
+
+export const readerHandler: Handler = readerClass.handler;
+export const writerHandler: Handler = writerClass.handler;

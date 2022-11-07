@@ -26,5 +26,14 @@ export const executeMiddlewares = async (
     const response = await middleware(context, async (ctx) => await exec(ctx, middlewares.slice(1)));
     return response;
   };
+
+  if (middlewares.length === 0) {
+    return await execute(context);
+  }
+
   return await exec(context, middlewares);
 };
+
+export interface Middleware {
+  handle: QueryEngineProxyMiddleware;
+}

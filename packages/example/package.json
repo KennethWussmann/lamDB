@@ -9,6 +9,7 @@
     "deploy": "npm run deploy:infra && echo \"Triggering migration ... \" && sleep 3 && npm run deploy:migrate",
     "deploy:infra": "cdk deploy --require-approval never",
     "deploy:migrate": "aws lambda invoke --function-name lamdb-test-migrate --log-type Tail /dev/null --output json --query 'LogResult' | tr -d '\"' | base64 -d",
+    "deploy:reset": "aws lambda invoke --cli-binary-format raw-in-base64-out --payload '{\"reset\": true}' --function-name lamdb-test-migrate --log-type Tail /dev/null --output json --query 'LogResult' | tr -d '\"' | base64 -d",
     "migrate:dev": "prisma migrate dev",
     "codegen": "prisma generate --data-proxy",
     "build": "tsc",

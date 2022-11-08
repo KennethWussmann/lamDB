@@ -1,14 +1,32 @@
-import { Events, LambdaInterface } from '@aws-lambda-powertools/commons';
-import { tracer } from '@lamdb/core';
+import { LambdaInterface } from '@aws-lambda-powertools/commons';
+import { createLogger, tracer } from '@lamdb/core';
 import { Context } from 'aws-lambda';
 import { defaultApplicationContext } from '../applicationContext';
 
+const logger = createLogger({ name: 'MigrateHandler' });
+
+type MigrationEvent = {
+  force?: boolean;
+  reset?: boolean;
+  migrate?: boolean;
+};
+
 class MigrateHandler implements LambdaInterface {
   @tracer.captureLambdaHandler()
-  public async handler(_: typeof Events.Custom.CustomEvent, __: Context): Promise<unknown> {
+  public async handler(
+    { force = false, reset = false, migrate = true }: MigrationEvent = {},
+    _: Context,
+  ): Promise<unknown> {
     tracer.getSegment().addMetadata('initType', process.env.AWS_LAMBDA_INITIALIZATION_TYPE);
     const { service } = defaultApplicationContext;
-    return { appliedMigrations: await service.migrate() };
+
+    if (reset) {
+      logger.warn('The database will be deleted.');
+      await service.reset();
+    }
+
+    const appliedMigrations = migrate ? await service.migrate(force) : undefined;
+    return { appliedMigrations, reset, migrate, force };
   }
 }
 

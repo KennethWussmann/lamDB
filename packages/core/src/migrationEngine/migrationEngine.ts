@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, rm, writeFile } from 'fs/promises';
 import { basename, dirname, join } from 'path';
 import { createLogger } from '../logger';
 import { errorLog, exists, getDatabaseUrl, sha1Hash } from '../utils';
@@ -177,6 +177,29 @@ export class MigrationEngine {
       migration?.kill();
     }
     return appliedMigrationNames ?? [];
+  }
+
+  /**
+   * Caution: Will delete the entire database files.
+   * Reset the EFS to a clean state.
+   */
+  @tracer.captureMethod()
+  async reset() {
+    const databaseDir = dirname(this.config.databaseFilePath);
+    await Promise.all(
+      [
+        this.config.databaseFilePath,
+        this.migrationLockFilePath,
+        `${databaseDir}-shm`,
+        `${databaseDir}-wal`,
+        `${databaseDir}-journal`,
+      ].map(async (file) => {
+        if (await exists(file)) {
+          await rm(file);
+        }
+      }),
+    );
+    this.migrationDone = false;
   }
 }
 

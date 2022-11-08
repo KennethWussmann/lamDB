@@ -50,6 +50,22 @@ The log output will show which migrations were applied.
 
 You can find a full working example in the [example package](../packages/example).
 
+#### Reset
+
+The migration lambda offers additional parameters that can be used to reset the entire database. Effectively removing all database files on the filesystem.
+
+```shell
+aws lambda invoke --cli-binary-format raw-in-base64-out --payload '{"reset": true}' --function-name <LAMDB_NAME>-migrate --log-type Tail /dev/null --output json --query 'LogResult' | tr -d '\"' | base64 -d
+```
+
+Other options for the payload:
+
+- `reset` - `boolean` (default: `false`): Remove database files before migration
+- `migrate` - `boolean` (default: `true`): Apply migrations
+- `force` - `boolean` (default: `false`): Force applying migrations, ignore lock file
+
+They can all be combined.
+
 ### Docker
 
 The Docker image will automatically apply migrations on startup. A restart would be enough.

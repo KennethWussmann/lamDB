@@ -63,6 +63,15 @@ export class LamDBService {
   async migrate(force: boolean = this.config.migrationEngineForceMigration) {
     return await this.migrationEngine.apply(force);
   }
+
+  /**
+   * Caution: Will delete the entire database files.
+   * Reset the EFS to a clean state.
+   */
+  @tracer.captureMethod()
+  async reset() {
+    await this.migrationEngine.reset();
+  }
 }
 
 let lamDBService: LamDBService | undefined;

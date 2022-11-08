@@ -12,6 +12,7 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
+    "@aws-lambda-powertools/tracer": "^1.4.0",
     "@lamdb/core": "*",
     "cors": "^2.8.5",
     "express": "^4.18.2"

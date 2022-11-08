@@ -6,6 +6,7 @@ import {
   MigrationEngine,
   QueryEngine,
   Request,
+  tracer,
 } from '@lamdb/core';
 import { LamDBConfiguration } from './configuration';
 import { getOperationInfo, graphQlErrorResponse } from './utils';
@@ -25,6 +26,7 @@ export class LamDBService {
       databaseFilePath: config.databasePath,
       libraryPath: config.queryEngineLibraryPath,
       prismaSchemaPath: config.prismaSchemaPath,
+      disableOperationOptimization: config.disableOperationOptimization,
     });
     this.migrationEngine = getMigrationEngine({
       binaryPath: config.migrationEngineBinaryPath,
@@ -33,7 +35,8 @@ export class LamDBService {
     });
   }
 
-  execute = async (request: Request, endpointType: 'reader' | 'writer' | 'proxy' = 'proxy') => {
+  @tracer.captureMethod({ captureResponse: false })
+  async execute(request: Request, endpointType: 'reader' | 'writer' | 'proxy' = 'proxy') {
     const operationInfo = getOperationInfo(request);
 
     if (operationInfo?.type === 'query' && endpointType === 'writer') {
@@ -54,10 +57,12 @@ export class LamDBService {
       this.logger.error('Failed to proxy request', errorLog(e));
       return graphQlErrorResponse(`Failed to proxy request: ${e?.message}`);
     }
-  };
+  }
 
-  migrate = async (force: boolean = this.config.migrationEngineForceMigration) =>
-    await this.migrationEngine.apply(force);
+  @tracer.captureMethod()
+  async migrate(force: boolean = this.config.migrationEngineForceMigration) {
+    return await this.migrationEngine.apply(force);
+  }
 }
 
 let lamDBService: LamDBService | undefined;

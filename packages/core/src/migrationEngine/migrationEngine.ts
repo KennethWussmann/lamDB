@@ -4,6 +4,7 @@ import { createLogger } from '../logger';
 import { errorLog, exists, getDatabaseUrl, sha1Hash } from '../utils';
 import execa from 'execa';
 import { ApplyMigrationRequest, isRPCError, isRPCMigrationResult, RPCResponse, rpcResponse } from './types';
+import { tracer } from '../tracer';
 
 type MigrationEngineConfig = {
   binaryPath: string;
@@ -26,31 +27,35 @@ export class MigrationEngine {
 
   constructor(private config: MigrationEngineConfig) {}
 
-  private getSchemaContent = async () => {
+  @tracer.captureMethod({ captureResponse: false })
+  private async getSchemaContent() {
     if (this.schemaContent) {
       return this.schemaContent;
     }
     this.schemaContent = await readFile(this.config.prismaSchemaPath, 'utf8');
     return this.schemaContent;
-  };
+  }
 
-  private getSchemaHash = async () => {
+  @tracer.captureMethod()
+  private async getSchemaHash() {
     if (this.schemaHash) {
       return this.schemaHash;
     }
     this.schemaHash = sha1Hash(await this.getSchemaContent());
     return this.schemaHash;
-  };
+  }
 
-  private getPreviousSchemaHash = async () => {
+  @tracer.captureMethod()
+  private async getPreviousSchemaHash() {
     if (this.previousSchemaHash) {
       return this.previousSchemaHash;
     }
     this.previousSchemaHash = await readFile(this.migrationLockFilePath, 'utf8');
     return this.previousSchemaHash;
-  };
+  }
 
-  private requiresMigration = async () => {
+  @tracer.captureMethod()
+  private async requiresMigration() {
     if (this.migrationDone) {
       return false;
     }
@@ -62,15 +67,17 @@ export class MigrationEngine {
       return true;
     }
     return (await this.getPreviousSchemaHash()) !== (await this.getSchemaHash());
-  };
+  }
 
-  private updateMigrationLockFile = async () => {
+  @tracer.captureMethod()
+  private async updateMigrationLockFile() {
     await writeFile(this.migrationLockFilePath, await this.getSchemaHash(), 'utf8');
-  };
+  }
 
-  private rollbackMigrationLockFile = async () => {
+  @tracer.captureMethod()
+  private async rollbackMigrationLockFile() {
     await writeFile(this.migrationLockFilePath, await this.getPreviousSchemaHash(), 'utf8');
-  };
+  }
 
   /**
    * Check if migration is necessary using a lockfile. If lockfile is in sync with current schema, nothing will be applied.
@@ -78,7 +85,8 @@ export class MigrationEngine {
    * @param force Skip checksum lockfile check and try to apply anyways
    * @returns array of applied migration names
    */
-  apply = async (force = false): Promise<string[]> => {
+  @tracer.captureMethod()
+  async apply(force = false): Promise<string[]> {
     if (!force && !(await this.requiresMigration())) {
       this.logger.debug('Not running migration: Database already up-to-date');
       return [];
@@ -169,7 +177,7 @@ export class MigrationEngine {
       migration?.kill();
     }
     return appliedMigrationNames ?? [];
-  };
+  }
 }
 
 let migrationEngine: MigrationEngine | undefined;

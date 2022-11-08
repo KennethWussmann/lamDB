@@ -2,6 +2,7 @@ import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructu
 import { Request, requestSchema, Response } from '../../core/src/requestResponse';
 import { isExecutableDefinitionNode, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql';
 import { sha1Hash } from '@lamdb/core';
+import { Tracer } from '@aws-lambda-powertools/tracer';
 
 export const graphQlErrorResponse = (message: string): Response => ({
   status: 400,
@@ -92,3 +93,34 @@ export const getOperationInfo = (
 
 export const isRequest = (request: APIGatewayProxyEventV2 | Request): request is Request =>
   !!(request as Request)?.method;
+
+export const traceLambda = async <T>(
+  fn: () => Promise<T>,
+  tracer: Tracer,
+  name = `## ${process.env._HANDLER}`,
+): Promise<T> => {
+  const segment = tracer.getSegment();
+  const subsegment = segment.addNewSubsegment(name);
+  tracer.setSegment(subsegment);
+  tracer.annotateColdStart();
+  tracer.addServiceNameAnnotation();
+
+  let response;
+  let error;
+  try {
+    response = fn();
+    tracer.addResponseAsMetadata(response, process.env._HANDLER);
+  } catch (e) {
+    tracer.addErrorAsMetadata(e as Error);
+    error = e;
+  } finally {
+    subsegment.close();
+    tracer.setSegment(segment);
+  }
+
+  if (!response) {
+    throw error;
+  }
+
+  return response;
+};

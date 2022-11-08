@@ -93,17 +93,23 @@ You could even invoke the corresponding Lambdas directly to rule out API Gateway
 
 ### Provisioned concurrency
 
-By defining provisioned concurrency, cold starts can be improved and latency reduced. This will cost more, but can help to improve performance in certain scenarios and request patterns. [This blog post can help](https://aws.amazon.com/fr/blogs/compute/creating-low-latency-high-volume-apis-with-provisioned-concurrency/) to investigate and improve performance using provisioned concurrency.
-
-Given there should always only be one writing lambda at a time, the max concurrency is set to 1 by default. Defining a provisioned concurrency schedule does not make sense for the writer lambda, only for readers.
+By defining provisioned concurrency, cold starts can be improved and latency reduced. This will cost more, but can help to improve performance in certain scenarios and request patterns. [This blog post can help](https://aws.amazon.com/fr/blogs/compute/creating-low-latency-high-volume-apis-with-provisioned-concurrency/) to investigate and improve performance using provisioned concurrency. Provisioned concurrency is very expensive, at this point, rather consider another database technology.
 
 This can be done via CDK like this:
 
 ```typescript
-const lamDB = new LamDB(...);
-new Alias(this, 'ReaderPrd', {
-  version: lamDB.application.reader.currentVersion,
-  aliasName: 'reader-prd',
-  provisionedConcurrentExecutions: 10,
-});
+new LamDB(
+  // ...
+  // extend config by provisionedConcurreny. Choose what ever is reasonable to your application.
+  // Proxy, Reader, Writer can be configured individually and none of them are mandatory
+  lambda: {
+    provisionedConcurreny: {
+      // It makes sense to keep the proxy and reader setting the same
+      proxy: 1,
+      reader: 1,
+      // You cannot go higher than 1.
+      writer: 1,
+    },
+  },
+);
 ```

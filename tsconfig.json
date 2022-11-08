@@ -15,7 +15,9 @@
     "lib": ["ES2022"],
     "esModuleInterop": true,
     "declaration": true,
-    "outDir": "./build"
+    "outDir": "./build",
+    "experimentalDecorators": true,
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "**/*.js", "**/*.d.ts"]
 }

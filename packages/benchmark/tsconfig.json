@@ -4,5 +4,5 @@
     "declaration": false,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "../lambda/src/database/noOpFileAdapter.ts", "src/index.js"]
+  "include": ["src/**/*.js"]
 }

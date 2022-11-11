@@ -19,7 +19,7 @@ export type LamDBApiTokenAuthorizerProps = {
   tokens: LamDBApiTokenAuthorizerTokenProps[];
   lambdaFunctionProps?: Partial<Record<LambdaFunctionType, Partial<LamDBFunctionProps>>>;
   tracing?: boolean;
-};
+} & Pick<LamDBFunctionProps, 'logLevel'>;
 
 export class LamDBApiTokenAuthorizer extends Construct {
   public readonly authorizer: IHttpRouteAuthorizer;
@@ -41,6 +41,7 @@ export class LamDBApiTokenAuthorizer extends Construct {
       handler: 'apiTokenRotation',
       memorySize: 128,
       tracing,
+      logLevel: props.logLevel,
       entry: join(__dirname, 'lambda', 'authorizer.js'),
       ...props.lambdaFunctionProps?.['token-rotation'],
       environment: {
@@ -54,6 +55,7 @@ export class LamDBApiTokenAuthorizer extends Construct {
       handler: 'apiTokenAuthorizer',
       memorySize: 512,
       tracing,
+      logLevel: props.logLevel,
       entry: join(__dirname, 'lambda', 'authorizer.js'),
       ...props.lambdaFunctionProps?.authorizer,
       environment: {

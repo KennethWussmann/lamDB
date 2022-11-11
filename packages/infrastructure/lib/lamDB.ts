@@ -35,6 +35,7 @@ export class LamDB extends Construct {
             name: props.name,
             tokens: props.apiTokens,
             lambdaFunctionProps: props.lambda?.overwrites,
+            logLevel: props.logLevel,
           })
         : undefined;
     this.api = new LamDBAPI(this, 'GraphQLApi', {

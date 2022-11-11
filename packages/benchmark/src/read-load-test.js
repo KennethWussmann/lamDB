@@ -3,6 +3,8 @@ import { check } from 'k6';
 
 // eslint-disable-next-line no-undef
 const baseUrl = __ENV.URL;
+// eslint-disable-next-line no-undef
+const apiToken = __ENV.API_TOKEN;
 
 export const options = {
   stages: [
@@ -20,17 +22,30 @@ export const options = {
 };
 
 const start = () => {
-  const params = { headers: { 'content-type': 'application/json', accept: 'application/json' }}
-  const res = http.post(`${baseUrl}/reader`, JSON.stringify({
-    query: `query GetUsers {\n  findManyUser(take: 1000) {\n\t\tid\n\t\temail\n\t\tname\n\t}\n}`,
-    operationName: "GetUsers"
+  const params = { 
+    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken }
+  }
+  const res = http.post(`${baseUrl}/graphql`, JSON.stringify({
+    query: `
+    query findArticles {
+      findManyArticle(take: 6000) {
+        id
+        url
+        title
+        subtitle
+        publication
+        claps
+      }
+    }
+    `,
+    operationName: "findArticles"
   }), params)
   check(res, {
     'is status 200': (r) => r.status === 200,
   });
   check(res, {
       'verify body': (r) =>
-          r.body ? r.body.includes('example.com') : false,
+          r.body ? r.body.includes('A Beginner’s Guide to Word Embedding with Gensim Word2Vec Model') : false,
   });
 
 };

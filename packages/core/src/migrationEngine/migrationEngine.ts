@@ -4,7 +4,9 @@ import { createLogger } from '../logger';
 import { errorLog, exists, getDatabaseUrl, sha1Hash } from '../utils';
 import execa from 'execa';
 import { ApplyMigrationRequest, isRPCError, isRPCMigrationResult, RPCResponse, rpcResponse } from './types';
-import { tracer } from '../tracer';
+import { logTraceSync, tracer } from '../tracer';
+
+const logger = createLogger({ name: 'MigrationEngine' });
 
 type MigrationEngineConfig = {
   binaryPath: string;
@@ -13,7 +15,6 @@ type MigrationEngineConfig = {
 };
 
 export class MigrationEngine {
-  private logger = createLogger({ name: 'MigrationEngine' });
   private messageId = 0;
   private migrationDone = false;
   private schemaHash: string | undefined;
@@ -60,7 +61,7 @@ export class MigrationEngine {
       return false;
     }
     if (!(await exists(this.migrationsPath))) {
-      this.logger.warn('No migrations exist: Database may remain empty.');
+      logger.warn('No migrations exist: Database may remain empty.');
       return false;
     }
     if (!(await exists(this.migrationLockFilePath))) {
@@ -88,13 +89,13 @@ export class MigrationEngine {
   @tracer.captureMethod()
   async apply(force = false): Promise<string[]> {
     if (!force && !(await this.requiresMigration())) {
-      this.logger.debug('Not running migration: Database already up-to-date');
+      logger.debug('Not running migration: Database already up-to-date');
       return [];
     }
     // optimistically lock the migration, to avoid another parallel migraiton
     await this.updateMigrationLockFile();
 
-    this.logger.info('Executing migration', { schemaHash: this.schemaHash });
+    logger.info('Executing migration', { schemaHash: this.schemaHash });
 
     let appliedMigrationNames: string[] | undefined;
     let migration: execa.ExecaChildProcess<string> | undefined;
@@ -116,17 +117,17 @@ export class MigrationEngine {
           migrationsDirectoryPath: this.migrationsPath,
         },
       };
-      this.logger.debug('Executing migration egnine RPC request', { request: migrationRequest });
+      logger.debug('Executing migration egnine RPC request', { request: migrationRequest });
       migration.stdin?.write(`${JSON.stringify(migrationRequest)}\n`);
 
       migration.stdout?.on('data', (chunk) => {
         const responseString = Buffer.from(chunk).toString();
         try {
-          this.logger.debug('Received migration response', { responseString });
+          logger.debug('Received migration response', { responseString });
           const response: RPCResponse = rpcResponse.parse(JSON.parse(responseString));
 
           if (isRPCError(response)) {
-            this.logger.error(response.error.data.message, {
+            logger.error(response.error.data.message, {
               code: response.error.code,
               error_code: response.error.data.error_code,
             });
@@ -136,9 +137,9 @@ export class MigrationEngine {
           if (isRPCMigrationResult(response)) {
             appliedMigrationNames = response.result.appliedMigrationNames;
             if (!appliedMigrationNames || appliedMigrationNames.length === 0) {
-              this.logger.info('No migration scripts required execution');
+              logger.info('No migration scripts required execution');
             } else {
-              this.logger.info(
+              logger.info(
                 `Executed ${appliedMigrationNames.length} migration${appliedMigrationNames.length !== 1 ? 's' : ''}`,
                 { appliedMigrationNames },
               );
@@ -148,7 +149,7 @@ export class MigrationEngine {
             return;
           }
           if (response.method === 'print') {
-            this.logger.info(response.params.content);
+            logger.info(response.params.content);
             // ACK message, very important, engine will wait for it
             migration?.stdin?.write(
               `${JSON.stringify({
@@ -160,7 +161,7 @@ export class MigrationEngine {
             return;
           }
         } catch (e) {
-          this.logger.error('Received invalid migration response', { error: errorLog(e), response: responseString });
+          logger.error('Received invalid migration response', { error: errorLog(e), response: responseString });
           migration?.kill(1);
         }
       });
@@ -170,7 +171,7 @@ export class MigrationEngine {
       // ignore a graceful SIGTERM stop, all good
       if (e?.signal !== 'SIGTERM') {
         await this.rollbackMigrationLockFile();
-        this.logger.error('Failed to apply migrations', errorLog(e));
+        logger.error('Failed to apply migrations', errorLog(e));
         throw new Error('Failed to apply migrations');
       }
     } finally {
@@ -205,10 +206,16 @@ export class MigrationEngine {
 
 let migrationEngine: MigrationEngine | undefined;
 
-export const getMigrationEngine = (config: MigrationEngineConfig): MigrationEngine => {
-  if (migrationEngine) {
-    return migrationEngine;
-  }
-  migrationEngine = new MigrationEngine(config);
-  return migrationEngine;
-};
+export const getMigrationEngine = (config: MigrationEngineConfig): MigrationEngine =>
+  logTraceSync({
+    logger,
+    segmentName: 'getMigrationEngine',
+    metadata: { firstInit: !!migrationEngine },
+    method: () => {
+      if (migrationEngine) {
+        return migrationEngine;
+      }
+      migrationEngine = new MigrationEngine(config);
+      return migrationEngine;
+    },
+  });

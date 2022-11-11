@@ -8,6 +8,7 @@ class ReaderWriterHandler {
 
   @tracer.captureLambdaHandler({ captureResponse: false })
   async handler(request: APIGatewayProxyEventV2 | Request, context: Context) {
+    tracer.annotateColdStart();
     tracer.getSegment().addMetadata('initType', process.env.AWS_LAMBDA_INITIALIZATION_TYPE);
     const { service, serverlessExpressHandler } = defaultApplicationContext;
 

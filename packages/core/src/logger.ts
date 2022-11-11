@@ -1,7 +1,7 @@
 import { createLogger as createWinstonLogger, format } from 'winston';
 import { Console } from 'winston/lib/winston/transports';
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
 export const createLogger = (
   meta: Record<string, unknown> | undefined = undefined,

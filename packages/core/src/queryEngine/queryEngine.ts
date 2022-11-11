@@ -3,12 +3,13 @@ import { Library, QueryEngineInstance } from '@prisma/engine-core/dist/library/t
 import { buildSchema, GraphQLSchema } from 'graphql';
 import { createLogger } from '../logger';
 import { Request, Response } from '../requestResponse';
-import { tracer } from '../tracer';
+import { logTraceSync, tracer } from '../tracer';
 import { errorLog, exists, getDatabaseUrl } from '../utils';
 import { interceptIntrospectionQuery } from './middlewares/interceptIntrospectionQuery';
 import { executeMiddlewares, MiddlewareContext } from './middlewares/middleware';
 import { optimizeOperation } from './middlewares/optimizeOperation';
 
+const logger = createLogger({ name: 'QueryEngine' });
 export type QueryEngineSettings = {
   libraryPath: string;
   prismaSchemaPath: string;
@@ -17,7 +18,6 @@ export type QueryEngineSettings = {
 };
 
 export class QueryEngine {
-  private logger = createLogger({ name: 'QueryEngine' });
   private graphQlSchema: GraphQLSchema | undefined;
   private engine: LibraryEngine;
 
@@ -42,7 +42,7 @@ export class QueryEngine {
         loadLibrary: async () => {
           const { libraryPath } = this.settings;
           if (!(await exists(libraryPath))) {
-            this.logger.error('Failed to load query engine node library. Library does not exist at given path', {
+            logger.error('Failed to load query engine node library. Library does not exist at given path', {
               libraryPath,
             });
             throw new Error(`Library does not exist: ${libraryPath}`);
@@ -81,7 +81,7 @@ export class QueryEngine {
     try {
       const operation = JSON.parse(context.request.body ?? '{}');
       const query = operation.query;
-      this.logger.debug('Executing operation', { operation });
+      logger.debug('Executing operation', { operation });
       const res = await this.engine.request(query);
       const response = {
         headers: {
@@ -93,14 +93,14 @@ export class QueryEngine {
 
       return response;
     } catch (e) {
-      this.logger.error('Failed to execute engine request', { ...errorLog(e), request: context.request });
+      logger.error('Failed to execute engine request', { ...errorLog(e), request: context.request });
       throw e;
     }
   }
 
   @tracer.captureMethod({ captureResponse: false })
   async execute(request: Request): Promise<Response> {
-    this.logger.debug('Handling request', {
+    logger.debug('Handling request', {
       request,
       operationOptimization: !this.settings.disableOperationOptimization,
     });
@@ -120,10 +120,16 @@ export class QueryEngine {
 }
 let queryEngine: QueryEngine | undefined;
 
-export const getQueryEngine = (config: QueryEngineSettings): QueryEngine => {
-  if (queryEngine) {
-    return queryEngine;
-  }
-  queryEngine = new QueryEngine(config);
-  return queryEngine;
-};
+export const getQueryEngine = (config: QueryEngineSettings): QueryEngine =>
+  logTraceSync({
+    logger,
+    segmentName: 'getQueryEngine',
+    metadata: { firstInit: !!queryEngine },
+    method: () => {
+      if (queryEngine) {
+        return queryEngine;
+      }
+      queryEngine = new QueryEngine(config);
+      return queryEngine;
+    },
+  });

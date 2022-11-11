@@ -9,9 +9,10 @@ const lambdaClient = tracer.captureAWSv3Client(new Lambda({}));
 const logger = createLogger({ name: 'ProxyHandler' });
 const queryRouter = new QueryRouter();
 
-export class ProxyHandler implements LambdaInterface {
+class ProxyHandler implements LambdaInterface {
   @tracer.captureLambdaHandler({ captureResponse: false })
   public async handler(event: APIGatewayProxyEventV2 | Request, _: Context): Promise<APIGatewayProxyResultV2> {
+    tracer.annotateColdStart();
     tracer.getSegment().addMetadata('initType', process.env.AWS_LAMBDA_INITIALIZATION_TYPE);
     const readerFunctionArn = process.env.READER_FUNCTION_ARN;
     const writerFunctionArn = process.env.WRITER_FUNCTION_ARN;

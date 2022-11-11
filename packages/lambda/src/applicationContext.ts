@@ -2,6 +2,7 @@ import { LamDBConfiguration, lamDBRouter, LamDBService } from '@lamdb/api-router
 import { Handler } from 'aws-lambda';
 import express, { Application } from 'express';
 import serverlessExpress from '@vendia/serverless-express';
+import { logTraceSync } from '@lamdb/core';
 
 class ApplicationContext {
   configuration = new LamDBConfiguration();
@@ -20,4 +21,7 @@ class ApplicationContext {
   }
 }
 
-export const defaultApplicationContext = new ApplicationContext();
+export const defaultApplicationContext = logTraceSync({
+  segmentName: 'ApplicationContext.init',
+  method: () => new ApplicationContext(),
+});

@@ -7,6 +7,8 @@
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
     "test:load:read": "k6 run src/read-load-test.js --no-usage-report",
-    "test:load:write": "k6 run src/write-load-test.js --no-usage-report"
+    "test:load:write": "k6 run src/write-load-test.js --no-usage-report",
+    "test:load:journey": "k6 run src/journey-load-test.js --no-usage-report",
+    "test:load:fly": "k6 run src/journey-fly.js --no-usage-report"
   }
 }

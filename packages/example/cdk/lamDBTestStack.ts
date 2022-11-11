@@ -26,9 +26,9 @@ export class LamDBTestStack extends Stack {
         },
       ],
       // Optional: Define some logging level for debugging and add reader/writer endpoints for testing
-      logLevel: 'debug',
+      logLevel: 'info',
       exposeReaderWriterEndpoints: true,
-      tracing: true,
+      tracing: false,
     });
 
     // Additional infrastructure for this specific example application

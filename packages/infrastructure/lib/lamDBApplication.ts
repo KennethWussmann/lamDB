@@ -114,10 +114,10 @@ export class LamDBApplication extends Construct {
     const fn = new LamDBFunction(this, id, {
       entry: join(__dirname, 'lambda', `${handler}.js`),
       tracing: this.props.tracing ? Tracing.ACTIVE : undefined,
+      logLevel: this.props.logLevel,
       ...props,
       ...this.props.lambda?.overwrites?.[type],
       environment: {
-        LOG_LEVEL: this.props.logLevel ?? 'info',
         DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',
         DATABASE_PATH: join(this.fileSystem.efsMountPath, 'database.db'),
         QUERY_ENGINE_LIBRARY_PATH: '/opt/libquery-engine.node',

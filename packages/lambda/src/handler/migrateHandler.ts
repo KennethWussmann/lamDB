@@ -17,6 +17,7 @@ class MigrateHandler implements LambdaInterface {
     { force = false, reset = false, migrate = true }: MigrationEvent = {},
     _: Context,
   ): Promise<unknown> {
+    tracer.annotateColdStart();
     tracer.getSegment().addMetadata('initType', process.env.AWS_LAMBDA_INITIALIZATION_TYPE);
     const { service } = defaultApplicationContext;
 

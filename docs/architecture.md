@@ -20,9 +20,6 @@ graph
     Lambda[<b>lambda</b><br/><hr/><small><i>AWS specific code to run lamDB on AWS Lambda<i/></small>] --> Core[<b>core</b><br/><hr/><small><i>bridge code to Prisma engines & utils<i/></small>]
     Server[<b>server</b><br/><hr/><small><i>Express app to run lamDB standalone in Docker<i/></small>] --> Core
     Infrastructure[<b>infrastructure</b><br/><hr/><small><i>CDK library to deploy lamDB to AWS<i/></small>] --> Lambda
-    APIRouter[<b>api-router</b><br/><hr/><small><i>Express router to abstract API behaviour<i/></small>] --> Core
-    Lambda --> APIRouter
-    Server --> APIRouter
     Core --> EngineLayer[<b>engine-layer</b><br/><hr/><small><i>Helper to download Prisma engines<i/></small>]
     Infrastructure --> EngineLayer
     Server --> EngineLayer

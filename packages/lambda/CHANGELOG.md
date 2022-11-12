@@ -1,5 +1,15 @@
 # @lamdb/lambda
 
+## 0.1.7
+
+### Patch Changes
+
+- c9b089d: Implement tracing and allow easy configuration of provisioned concurrency
+- 97392c4: Add ability to reset the database
+- 9b8e6e2: Improve bundle size
+- Updated dependencies [c9b089d]
+  - @lamdb/core@0.1.7
+
 ## 0.1.6
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@lamdb/core",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Kenneth Wußmann",
   "license": "MIT",
   "main": "dist/index.js",

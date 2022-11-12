@@ -1,7 +1,5 @@
 import { getIntrospectionQuery, GraphQLSchema, graphqlSync } from 'graphql';
-import { Response } from '../../requestResponse';
-import { tracer } from '../../tracer';
-import { errorLog } from '../../utils';
+import { Response, tracer, errorLog } from '../../utils';
 import { Middleware, MiddlewareContext, MiddlewareNextFunction } from './middleware';
 
 class InterceptIntrospectionQueryMiddleware implements Middleware {

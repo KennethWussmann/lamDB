@@ -1,8 +1,7 @@
 import { testQuery } from '../../../test/testOperation';
 import { getTestQueryEngine } from '../../../test/testQueryEngine';
 import { operationToRequest } from '../../../test/utils';
-import { createLogger } from '../../logger';
-import { Response } from '../../requestResponse';
+import { Response, createLogger } from '../../utils';
 import { executeMiddlewares, MiddlewareContext, QueryEngineProxyMiddleware } from './middleware';
 
 let context: MiddlewareContext;

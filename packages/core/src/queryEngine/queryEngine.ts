@@ -1,10 +1,8 @@
 import { LibraryEngine } from '@prisma/engine-core';
 import { Library, QueryEngineInstance } from '@prisma/engine-core/dist/library/types/Library';
 import { buildSchema, GraphQLSchema } from 'graphql';
-import { createLogger } from '../logger';
-import { Request, Response } from '../requestResponse';
-import { logTraceSync, tracer } from '../tracer';
-import { errorLog, exists, getDatabaseUrl } from '../utils';
+import { createLogger, Request, Response, logTraceSync, tracer } from '../utils';
+import { errorLog, exists, getDatabaseUrl } from '../utils/utils';
 import { interceptIntrospectionQuery } from './middlewares/interceptIntrospectionQuery';
 import { executeMiddlewares, MiddlewareContext } from './middlewares/middleware';
 import { optimizeOperation } from './middlewares/optimizeOperation';

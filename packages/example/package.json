@@ -13,12 +13,12 @@
     "migrate:dev": "prisma migrate dev",
     "codegen": "prisma generate --data-proxy",
     "build": "tsc",
-    "clean": "rm -rf ./build"
+    "clean": "rm -rf ./build ./cdk.out"
   },
   "devDependencies": {
+    "@lamdb/infrastructure": "*",
     "@aws-cdk/aws-apigatewayv2-alpha": "^2.50.0-alpha.0",
     "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.50.0-alpha.0",
-    "@lamdb/infrastructure": "*",
     "@types/aws-lambda": "^8.10.108",
     "aws-cdk": "^2.50.0",
     "aws-cdk-lib": "^2.50.0",

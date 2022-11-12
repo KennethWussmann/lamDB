@@ -15,9 +15,7 @@ import {
   visit,
 } from 'graphql';
 import { Logger } from 'winston';
-import { Response } from '../../requestResponse';
-import { captureMethod, captureMethodSync, tracer } from '../../tracer';
-import { errorLog, sha1Hash } from '../../utils';
+import { errorLog, sha1Hash, Response, captureMethod, captureMethodSync, tracer } from '../../utils';
 import { Middleware, MiddlewareContext, MiddlewareNextFunction } from './middleware';
 
 class OptimizeOperationMiddleware implements Middleware {

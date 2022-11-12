@@ -1,7 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { Request, requestSchema, Response } from '../../core/src/requestResponse';
 import { isExecutableDefinitionNode, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql';
-import { captureMethodSync, sha1Hash } from '@lamdb/core';
+import { captureMethodSync, Request, requestSchema, Response, sha1Hash } from '@lamdb/core';
 
 export const graphQlErrorResponse = (message: string): Response => ({
   status: 400,

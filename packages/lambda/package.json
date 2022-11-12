@@ -12,13 +12,11 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
+    "@lamdb/core": "*",
     "@aws-lambda-powertools/commons": "^1.4.0",
     "@aws-lambda-powertools/tracer": "^1.4.0",
     "@aws-sdk/client-lambda": "^3.201.0",
-    "@aws-sdk/client-secrets-manager": "^3.201.0",
-    "@lamdb/api-router": "*",
-    "@lamdb/core": "*",
-    "@vendia/serverless-express": "^4.10.1"
+    "@aws-sdk/client-secrets-manager": "^3.201.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.108"

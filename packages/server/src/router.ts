@@ -1,7 +1,6 @@
 import { Router, json } from 'express';
 import cors from 'cors';
-import { LamDBService } from './lamDBService';
-import { LamDBConfiguration } from './configuration';
+import { LamDBService, LamDBConfiguration } from '@lamdb/core';
 import { applyToExpressResponse, fromExpressRequest } from './utils';
 import { errorLog } from '@lamdb/core';
 

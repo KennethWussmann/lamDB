@@ -1,10 +1,8 @@
 import { readFile, rm, writeFile } from 'fs/promises';
 import { basename, dirname, join } from 'path';
-import { createLogger } from '../logger';
-import { errorLog, exists, getDatabaseUrl, sha1Hash } from '../utils';
+import { createLogger, logTraceSync, tracer, errorLog, exists, getDatabaseUrl, sha1Hash } from '../utils';
 import execa from 'execa';
 import { ApplyMigrationRequest, isRPCError, isRPCMigrationResult, RPCResponse, rpcResponse } from './types';
-import { logTraceSync, tracer } from '../tracer';
 
 const logger = createLogger({ name: 'MigrationEngine' });
 

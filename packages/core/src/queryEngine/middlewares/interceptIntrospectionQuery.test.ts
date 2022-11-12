@@ -1,7 +1,7 @@
 import { testQuery } from '../../../test/testOperation';
 import { getTestQueryEngine } from '../../../test/testQueryEngine';
 import { operationToRequest } from '../../../test/utils';
-import { createLogger } from '../../logger';
+import { createLogger } from '../../utils/logger';
 import { interceptIntrospectionQuery } from './interceptIntrospectionQuery';
 import { MiddlewareContext } from './middleware';
 

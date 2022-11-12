@@ -11,12 +11,12 @@ type CaptureMethodParams<T> = {
   segmentName: string;
   method: () => T;
   captureResponse?: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 };
 
 type LogTraceMethodParams<T> = CaptureMethodParams<T> & { logger?: Logger; level?: LogLevel };
 
-const addMetadata = (metadata: Record<string, any> | undefined) => {
+const addMetadata = (metadata: Record<string, unknown> | undefined) => {
   if (!metadata) {
     return;
   }

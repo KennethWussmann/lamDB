@@ -1,6 +1,34 @@
+import { createHash } from 'crypto';
+import { access } from 'fs/promises';
 import { isExecutableDefinitionNode, OperationDefinitionNode, OperationTypeNode, parse } from 'graphql';
-import { Request, Response, sha1Hash } from '@lamdb/core';
-import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import { Request, Response } from './requestResponse';
+
+export const sha1Hash = (operation: string): string => {
+  const hashsum = createHash('sha1');
+  hashsum.update(operation);
+  return hashsum.digest('hex').toString();
+};
+
+export const exists = async (file: string) => {
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const errorLog = (e: unknown): object => {
+  const error = e as Error;
+  return {
+    error: {
+      name: error.name,
+      message: error.message,
+      cause: error.cause,
+      stack: error.stack,
+    },
+  };
+};
 
 export const graphQlErrorResponse = (message: string): Response => ({
   status: 400,
@@ -16,21 +44,6 @@ export const graphQlErrorResponse = (message: string): Response => ({
     'content-type': 'application/json',
   },
 });
-
-export const fromExpressRequest = (expressRequest: ExpressRequest): Request => ({
-  method: expressRequest.method,
-  body: JSON.stringify(expressRequest.body),
-  headers: Object.fromEntries(
-    Object.entries(expressRequest.headers).map(([key, value]) => [key, Array.isArray(value) ? value[0] : value ?? '']),
-  ),
-  path: expressRequest.path,
-});
-
-export const applyToExpressResponse = (response: Response, expressResponse: ExpressResponse) => {
-  Object.entries(response.headers).forEach(([key, value]) => expressResponse.setHeader(key, value));
-  expressResponse.status(response.status);
-  expressResponse.send(response.body);
-};
 
 export const getOperationInfo = (
   request: Request,
@@ -72,3 +85,6 @@ export const getOperationInfo = (
     hash: request.body ? sha1Hash(request.body) : undefined,
   };
 };
+
+export const getDatabaseUrl = (databaseFilePath: string) =>
+  `file:${databaseFilePath}?pool_timeout=3&connection_limit=1`;

@@ -1,5 +1,5 @@
 import { Logger } from 'winston';
-import { Request, Response } from '../../requestResponse';
+import { Request, Response } from '../../utils';
 import { QueryEngine } from '../queryEngine';
 
 export type MiddlewareContext = {

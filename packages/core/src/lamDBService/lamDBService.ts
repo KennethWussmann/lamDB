@@ -1,21 +1,24 @@
+import { getMigrationEngine, MigrationEngine } from '../migrationEngine';
+import { getQueryEngine, QueryEngine } from '../queryEngine';
 import {
   createLogger,
   errorLog,
-  getMigrationEngine,
-  getQueryEngine,
-  MigrationEngine,
-  QueryEngine,
+  logTraceSync,
   Request,
   tracer,
-} from '@lamdb/core';
-import { LamDBConfiguration } from './configuration';
-import { getOperationInfo, graphQlErrorResponse } from './utils';
+  LamDBConfiguration,
+  getOperationInfo,
+  graphQlErrorResponse,
+} from '../utils';
 
 export type LamDBServiceConfig = {
   queryEngine: QueryEngine;
   migrationEngine: MigrationEngine;
 };
 
+/**
+ * Service that offers an opinionated interface to the Query- and MigrationEngine.
+ */
 export class LamDBService {
   private queryEngine: QueryEngine;
   private migrationEngine: MigrationEngine;
@@ -76,10 +79,15 @@ export class LamDBService {
 
 let lamDBService: LamDBService | undefined;
 
-export const getLamDBService = (config: LamDBConfiguration): LamDBService => {
-  if (lamDBService) {
-    return lamDBService;
-  }
-  lamDBService = new LamDBService(config);
-  return lamDBService;
-};
+export const getLamDBService = (config: LamDBConfiguration): LamDBService =>
+  logTraceSync({
+    segmentName: 'getLamDBService',
+    metadata: { firstInit: !!lamDBService },
+    method: () => {
+      if (lamDBService) {
+        return lamDBService;
+      }
+      lamDBService = new LamDBService(config);
+      return lamDBService;
+    },
+  });

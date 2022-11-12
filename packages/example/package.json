@@ -22,13 +22,13 @@
     "@types/aws-lambda": "^8.10.108",
     "aws-cdk": "^2.50.0",
     "aws-cdk-lib": "^2.50.0",
-    "constructs": "^10.1.147",
-    "prisma": "^4.5.0"
+    "constructs": "^10.1.157",
+    "prisma": "^4.6.1"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.201.0",
-    "@prisma/client": "^4.5.0",
-    "esbuild": "^0.15.12",
+    "@aws-sdk/client-secrets-manager": "^3.209.0",
+    "@prisma/client": "^4.6.1",
+    "esbuild": "^0.15.13",
     "zod": "^3.19.1"
   }
 }

@@ -1,5 +1,11 @@
 # @lamdb/core
 
+## 0.1.7
+
+### Patch Changes
+
+- c9b089d: Implement tracing and allow easy configuration of provisioned concurrency
+
 ## 0.1.6
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @lamdb/infrastructure
 
+## 0.1.7
+
+### Patch Changes
+
+- c9b089d: Implement tracing and allow easy configuration of provisioned concurrency
+- 9b8e6e2: Improve bundle size
+- Updated dependencies [c9b089d]
+- Updated dependencies [97392c4]
+- Updated dependencies [9b8e6e2]
+  - @lamdb/lambda@0.1.7
+
 ## 0.1.6
 
 ### Patch Changes

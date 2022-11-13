@@ -1,6 +1,6 @@
 {
   "name": "@lamdb/infrastructure",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "author": "Kenneth Wußmann",
   "license": "MIT",
   "main": "dist/index.js",

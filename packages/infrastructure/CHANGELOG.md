@@ -1,5 +1,14 @@
 # @lamdb/infrastructure
 
+## 0.1.9
+
+### Patch Changes
+
+- 1dd9371: Release
+- Updated dependencies [1dd9371]
+  - @lamdb/api-token-authorizer@0.1.9
+  - @lamdb/lambda@0.1.9
+
 ## 0.1.7
 
 ### Patch Changes

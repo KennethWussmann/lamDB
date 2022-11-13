@@ -1,5 +1,13 @@
 # @lamdb/lambda
 
+## 0.1.9
+
+### Patch Changes
+
+- 1dd9371: Release
+- Updated dependencies [1dd9371]
+  - @lamdb/core@0.1.9
+
 ## 0.1.8
 
 ### Patch Changes

@@ -14,7 +14,6 @@
   "dependencies": {
     "@lamdb/core": "*",
     "@aws-lambda-powertools/commons": "^1.4.1",
-    "@aws-lambda-powertools/tracer": "^1.4.1",
     "@aws-sdk/client-lambda": "^3.209.0"
   },
   "devDependencies": {

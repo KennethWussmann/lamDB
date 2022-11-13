@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@lamdb/commons": "*",
-    "@aws-lambda-powertools/tracer": "^1.4.1",
     "@graphql-tools/load": "^7.8.5",
     "@graphql-tools/merge": "^8.3.11",
     "@graphql-tools/relay-operation-optimizer": "^6.5.11",

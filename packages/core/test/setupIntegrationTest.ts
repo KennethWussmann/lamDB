@@ -1,6 +1,6 @@
+import { exists } from '@lamdb/commons';
 import { rm } from 'fs/promises';
 import { join } from 'path';
-import { exists } from '../src';
 import { prismaPath } from './binaryPaths';
 
 beforeEach(async () => {

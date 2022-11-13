@@ -2,12 +2,13 @@
   <h1><code>lamDB</code></h1>
 
   <p>
-    <strong>Pay as you go true serverless relational database using SQLite on Lambda</strong>
+    <strong>Pay as you go true serverless relational database using SQLite on AWS Lambda</strong>
   </p>
 </div>
 
 ## Features
 
+- **SQLite**: Use the power of SQLite on AWS Lambda
 - **Auto-scaling:** Running on AWS Lambda and scaling like you're used to
 - **Cluster:** Single-writer, multi-reader cluster by default
 - **Simple backups:** S3 versioned buckets for perfect backup and restore procedures
@@ -20,7 +21,17 @@
 
 ## Getting started
 
-Deploying lamDB is done in 3 easy steps. Read the [getting started guide](docs/getting-started.md).
+```typescript
+// This is all what's needed to deploy a new serverless relational database using LamDB and CDK
+const lamDB = new LamDB(this, 'LamDBTest', {
+  // Give a unique name to name and identify the infrastructure
+  name: 'lamdb-test',
+  // Provide the path to your Prisma schema
+  schemaPath: join(__dirname, '../prisma/schema.prisma'),
+});
+```
+
+Deploying lamDB is done in 3 easy steps. Read the [getting started guide](docs/getting-started.md) or see the [full example](./packages/example/).
 
 Not sure if this is the right for you? Check the [FAQ](docs/faq.md)
 

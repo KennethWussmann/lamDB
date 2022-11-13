@@ -12,7 +12,7 @@ export class LamDBTestStack extends Stack {
 
     const schemaPath = join(__dirname, '../prisma/schema.prisma');
 
-    // This is all what's needed to deploy a new serverless relation database using LamDB
+    // This is all what's needed to deploy a new serverless relational database using LamDB
     const lamDB = new LamDB(this, 'LamDBTest', {
       // Give a unique name to name and identify the infrastructure
       name: 'lamdb-test',

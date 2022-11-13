@@ -3,11 +3,14 @@ import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { LambdaInterface } from '@aws-lambda-powertools/commons';
 import { tracer } from '@lamdb/commons';
 
-class APITokenAuthorizer implements LambdaInterface {
+export class APITokenAuthorizer implements LambdaInterface {
   apiTokens: string[] = [];
   apiTokensValidUntil = -1;
 
-  constructor(private secretsManager: SecretsManager = tracer.captureAWSv3Client(new SecretsManager({}))) {}
+  constructor(
+    private secretsManager: SecretsManager = tracer.captureAWSv3Client(new SecretsManager({})),
+    private secretPrefix = process.env.SECRET_PREFIX ?? '',
+  ) {}
 
   @tracer.captureLambdaHandler()
   public async handler(
@@ -15,18 +18,14 @@ class APITokenAuthorizer implements LambdaInterface {
     _: Context,
   ): Promise<APIGatewaySimpleAuthorizerResult> {
     tracer.annotateColdStart();
-    const secretPrefix = process.env.SECRET_PREFIX;
-    if (!secretPrefix) {
-      throw new Error('Secret prefix environment variable not set: SECRET_PREFIX');
-    }
-    tracer.getSegment().addMetadata('secretPrefix', secretPrefix);
+    tracer.getSegment().addMetadata('secretPrefix', this.secretPrefix);
 
     const usedToken = this.getApiTokenFromRequest(event);
     if (!usedToken) {
       return { isAuthorized: false };
     }
 
-    const tokens = await this.getApiTokens(secretPrefix);
+    const tokens = await this.getApiTokens();
     return {
       isAuthorized: tokens.includes(usedToken),
     };
@@ -50,28 +49,26 @@ class APITokenAuthorizer implements LambdaInterface {
   }
 
   @tracer.captureMethod({ captureResponse: false })
-  private async getApiTokens(secretPrefix: string): Promise<string[]> {
-    tracer.getSegment().addMetadata('secretPrefix', secretPrefix);
+  private async getApiTokens(): Promise<string[]> {
     const tokenCacheValid = this.apiTokensValidUntil > new Date().getTime() && this.apiTokens.length > 0;
     tracer.getSegment().addMetadata('tokenCacheValid', tokenCacheValid);
     if (tokenCacheValid) {
       return this.apiTokens;
     }
 
-    this.apiTokens = await this.getSecretValues(secretPrefix);
+    this.apiTokens = await this.getSecretValues();
     this.apiTokensValidUntil = new Date().getTime() + 1000 * 30;
 
     return this.apiTokens;
   }
 
   @tracer.captureMethod()
-  private async findSecretNames(secretPrefix: string): Promise<string[]> {
-    tracer.getSegment().addMetadata('secretPrefix', secretPrefix);
+  private async findSecretNames(): Promise<string[]> {
     const result = await this.secretsManager.listSecrets({
       Filters: [
         {
           Key: 'name',
-          Values: [secretPrefix],
+          Values: [this.secretPrefix],
         },
       ],
     });
@@ -80,9 +77,8 @@ class APITokenAuthorizer implements LambdaInterface {
   }
 
   @tracer.captureMethod({ captureResponse: false })
-  async getSecretValues(secretPrefix: string): Promise<string[]> {
-    tracer.getSegment().addMetadata('secretPrefix', secretPrefix);
-    const names = await this.findSecretNames(secretPrefix);
+  async getSecretValues(): Promise<string[]> {
+    const names = await this.findSecretNames();
 
     return await Promise.all(
       names.map(async (name) => {

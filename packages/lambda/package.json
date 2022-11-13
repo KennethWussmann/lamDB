@@ -1,6 +1,6 @@
 {
   "name": "@lamdb/lambda",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "author": "Kenneth Wußmann",
   "license": "MIT",
   "main": "dist/lambda/src/index.js",

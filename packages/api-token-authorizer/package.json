@@ -12,7 +12,7 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "@lamdb/core": "*",
+    "@lamdb/commons": "*",
     "@aws-lambda-powertools/commons": "^1.4.1",
     "@aws-lambda-powertools/tracer": "^1.4.1",
     "@aws-sdk/client-secrets-manager": "^3.209.0"

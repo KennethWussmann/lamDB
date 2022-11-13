@@ -1,4 +1,4 @@
-import { createLogger } from '../../utils';
+import { createLogger } from '@lamdb/commons';
 import { optimizeOperation } from './optimizeOperation';
 import { getTestQueryEngine } from '../../../test/testQueryEngine';
 import { operationToRequest } from '../../../test/utils';

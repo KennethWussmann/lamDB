@@ -1,5 +1,5 @@
 import { getIntrospectionQuery, GraphQLSchema, graphqlSync } from 'graphql';
-import { Response, tracer, errorLog } from '../../utils';
+import { Response, tracer, errorLog } from '@lamdb/commons';
 import { Middleware, MiddlewareContext, MiddlewareNextFunction } from './middleware';
 
 class InterceptIntrospectionQueryMiddleware implements Middleware {

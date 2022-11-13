@@ -1,5 +1,5 @@
 import { LambdaInterface } from '@aws-lambda-powertools/commons';
-import { createLogger, tracer } from '@lamdb/core';
+import { createLogger, tracer } from '@lamdb/commons';
 import { Context } from 'aws-lambda';
 import { defaultApplicationContext } from '../applicationContext';
 

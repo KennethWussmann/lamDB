@@ -15,7 +15,7 @@ import {
   visit,
 } from 'graphql';
 import { Logger } from 'winston';
-import { errorLog, sha1Hash, Response, captureMethod, captureMethodSync, tracer } from '../../utils';
+import { errorLog, sha1Hash, Response, captureMethod, captureMethodSync, tracer } from '@lamdb/commons';
 import { Middleware, MiddlewareContext, MiddlewareNextFunction } from './middleware';
 
 class OptimizeOperationMiddleware implements Middleware {

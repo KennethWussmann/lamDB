@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 import { getRequestFromUnion, toApiGatewayResponse } from '../utils';
-import { createLogger, Request, tracer } from '@lamdb/core';
+import { createLogger, Request, tracer } from '@lamdb/commons';
 import { LambdaInterface } from '@aws-lambda-powertools/commons';
 import { QueryRouter } from '../queryRouter';
 import { Lambda } from '@aws-sdk/client-lambda';

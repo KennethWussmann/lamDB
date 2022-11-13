@@ -1,5 +1,5 @@
 import { Logger } from 'winston';
-import { Request, Response } from '../../utils';
+import { Request, Response } from '@lamdb/commons';
 import { QueryEngine } from '../queryEngine';
 
 export type MiddlewareContext = {

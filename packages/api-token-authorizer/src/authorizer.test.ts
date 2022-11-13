@@ -2,6 +2,7 @@ import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { APITokenAuthorizer } from './authorizer';
 import { DeepMockProxy, mock, mockDeep } from 'jest-mock-extended';
 import { APIGatewayRequestAuthorizerEventV2, Context } from 'aws-lambda';
+
 let authorizer: APITokenAuthorizer;
 let secretsManagerMock: DeepMockProxy<SecretsManager>;
 

@@ -3,9 +3,9 @@ import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { LambdaInterface } from '@aws-lambda-powertools/commons';
 import { tracer } from '@lamdb/commons';
 
-const secretsManager = tracer.captureAWSv3Client(new SecretsManager({}));
+export class RotationHandler implements LambdaInterface {
+  constructor(private secretsManager = tracer.captureAWSv3Client(new SecretsManager({}))) {}
 
-class RotationHandler implements LambdaInterface {
   @tracer.captureLambdaHandler({ captureResponse: false })
   public async handler(event: SecretsManagerRotationEvent, _: Context): Promise<void> {
     tracer.annotateColdStart();
@@ -27,7 +27,7 @@ class RotationHandler implements LambdaInterface {
   @tracer.captureMethod({ captureResponse: false })
   private async updateToken(secretId: string, token: string): Promise<void> {
     tracer.getSegment().addMetadata('secretId', secretId);
-    await secretsManager.updateSecret({
+    await this.secretsManager.updateSecret({
       SecretId: secretId,
       SecretString: token,
     });

@@ -1,6 +1,6 @@
-import { fromApiGatewayResponse, getOperationInfo, graphQlErrorResponse } from './utils';
+import { fromApiGatewayResponse, graphQlErrorResponse } from './utils';
 import { Lambda } from '@aws-sdk/client-lambda';
-import { errorLog, tracer, createLogger, Request, Response } from '@lamdb/core';
+import { getOperationInfo, errorLog, tracer, createLogger, Request, Response } from '@lamdb/commons';
 
 const logger = createLogger({ name: 'QueryRouter' });
 

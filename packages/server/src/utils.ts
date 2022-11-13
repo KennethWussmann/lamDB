@@ -1,4 +1,4 @@
-import { Request, Response } from '@lamdb/core';
+import { Request, Response } from '@lamdb/commons';
 import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 
 export const fromExpressRequest = (expressRequest: ExpressRequest): Request => ({

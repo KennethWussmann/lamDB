@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, Context, Handler } from 'aws-lambda';
 import { fromApiGatwayRequest, isRequest, toApiGatewayResponse } from '../utils';
-import { Request, tracer } from '@lamdb/core';
+import { Request, tracer } from '@lamdb/commons';
 import { defaultApplicationContext } from '../applicationContext';
 
 class ReaderWriterHandler {

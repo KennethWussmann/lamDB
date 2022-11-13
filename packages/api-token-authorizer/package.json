@@ -1,5 +1,5 @@
 {
-  "name": "@lamdb/lambda",
+  "name": "@lamdb/api-token-authorizer",
   "version": "0.1.7",
   "author": "Kenneth Wußmann",
   "license": "MIT",
@@ -12,9 +12,8 @@
     "clean": "rm -rf ./dist"
   },
   "dependencies": {
-    "@lamdb/core": "*",
-    "@aws-lambda-powertools/commons": "^1.4.1",
-    "@aws-sdk/client-lambda": "^3.209.0"
+    "@lamdb/commons": "*",
+    "@aws-sdk/client-secrets-manager": "^3.209.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.108"

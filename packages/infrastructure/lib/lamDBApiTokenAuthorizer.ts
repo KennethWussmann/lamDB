@@ -42,7 +42,7 @@ export class LamDBApiTokenAuthorizer extends Construct {
       memorySize: 128,
       tracing,
       logLevel: props.logLevel,
-      entry: join(__dirname, 'lambda', 'authorizer.js'),
+      entry: join(__dirname, 'lambda', 'rotation.js'),
       ...props.lambdaFunctionProps?.['token-rotation'],
       environment: {
         SECRET_PREFIX: secretPrefix,

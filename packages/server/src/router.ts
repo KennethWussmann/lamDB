@@ -2,7 +2,7 @@ import { Router, json } from 'express';
 import cors from 'cors';
 import { LamDBService, LamDBConfiguration } from '@lamdb/core';
 import { applyToExpressResponse, fromExpressRequest } from './utils';
-import { errorLog } from '@lamdb/core';
+import { errorLog } from '@lamdb/commons';
 
 export type RouterConfig = {
   configuration: LamDBConfiguration;

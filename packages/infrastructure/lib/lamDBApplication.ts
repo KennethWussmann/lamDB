@@ -71,6 +71,8 @@ export class LamDBApplication extends Construct {
         WRITER_FUNCTION_ARN: this.writer.functionArn,
         READER_FUNCTION_ARN: this.reader.functionArn,
       },
+      false,
+      false,
     );
     this.reader.grantInvoke(this.proxy);
     this.writer.grantInvoke(this.proxy);
@@ -110,6 +112,7 @@ export class LamDBApplication extends Construct {
     props: LamDBFunctionProps,
     additionalEnvironmentVariables: Record<string, string> = {},
     includeMigrations = false,
+    includeSchema = true,
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
       entry: join(__dirname, 'lambda', `${handler}.js`),
@@ -132,8 +135,12 @@ export class LamDBApplication extends Construct {
           afterBundling: () => [],
           beforeInstall: () => [],
           beforeBundling: (_, outputDir: string) => [
-            `echo "Copying prisma schema from ${this.props.schemaPath} to ${outputDir}"`,
-            `cp ${this.props.schemaPath} ${outputDir}`,
+            ...(includeSchema
+              ? [
+                  `echo "Copying prisma schema from ${this.props.schemaPath} to ${outputDir}"`,
+                  `cp ${this.props.schemaPath} ${outputDir}`,
+                ]
+              : []),
             ...(includeMigrations
               ? [
                   `echo "Copying prisma migrations from ${join(

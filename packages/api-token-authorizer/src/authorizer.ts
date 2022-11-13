@@ -1,7 +1,7 @@
 import { APIGatewaySimpleAuthorizerResult, APIGatewayRequestAuthorizerEventV2, Context } from 'aws-lambda';
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 import { LambdaInterface } from '@aws-lambda-powertools/commons';
-import { tracer } from '@lamdb/core';
+import { tracer } from '@lamdb/commons';
 
 class APITokenAuthorizer implements LambdaInterface {
   secretsManager = tracer.captureAWSv3Client(new SecretsManager({}));

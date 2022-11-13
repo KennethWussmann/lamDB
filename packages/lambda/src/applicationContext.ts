@@ -1,5 +1,5 @@
 import { LamDBConfiguration, LamDBService } from '@lamdb/core';
-import { logTraceSync } from '@lamdb/core';
+import { logTraceSync } from '@lamdb/commons';
 
 class ApplicationContext {
   configuration = new LamDBConfiguration();

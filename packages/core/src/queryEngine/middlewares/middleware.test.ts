@@ -1,7 +1,7 @@
 import { testQuery } from '../../../test/testOperation';
 import { getTestQueryEngine } from '../../../test/testQueryEngine';
 import { operationToRequest } from '../../../test/utils';
-import { Response, createLogger } from '../../utils';
+import { Response, createLogger } from '@lamdb/commons';
 import { executeMiddlewares, MiddlewareContext, QueryEngineProxyMiddleware } from './middleware';
 
 let context: MiddlewareContext;

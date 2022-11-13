@@ -1,7 +1,8 @@
-import { createLogger, getLamDBService, LamDBConfiguration } from '@lamdb/core';
+import { getLamDBService, LamDBConfiguration } from '@lamdb/core';
 import express from 'express';
 import { config } from 'dotenv';
 import { lamDBRouter } from './router';
+import { createLogger } from '@lamdb/commons';
 
 config();
 const logger = createLogger({ name: 'Server' });

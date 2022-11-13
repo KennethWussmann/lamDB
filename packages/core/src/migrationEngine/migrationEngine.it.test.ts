@@ -1,5 +1,5 @@
 import { databaseMigrationLockPath, databasePath, migrationEnginePath, prismaSchemaPath } from '../../test/binaryPaths';
-import { exists } from '../utils/utils';
+import { exists } from '@lamdb/commons';
 import { MigrationEngine } from './migrationEngine';
 
 const engine = new MigrationEngine({

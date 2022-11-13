@@ -1,5 +1,5 @@
+import { Request } from '@lamdb/commons';
 import { DocumentNode, print } from 'graphql';
-import { Request } from '../src';
 
 export const operationDocumentNodeToRequest = (
   operation: DocumentNode,

@@ -1,4 +1,4 @@
-import { Request } from '../src';
+import { Request } from '@lamdb/commons';
 import { operationToRequest } from './utils';
 
 /**

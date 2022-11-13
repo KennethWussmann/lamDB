@@ -4,9 +4,10 @@ import { LambdaInterface } from '@aws-lambda-powertools/commons';
 import { tracer } from '@lamdb/commons';
 
 class APITokenAuthorizer implements LambdaInterface {
-  secretsManager = tracer.captureAWSv3Client(new SecretsManager({}));
   apiTokens: string[] = [];
   apiTokensValidUntil = -1;
+
+  constructor(private secretsManager: SecretsManager = tracer.captureAWSv3Client(new SecretsManager({}))) {}
 
   @tracer.captureLambdaHandler()
   public async handler(

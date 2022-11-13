@@ -3,7 +3,9 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [["@lamdb/core", "@lamdb/infrastructure", "@lamdb/lambda"]],
+  "linked": [
+    ["@lamdb/api-token-authorizer", "@lamdb/commons", "@lamdb/core", "@lamdb/infrastructure", "@lamdb/lambda"]
+  ],
   "access": "restricted",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",

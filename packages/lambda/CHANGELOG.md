@@ -1,5 +1,11 @@
 # @lamdb/lambda
 
+## 0.1.8
+
+### Patch Changes
+
+- 0e939c2: Extract authorizer from main lambda package to reduce bundle size
+
 ## 0.1.7
 
 ### Patch Changes

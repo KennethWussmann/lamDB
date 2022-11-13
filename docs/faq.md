@@ -6,12 +6,9 @@ The applications can be versatile. It is designed for high read demand and lower
 
 It's not desgined to replace your DynamoDB (in most cases), but rather to extend your serverless options. LamDB can be a perfect serverless search engine, for example. Just mirror searchable content from DynamoDB to lamDB for complex queries and fulltext search.
 
-Given how Lambda works there are cold starts, where the database may need to be downloaded to the instance. Due to the single writer you may experience throttling in high throughput times. That's sadly a limitation that is hard to get around.
+Given how Lambda works there are cold starts, where the code needs to be initialized and connections needs to be established. Due to the single writer you may experience throttling in high throughput times. That's sadly a limitation that is hard to get around.
 
-The database size is also important to monitor. As the file grows cold-starts are getting longer.
-Databases up to 800 MB should still be fine.
-
-Hence the limitations, it's great for read intensive applications with lower write throughput and known database size.
+Hence the limitations, it's great for read intensive applications where the one second cold-start does not hurt with lower write throughput and known database size.
 
 ## What does lamDB cost to run?
 

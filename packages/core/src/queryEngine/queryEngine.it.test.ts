@@ -7,6 +7,7 @@ const engine = new QueryEngine({
   libraryPath: queryEnginePath,
   databaseFilePath: databasePath,
   prismaSchemaPath: prismaSchemaPath,
+  operationOptimization: true,
 });
 
 describe('queryEngine', () => {

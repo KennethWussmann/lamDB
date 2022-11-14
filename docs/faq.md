@@ -10,6 +10,8 @@ Due to the single writer you may experience throttling in high throughput times.
 
 Hence the limitations, it's great for read intensive applications where the one second cold-start does not hurt with lower write throughput and known database size.
 
+Read more about the [motivation behind lamDB](./motivation.md).
+
 ## What does lamDB cost to run?
 
 Lets compare some different managed database options. Notice that these are at best rough estimates, especially with lamDB where it also depends on network traffic. Also all these providers offer a magnitude of different features, performance and quality and should rather give you a rough idea where you stand when choosing lamDB.
@@ -50,7 +52,7 @@ If you keep the limitations in mind, yes. LamDB uses Prisma and AWS - software t
 ## How does auto-scaling work?
 
 Just like AWS lambda, because it's running on it. The default setup is using single-writer, multi-reader.
-Means the default configuration is designed for high read demand and lower writer throughput. That's to avoid merge conflicts with the SQLite database when multiple lambda instances want to write to the database.
+Means the default configuration is designed for read demand and lower writer throughput. That's to avoid merge conflicts with the SQLite database when multiple lambda instances want to write to the database.
 
 You don't need to worry about redirecting your writes or reads to a certain instance. The writer and readers are conveniently behind an extra proxy endpoint that takes care of routing reads and writes to the correct destination. It also takes care of write throttling.
 
@@ -63,14 +65,15 @@ Read more about connecting to the database in the [getting started guide](gettin
 
 ## How is the database secured?
 
-By default it's running behind an API Gateway secured by IAM auth. Means you need to do IAM signed requests to use the API.
-But API Gateway is flexible and can be configured from Cognito to API keys or no auth at all however you prefer.
+By default it's not secured and publicly accessible via API Gateway.
+But API Gateway is flexible and can be configured from IAM auth (recommended), Cognito to API tokens.
+It's not advised to keep the database publicly accessible. If you are unsure and just testing, the API tokens are a good start though.
 
 The docker image does not come with any authentication. Just add an API Gateway (Kong, Traefik, caddy, nginx, etc.) of your choice in front of it.
 
 ## Single-writer, are writes throttled?
 
-Yes, when the writer is busy, write requests will be retried for a configurable amount of time.
+Yes, when the writer is busy, write requests will be retried. Once they reach the maximum retry count the request will fail.
 
 ## How can I improve response times?
 

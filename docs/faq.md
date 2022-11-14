@@ -1,5 +1,15 @@
 # FAQ
 
+1. [Whom is this for?](#whom-is-this-for)
+2. [What does lamDB cost to run?](#what-does-lamdb-cost-to-run)
+3. [Can I run lamDB outside AWS Lambda?](#can-i-run-lamdb-outside-aws-lambda)
+4. [Is it production-ready?](#is-it-production-ready)
+5. [How does auto-scaling work?](#how-does-auto-scaling-work)
+6. [How can I access the database?](#how-can-i-access-the-database)
+7. [How is the database secured?](#how-is-the-database-secured)
+8. [Single-writer, are writes throttled?](#single-writer-are-writes-throttled)
+9. [How can I improve response times?](#how-can-i-improve-response-times)
+
 ## Whom is this for?
 
 The applications can be versatile. It is designed for high read demand and lower write throughput.

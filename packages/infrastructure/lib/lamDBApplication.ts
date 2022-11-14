@@ -126,7 +126,7 @@ export class LamDBApplication extends Construct {
         QUERY_ENGINE_LIBRARY_PATH: '/opt/libquery-engine.node',
         MIGRATION_ENGINE_BINARY_PATH: '/opt/migration-engine',
         PRISMA_SCHEMA_PATH: './schema.prisma',
-        DISABLE_OPERATION_OPTIMIZATION: this.props.operationOptimization === false ? 'true' : 'false',
+        OPERATION_OPTIMIZATION: this.props.operationOptimization === true ? 'true' : 'false',
         ...additionalEnvironmentVariables,
         ...this.props.lambda?.overwrites?.[type]?.environment,
       },

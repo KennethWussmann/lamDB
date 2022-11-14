@@ -17,8 +17,8 @@ export class LamDBConfiguration {
   get prismaSchemaPath() {
     return assertEnv('PRISMA_SCHEMA_PATH');
   }
-  get disableOperationOptimization() {
-    return assertEnv('DISABLE_OPERATION_OPTIMIZATION', 'false').toLowerCase() === 'true';
+  get operationOptimization() {
+    return assertEnv('OPERATION_OPTIMIZATION', 'false').toLowerCase() === 'true';
   }
 
   get server() {

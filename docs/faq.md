@@ -6,7 +6,7 @@ The applications can be versatile. It is designed for high read demand and lower
 
 It's not desgined to replace your DynamoDB (in most cases), but rather to extend your serverless options. LamDB can be a perfect serverless search engine, for example. Just mirror searchable content from DynamoDB to lamDB for complex queries and fulltext search.
 
-Given how Lambda works there are cold starts, where the code needs to be initialized and connections needs to be established. Due to the single writer you may experience throttling in high throughput times. That's sadly a limitation that is hard to get around.
+Due to the single writer you may experience throttling in high throughput times. That's sadly a limitation that is hard to get around.
 
 Hence the limitations, it's great for read intensive applications where the one second cold-start does not hurt with lower write throughput and known database size.
 
@@ -57,7 +57,9 @@ You don't need to worry about redirecting your writes or reads to a certain inst
 ## How can I access the database?
 
 LamDB exposes a dynamic GraphQL API based on your database schema. The API is provided by a subprocess of Prisma's query engine running in the background.
-So you may not be able to use your favorite ORM out of the box, but actually you don't really need one - the GraphQL API is enough.
+As lamDB uses Prisma's own query engine you can just use Prisma client as your ORM, but actually you don't really need an ORM - the GraphQL API is enough.
+
+Read more about connecting to the database in the [getting started guide](getting-started.md).
 
 ## How is the database secured?
 
@@ -72,13 +74,7 @@ Yes, when the writer is busy, write requests will be retried for a configurable 
 
 ## How can I improve response times?
 
-### Keep database size small
-
-The network overhead of a large database can add up quickly in response times.
-
-### Assign more memory
-
-Assigning more RAM will increase costs, but also CPU which is helpful when communicating with the database.
+Given how Lambda works there are cold starts, where the code needs to be initialized and connections needs to be established. The base cold start time of [JavaScript lambdas is around 400 ms](https://mikhail.io/serverless/coldstarts/aws/). There is no way of getting quicker than that. LamDB Lambdas are around 700 kB big and require some initialization of the Prisma Query Engine. Therefore the cold start with a small response is currently around 1.5 seconds. Warm instances respond in 50 - 80 ms, also depends on the response size of course.
 
 ### Use the reader and writer directly
 
@@ -110,3 +106,9 @@ new LamDB(
   },
 );
 ```
+
+### Notes on database size and memory
+
+A smaller database file can improve performance. Also check this [blog post with tips to improve SQLite performance](https://phiresky.github.io/blog/2020/sqlite-performance-tuning/).
+
+Assigning more memory will increase costs, but also CPU which is helpful when communicating with the database. Tests show that more memory will not improve the init phase of a Lambda and therefore don't really improve cold starts in general for lamDB either.

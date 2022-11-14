@@ -113,6 +113,18 @@ curl --request POST \
 
 This would potentially be enough to query and mutate your LamDB, but of course can be improved by proper GraphQL tools of your choosen programming language. Here is a great [overview of GraphQL tools](https://graphql.org/code/).
 
+### Operation Optimization
+
+Prisma's query engine which is used internally does not support all GraphQL language features, like variables. LamDB has some feature to optimize the query to make it compatible as best as possible. This is disabled by default, because it takes significant time. Generelly it's advised to just stick with Prisma Client, it's a great ORM indeed. But if you need to use the plain GraphQL interface and want the extra language features, you can enable this optimization.
+
+```typescript
+new LamDB(this, 'MyLamDB', {
+  // ...
+  // Add the following setting to your existing lamDB
+  operationOptimization: true,
+});
+```
+
 ## Migration, Backup, Restore
 
 For more operational tasks read further in the [operation guide](operation.md).

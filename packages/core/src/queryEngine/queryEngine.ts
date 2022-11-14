@@ -12,7 +12,7 @@ export type QueryEngineSettings = {
   libraryPath: string;
   prismaSchemaPath: string;
   databaseFilePath: string;
-  disableOperationOptimization?: boolean;
+  operationOptimization?: boolean;
 };
 
 export class QueryEngine {
@@ -100,18 +100,18 @@ export class QueryEngine {
   async execute(request: Request): Promise<Response> {
     logger.debug('Handling request', {
       request,
-      operationOptimization: !this.settings.disableOperationOptimization,
+      operationOptimization: this.settings.operationOptimization,
     });
-    tracer.getSegment().addMetadata('operationOptimization', !this.settings.disableOperationOptimization);
+    tracer.getSegment().addMetadata('operationOptimization', this.settings.operationOptimization);
     return await executeMiddlewares(
       {
         queryEngine: this,
         request,
         logger: createLogger({ name: 'QueryEngineMiddleware' }),
       },
-      this.settings.disableOperationOptimization
-        ? [interceptIntrospectionQuery]
-        : [interceptIntrospectionQuery, optimizeOperation],
+      this.settings.operationOptimization
+        ? [interceptIntrospectionQuery, optimizeOperation]
+        : [interceptIntrospectionQuery],
       this.executeRequest.bind(this),
     );
   }

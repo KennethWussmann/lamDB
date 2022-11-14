@@ -29,7 +29,7 @@ export class LamDBService {
       databaseFilePath: config.databasePath,
       libraryPath: config.queryEngineLibraryPath,
       prismaSchemaPath: config.prismaSchemaPath,
-      disableOperationOptimization: config.disableOperationOptimization,
+      operationOptimization: config.operationOptimization,
     });
     this.migrationEngine = getMigrationEngine({
       binaryPath: config.migrationEngineBinaryPath,

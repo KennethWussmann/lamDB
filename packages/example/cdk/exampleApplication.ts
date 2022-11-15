@@ -49,8 +49,8 @@ export class ExampleApplication extends Construct {
           ],
           afterBundling: (_: string, outputDir: string) => [
             `cd ${outputDir}`,
-            `npx prisma generate --data-proxy`,
-            `rm -rf node_modules/@prisma/engines`,
+            "npx prisma generate --data-proxy",
+            "rm -rf node_modules/@prisma/engines",
           ],
         },
       },

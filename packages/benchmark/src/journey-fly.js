@@ -24,7 +24,7 @@ const start = () => {
   const params = { 
     headers: { 'content-type': 'application/json', accept: 'application/json'}
   }
-  const createResponse = http.post(`http://149.248.192.15/graphql`, JSON.stringify({
+  const createResponse = http.post("http://149.248.192.15/graphql", JSON.stringify({
     query: `
     mutation {
       createOnePost(data:{
@@ -77,7 +77,7 @@ const start = () => {
       'verify body': (r) =>
           r.body ? r.body.includes(randomPostName) : false,
   });
-  const findResponse = http.post(`http://149.248.192.15/graphql`, JSON.stringify({
+  const findResponse = http.post("http://149.248.192.15/graphql", JSON.stringify({
     query: `
     query {
       findFirstPost (where:{

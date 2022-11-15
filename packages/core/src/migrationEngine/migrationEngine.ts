@@ -87,7 +87,7 @@ export class MigrationEngine {
    */
   @tracer.captureMethod()
   async apply(force = false): Promise<string[]> {
-    if (!force && !(await this.requiresMigration())) {
+    if (!(force || (await this.requiresMigration()))) {
       logger.debug('Not running migration: Database already up-to-date');
       return [];
     }

@@ -3,8 +3,8 @@
  * It replaces all * versions in all monorepo projects package.json files with their actual current version.
  * The changes made by the script should not be committed.
  */
-import { readFile, writeFile } from 'fs/promises';
-import globby from 'globby';
+import { readFile, writeFile } from "fs/promises";
+import globby from "globby";
 
 const replaceWildcards = (
   dependencies: Record<string, string>,
@@ -12,7 +12,7 @@ const replaceWildcards = (
 ): Record<string, string> =>
   Object.fromEntries(
     Object.entries(dependencies).map(([name, version]) => {
-      if (version === '*' && name.startsWith('@lamdb/')) {
+      if (version === "*" && name.startsWith("@lamdb/")) {
         return [name, versions[name]];
       }
       return [name, version];
@@ -20,9 +20,14 @@ const replaceWildcards = (
   );
 
 (async () => {
-  const packageJsonPaths = await globby(['packages/*/package.json']);
+  const packageJsonPaths = await globby(["packages/*/package.json"]);
   const packageJsons: Record<string, any> = Object.fromEntries(
-    await Promise.all(packageJsonPaths.map(async (path) => [path, JSON.parse(await readFile(path, 'utf8'))])),
+    await Promise.all(
+      packageJsonPaths.map(async (path) => [
+        path,
+        JSON.parse(await readFile(path, "utf8")),
+      ]),
+    ),
   );
   const currentVersions: Record<string, string> = Object.fromEntries(
     Object.values(packageJsons).map((pkg) => [pkg.name, pkg.version]),
@@ -34,12 +39,17 @@ const replaceWildcards = (
         {
           ...pkg,
           ...Object.fromEntries(
-            ['devDependencies', 'dependencies', 'peerDependencies']
+            ["devDependencies", "dependencies", "peerDependencies"]
               .filter((deps) => !!pkg[deps])
-              .map((deps) => [deps, replaceWildcards(pkg[deps], currentVersions)]),
+              .map((deps) => [
+                deps,
+                replaceWildcards(pkg[deps], currentVersions),
+              ]),
           ),
         },
       ])
-      .map(([path, pkg]) => writeFile(path, JSON.stringify(pkg, null, 2), 'utf8')),
+      .map(([path, pkg]) =>
+        writeFile(path, JSON.stringify(pkg, null, 2), "utf8"),
+      ),
   );
 })().catch(console.error);

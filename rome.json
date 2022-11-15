@@ -1,0 +1,28 @@
+{
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    },
+    "ignore": [
+      "**/node_modules/*",
+      "**/*.d.ts",
+      "**/dist/*",
+      "**/build/*",
+      "**/.turbo/*",
+      "**/cdk.out/*"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "ignore": [
+      "**/node_modules/*",
+      "**/*.d.ts",
+      "**/dist/*",
+      "**/build/*",
+      "**/.turbo/*",
+      "**/cdk.out/*"
+    ]
+  },
+  "files": {}
+}

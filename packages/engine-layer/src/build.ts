@@ -88,7 +88,7 @@ const downloadPrismaLicense = async (destination: string, version: string) => {
   const licenseText = await response.text();
 
   // ensure the license is still as expected before bundling it
-  if (!licenseText.includes('Apache License') || !licenseText.includes('Version 2.0')) {
+  if (!(licenseText.includes('Apache License') && licenseText.includes('Version 2.0'))) {
     throw new Error('Unexpected prisma-engines license');
   }
 
@@ -125,19 +125,19 @@ export const buildEngines = async ({
   const enginesJsonPath = join(destination, 'engines.json');
 
   if (await exists(destination)) {
-    if (!(await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion))) {
-      console.log('Removing cache because desired binary is not compatible');
-      await rm(destination, {
-        recursive: true,
-      });
-      await mkdir(destination);
-    } else {
+    if ((await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion))) {
       console.log('Using cached binaries', {
         prismaVersion,
         engines,
         prismaTarget,
       });
       return;
+    } else {
+      console.log('Removing cache because desired binary is not compatible');
+      await rm(destination, {
+        recursive: true,
+      });
+      await mkdir(destination);
     }
   } else {
     await mkdir(destination);

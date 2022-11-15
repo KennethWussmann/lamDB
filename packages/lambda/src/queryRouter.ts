@@ -49,7 +49,7 @@ export class QueryRouter {
       logger.debug('Parsed operation', { operationInfo });
 
       if (!operationInfo) {
-        return graphQlErrorResponse(`Failed to route request: Could not determine GraphQL operation type`);
+        return graphQlErrorResponse("Failed to route request: Could not determine GraphQL operation type");
       }
 
       if (operationInfo.type !== 'mutation' && operationInfo.type !== 'query') {

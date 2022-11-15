@@ -1,8 +1,8 @@
 module.exports = {
   collectCoverage: false,
   coverageDirectory: '<rootDir>/coverage',
-  coverageReporters: [['lcov', { projectRoot: '../..' }]],
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts'],
+  coverageReporters: [['lcov']],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.test.ts', '!src/**/index.ts'],
   projects: [
     {
       testEnvironment: 'node',

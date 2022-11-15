@@ -13,10 +13,7 @@ export class APITokenAuthorizer implements LambdaInterface {
   ) {}
 
   @tracer.captureLambdaHandler()
-  public async handler(
-    event: APIGatewayRequestAuthorizerEventV2,
-    _: Context,
-  ): Promise<APIGatewaySimpleAuthorizerResult> {
+  public async handler(event: APIGatewayRequestAuthorizerEventV2, _: Context): Promise<APIGatewaySimpleAuthorizerResult> {
     tracer.annotateColdStart();
     tracer.getSegment().addMetadata('secretPrefix', this.secretPrefix);
 

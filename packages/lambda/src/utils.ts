@@ -33,9 +33,7 @@ export const fromApiGatwayRequest = (request: APIGatewayProxyEventV2): Request =
 export const fromApiGatewayResponse = (response: APIGatewayProxyStructuredResultV2): Response => ({
   status: response.statusCode ?? 0,
   body: response.body,
-  headers: response.headers
-    ? Object.fromEntries(Object.entries(response.headers).map(([key, value]) => [key, value.toString()]))
-    : {},
+  headers: response.headers ? Object.fromEntries(Object.entries(response.headers).map(([key, value]) => [key, value.toString()])) : {},
 });
 
 export const getRequestFromUnion = (request: APIGatewayProxyEventV2 | Request): Request => {
@@ -47,5 +45,4 @@ export const getRequestFromUnion = (request: APIGatewayProxyEventV2 | Request): 
   }
 };
 
-export const isRequest = (request: APIGatewayProxyEventV2 | Request): request is Request =>
-  !!(request as Request)?.method;
+export const isRequest = (request: APIGatewayProxyEventV2 | Request): request is Request => !!(request as Request)?.method;

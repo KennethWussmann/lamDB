@@ -15,18 +15,20 @@ export const options = {
     //{ duration: '10s', target: 1000 },
   ],
   thresholds: {
-    'http_req_duration': ['p(99)<1700'], // 99% of requests must complete below 1.7s
-    http_req_failed: ['rate<0.01']
+    http_req_duration: ['p(99)<1700'], // 99% of requests must complete below 1.7s
+    http_req_failed: ['rate<0.01'],
   },
   summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(95)', 'p(99)', 'count'],
 };
 
 const start = () => {
-  const params = { 
-    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken }
-  }
-  const res = http.post(`${baseUrl}/graphql`, JSON.stringify({
-    query: `
+  const params = {
+    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken },
+  };
+  const res = http.post(
+    `${baseUrl}/graphql`,
+    JSON.stringify({
+      query: `
     query findArticles {
       findManyArticle(take: 6000) {
         id
@@ -38,16 +40,16 @@ const start = () => {
       }
     }
     `,
-    operationName: "findArticles"
-  }), params)
+      operationName: 'findArticles',
+    }),
+    params,
+  );
   check(res, {
     'is status 200': (r) => r.status === 200,
   });
   check(res, {
-      'verify body': (r) =>
-          r.body ? r.body.includes('A Beginner’s Guide to Word Embedding with Gensim Word2Vec Model') : false,
+    'verify body': (r) => (r.body ? r.body.includes('A Beginner’s Guide to Word Embedding with Gensim Word2Vec Model') : false),
   });
-
 };
 
 export default start;

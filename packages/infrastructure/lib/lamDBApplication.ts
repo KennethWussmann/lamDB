@@ -136,17 +136,11 @@ export class LamDBApplication extends Construct {
           beforeInstall: () => [],
           beforeBundling: (_, outputDir: string) => [
             ...(includeSchema
-              ? [
-                  `echo "Copying prisma schema from ${this.props.schemaPath} to ${outputDir}"`,
-                  `cp ${this.props.schemaPath} ${outputDir}`,
-                ]
+              ? [`echo "Copying prisma schema from ${this.props.schemaPath} to ${outputDir}"`, `cp ${this.props.schemaPath} ${outputDir}`]
               : []),
             ...(includeMigrations
               ? [
-                  `echo "Copying prisma migrations from ${join(
-                    dirname(this.props.schemaPath),
-                    'migrations',
-                  )} to ${outputDir}"`,
+                  `echo "Copying prisma migrations from ${join(dirname(this.props.schemaPath), 'migrations')} to ${outputDir}"`,
                   `cp -r ${join(dirname(this.props.schemaPath), 'migrations')} ${outputDir}`,
                 ]
               : []),

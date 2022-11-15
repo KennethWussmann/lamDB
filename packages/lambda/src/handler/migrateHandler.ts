@@ -13,10 +13,7 @@ type MigrationEvent = {
 
 class MigrateHandler implements LambdaInterface {
   @tracer.captureLambdaHandler()
-  public async handler(
-    { force = false, reset = false, migrate = true }: MigrationEvent = {},
-    _: Context,
-  ): Promise<unknown> {
+  public async handler({ force = false, reset = false, migrate = true }: MigrationEvent = {}, _: Context): Promise<unknown> {
     tracer.annotateColdStart();
     tracer.getSegment().addMetadata('initType', process.env.AWS_LAMBDA_INITIALIZATION_TYPE);
     const { service } = defaultApplicationContext;

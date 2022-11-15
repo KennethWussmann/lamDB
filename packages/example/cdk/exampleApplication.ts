@@ -43,15 +43,8 @@ export class ExampleApplication extends Construct {
         nodeModules: ['@prisma/client', 'prisma'],
         commandHooks: {
           beforeBundling: () => [],
-          beforeInstall: (_: string, outputDir: string) => [
-            `echo "Copying prisma schema from ${schemaPath} to ${outputDir}"`,
-            `cp ${schemaPath} ${outputDir}`,
-          ],
-          afterBundling: (_: string, outputDir: string) => [
-            `cd ${outputDir}`,
-            "npx prisma generate --data-proxy",
-            "rm -rf node_modules/@prisma/engines",
-          ],
+          beforeInstall: (_: string, outputDir: string) => [`echo "Copying prisma schema from ${schemaPath} to ${outputDir}"`, `cp ${schemaPath} ${outputDir}`],
+          afterBundling: (_: string, outputDir: string) => [`cd ${outputDir}`, 'npx prisma generate --data-proxy', 'rm -rf node_modules/@prisma/engines'],
         },
       },
     });

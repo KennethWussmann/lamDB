@@ -26,9 +26,7 @@ class ProxyHandler implements LambdaInterface {
     const request = getRequestFromUnion(event);
     logger.debug('Routing request to corresponding lambda', { request });
 
-    const response = toApiGatewayResponse(
-      await queryRouter.routeQuery(lambdaClient, request, writerFunctionArn, readerFunctionArn),
-    );
+    const response = toApiGatewayResponse(await queryRouter.routeQuery(lambdaClient, request, writerFunctionArn, readerFunctionArn));
 
     logger.debug('Returning response', { response });
 

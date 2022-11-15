@@ -13,13 +13,7 @@ import { LamDBDataSyncProps } from './types';
  * AWS DataSync setup to sync data from EFS to S3
  */
 export class LamDBDataSync extends Construct {
-  constructor(
-    scope: Construct,
-    id: string,
-    props: LamDBDataSyncProps & { name: string },
-    fileSystem: LamDBFileSystem,
-    storage: LamDBStorage,
-  ) {
+  constructor(scope: Construct, id: string, props: LamDBDataSyncProps & { name: string }, fileSystem: LamDBFileSystem, storage: LamDBStorage) {
     super(scope, id);
     const name = `${props.name}-efs-s3-sync`;
     const dataSyncPrincipal = new ServicePrincipal('datasync.amazonaws.com');
@@ -30,11 +24,7 @@ export class LamDBDataSync extends Construct {
       allowAllOutbound: true,
     });
 
-    securityGroup.connections.allowTo(
-      fileSystem.databaseStorageFileSystem,
-      Port.tcp(2049),
-      'Allow NFS access from DataSync',
-    );
+    securityGroup.connections.allowTo(fileSystem.databaseStorageFileSystem, Port.tcp(2049), 'Allow NFS access from DataSync');
 
     const logGroup = new LogGroup(this, 'DataSyncTaskLogGroup', {
       retention: RetentionDays.TWO_WEEKS,

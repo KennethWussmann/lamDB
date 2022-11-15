@@ -25,8 +25,5 @@ export const getDatabaseUrl = async () => {
   // Therefore we ask the SecretsManager about the secret value and build the connection string during runtime.
   // The connection string is usual Prisma stuff, just that we use or own data-proxy.
   // See https://www.prisma.io/docs/data-platform/data-proxy
-  return `${process.env.LAMDB_BASE_URL?.replace(
-    'https',
-    'prisma',
-  )}?api_key=${await getApiToken()}&pool_timeout=3&connection_limit=1`;
+  return `${process.env.LAMDB_BASE_URL?.replace('https', 'prisma')}?api_key=${await getApiToken()}&pool_timeout=3&connection_limit=1`;
 };

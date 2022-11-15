@@ -5,9 +5,7 @@ import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { NodejsFunction, NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LamDBProps } from './types';
 
-export type LamDBFunctionProps = Pick<NodejsFunctionProps, 'functionName' | 'handler' | 'entry'> &
-  Partial<NodejsFunctionProps> &
-  Pick<LamDBProps, 'logLevel'>;
+export type LamDBFunctionProps = Pick<NodejsFunctionProps, 'functionName' | 'handler' | 'entry'> & Partial<NodejsFunctionProps> & Pick<LamDBProps, 'logLevel'>;
 
 export class LamDBFunction extends NodejsFunction {
   constructor(scope: Construct, id: string, props: LamDBFunctionProps) {

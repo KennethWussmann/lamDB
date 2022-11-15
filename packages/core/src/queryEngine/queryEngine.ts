@@ -109,9 +109,7 @@ export class QueryEngine {
         request,
         logger: createLogger({ name: 'QueryEngineMiddleware' }),
       },
-      this.settings.operationOptimization
-        ? [interceptIntrospectionQuery, optimizeOperation]
-        : [interceptIntrospectionQuery],
+      this.settings.operationOptimization ? [interceptIntrospectionQuery, optimizeOperation] : [interceptIntrospectionQuery],
       this.executeRequest.bind(this),
     );
   }

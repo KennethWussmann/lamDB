@@ -19,10 +19,7 @@ export class MigrationEngine {
   private schemaHash: string | undefined;
   private previousSchemaHash: string | undefined;
   private schemaContent: string | undefined;
-  private migrationLockFilePath = join(
-    dirname(this.config.databaseFilePath),
-    `${basename(this.config.databaseFilePath)}.migration.lock`,
-  );
+  private migrationLockFilePath = join(dirname(this.config.databaseFilePath), `${basename(this.config.databaseFilePath)}.migration.lock`);
   private migrationsPath = join(dirname(this.config.prismaSchemaPath), 'migrations');
 
   constructor(private config: MigrationEngineConfig) {}
@@ -138,10 +135,7 @@ export class MigrationEngine {
             if (!appliedMigrationNames || appliedMigrationNames.length === 0) {
               logger.info('No migration scripts required execution');
             } else {
-              logger.info(
-                `Executed ${appliedMigrationNames.length} migration${appliedMigrationNames.length !== 1 ? 's' : ''}`,
-                { appliedMigrationNames },
-              );
+              logger.info(`Executed ${appliedMigrationNames.length} migration${appliedMigrationNames.length !== 1 ? 's' : ''}`, { appliedMigrationNames });
             }
             this.migrationDone = true;
             migration?.kill('SIGTERM');
@@ -187,13 +181,7 @@ export class MigrationEngine {
   async reset() {
     const databaseDir = dirname(this.config.databaseFilePath);
     await Promise.all(
-      [
-        this.config.databaseFilePath,
-        this.migrationLockFilePath,
-        `${databaseDir}-shm`,
-        `${databaseDir}-wal`,
-        `${databaseDir}-journal`,
-      ].map(async (file) => {
+      [this.config.databaseFilePath, this.migrationLockFilePath, `${databaseDir}-shm`, `${databaseDir}-wal`, `${databaseDir}-journal`].map(async (file) => {
         if (await exists(file)) {
           await rm(file);
         }

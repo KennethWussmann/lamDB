@@ -47,10 +47,7 @@ export class LamDBFileSystem extends Construct {
       },
       path: '/lambda',
     });
-    this.lambdaFileSystem = LambdaFileSystem.fromEfsAccessPoint(
-      this.databaseStorageFileSystemAccessPoint,
-      this.efsMountPath,
-    );
+    this.lambdaFileSystem = LambdaFileSystem.fromEfsAccessPoint(this.databaseStorageFileSystemAccessPoint, this.efsMountPath);
 
     if (typeof props.efs?.bastionHost === 'boolean' ? props.efs?.bastionHost : !!props.efs?.bastionHost) {
       this.databaseStorageEfsBastionHost = new LamDBBastionHost(this, 'EfsBastionHost', {

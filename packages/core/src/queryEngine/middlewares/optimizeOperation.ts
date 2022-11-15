@@ -41,10 +41,7 @@ class OptimizeOperationMiddleware implements Middleware {
                 // if supplied variables does not contain this variable, remove immediately
                 return null;
               }
-              const type = astFromValue(
-                variables[node.value.name.value],
-                variableDefinitions[node.value.name.value] as GraphQLInputType,
-              );
+              const type = astFromValue(variables[node.value.name.value], variableDefinitions[node.value.name.value] as GraphQLInputType);
               if (type?.kind === Kind.NULL) {
                 // query engine does not like when nullable arguments actually are written out with null.
                 // in case it's a variable and it's value is null, remove argument entirely.
@@ -93,12 +90,7 @@ class OptimizeOperationMiddleware implements Middleware {
         })[0],
     });
 
-  private optimizeDocument = (
-    logger: Logger,
-    schema: GraphQLSchema,
-    variables: Record<string, unknown>,
-    document: DocumentNode,
-  ): DocumentNode =>
+  private optimizeDocument = (logger: Logger, schema: GraphQLSchema, variables: Record<string, unknown>, document: DocumentNode): DocumentNode =>
     captureMethodSync({
       segmentName: '### OptimizeOperationMiddleware.optimizeDocument',
       method: () => {

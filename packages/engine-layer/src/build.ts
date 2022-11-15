@@ -28,22 +28,14 @@ const isCacheCompatible = async (enginesJsonPath: string, engines: BinaryType[],
   }
   const cacheTarget = JSON.parse(await readFile(enginesJsonPath, 'utf8'));
   return (
-    cacheTarget.prisma.target === target &&
-    engines.every((engine) => cacheTarget.prisma.engines.includes(engine)) &&
-    cacheTarget.prisma.version === version
+    cacheTarget.prisma.target === target && engines.every((engine) => cacheTarget.prisma.engines.includes(engine)) && cacheTarget.prisma.version === version
   );
 };
 
 export const getEnginePath = (destination: string, engine: BinaryType): string =>
   join(destination, `${engine}${engine === BinaryType.libqueryEngine ? '.node' : ''}`);
 
-const downloadPrisma = async (
-  destination: string,
-  engines: BinaryType[],
-  osPlatform: NodeJS.Platform,
-  target: Platform,
-  version: string,
-) => {
+const downloadPrisma = async (destination: string, engines: BinaryType[], osPlatform: NodeJS.Platform, target: Platform, version: string) => {
   const libExtension = libExtensions[osPlatform];
   const engineNames: Partial<Record<BinaryType, string>> = {
     [BinaryType.libqueryEngine]: 'libquery_engine',
@@ -63,10 +55,7 @@ const downloadPrisma = async (
   await Promise.all(
     engines.map(async (engine) => {
       await rename(
-        join(
-          destination,
-          `${engineNames[engine] ?? engine}-${target}${engineExtensions[engine] ? engineExtensions[engine] : ''}`,
-        ),
+        join(destination, `${engineNames[engine] ?? engine}-${target}${engineExtensions[engine] ? engineExtensions[engine] : ''}`),
         getEnginePath(destination, engine),
       );
     }),
@@ -119,13 +108,12 @@ export const buildEngines = async ({
   engines = [BinaryType.migrationEngine, BinaryType.libqueryEngine],
 }: BuildConfig = {}) => {
   const prismaVersion = process.env.PRISMA_VERSION ?? defaultVersion;
-  const prismaTarget: Platform =
-    process.env.DETECT_PLATFORM || defaultPlatform === 'detect' ? await getPlatform() : defaultPlatform;
+  const prismaTarget: Platform = process.env.DETECT_PLATFORM || defaultPlatform === 'detect' ? await getPlatform() : defaultPlatform;
   const osPlatform = process.env.DETECT_PLATFORM || defaultPlatform === 'detect' ? (await getos()).platform : 'linux';
   const enginesJsonPath = join(destination, 'engines.json');
 
   if (await exists(destination)) {
-    if ((await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion))) {
+    if (await isCacheCompatible(enginesJsonPath, engines, prismaTarget, prismaVersion)) {
       console.log('Using cached binaries', {
         prismaVersion,
         engines,

@@ -8,10 +8,7 @@ export type MiddlewareContext = {
   logger: Logger;
 };
 export type MiddlewareNextFunction = (context: MiddlewareContext) => Promise<Response>;
-export type QueryEngineProxyMiddleware = (
-  context: MiddlewareContext,
-  next: MiddlewareNextFunction,
-) => Promise<Response> | Response;
+export type QueryEngineProxyMiddleware = (context: MiddlewareContext, next: MiddlewareNextFunction) => Promise<Response> | Response;
 
 export const executeMiddlewares = async (
   context: MiddlewareContext,

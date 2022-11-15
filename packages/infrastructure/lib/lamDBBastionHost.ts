@@ -1,13 +1,5 @@
 import { Aws, Fn } from 'aws-cdk-lib';
-import {
-  BastionHostLinux,
-  CfnInstance,
-  InterfaceVpcEndpointAwsService,
-  Port,
-  SecurityGroup,
-  UserData,
-  Vpc,
-} from 'aws-cdk-lib/aws-ec2';
+import { BastionHostLinux, CfnInstance, InterfaceVpcEndpointAwsService, Port, SecurityGroup, UserData, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { FileSystem } from 'aws-cdk-lib/aws-efs';
 import { IKey } from 'aws-cdk-lib/aws-kms';
 import { IBucket } from 'aws-cdk-lib/aws-s3';

@@ -24,12 +24,7 @@ const addMetadata = (metadata: Record<string, unknown> | undefined) => {
   Object.entries(metadata).forEach(([key, value]) => segment.addMetadata(key, value));
 };
 
-export const captureMethodSync = <T>({
-  segmentName,
-  method,
-  captureResponse = false,
-  metadata,
-}: CaptureMethodParams<T>): T => {
+export const captureMethodSync = <T>({ segmentName, method, captureResponse = false, metadata }: CaptureMethodParams<T>): T => {
   const segment = tracer.getSegment();
   const subsegment = segment.addNewSubsegment(segmentName.startsWith('#') ? segmentName : `### ${segmentName}`);
   tracer.setSegment(subsegment);
@@ -53,12 +48,7 @@ export const captureMethodSync = <T>({
   return response;
 };
 
-export const captureMethod = async <T>({
-  segmentName,
-  method,
-  captureResponse = false,
-  metadata,
-}: CaptureMethodParams<Promise<T>>): Promise<T> => {
+export const captureMethod = async <T>({ segmentName, method, captureResponse = false, metadata }: CaptureMethodParams<Promise<T>>): Promise<T> => {
   const segment = tracer.getSegment();
   const subsegment = segment.addNewSubsegment(segmentName.startsWith('#') ? segmentName : `### ${segmentName}`);
   tracer.setSegment(subsegment);

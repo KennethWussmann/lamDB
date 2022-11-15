@@ -6,13 +6,7 @@ const logger = createLogger({ name: 'QueryRouter' });
 
 export class QueryRouter {
   @tracer.captureMethod({ captureResponse: false })
-  private async invokeFunction(
-    lambdaClient: Lambda,
-    functionArn: string,
-    request: Request,
-    retry: boolean,
-    retryAttempts = 3,
-  ): Promise<Response> {
+  private async invokeFunction(lambdaClient: Lambda, functionArn: string, request: Request, retry: boolean, retryAttempts = 3): Promise<Response> {
     if (retryAttempts <= 0) {
       throw new Error('Request failed: Max retry attempts reached');
     }
@@ -38,18 +32,13 @@ export class QueryRouter {
   }
 
   @tracer.captureMethod({ captureResponse: false })
-  async routeQuery(
-    lambdaClient: Lambda,
-    request: Request,
-    writerFunctionArn = 'writer',
-    readerFunctionArn = 'reader',
-  ): Promise<Response> {
+  async routeQuery(lambdaClient: Lambda, request: Request, writerFunctionArn = 'writer', readerFunctionArn = 'reader'): Promise<Response> {
     try {
       const operationInfo = getOperationInfo(request);
       logger.debug('Parsed operation', { operationInfo });
 
       if (!operationInfo) {
-        return graphQlErrorResponse("Failed to route request: Could not determine GraphQL operation type");
+        return graphQlErrorResponse('Failed to route request: Could not determine GraphQL operation type');
       }
 
       if (operationInfo.type !== 'mutation' && operationInfo.type !== 'query') {

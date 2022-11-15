@@ -15,19 +15,21 @@ export const options = {
     //{ duration: '10s', target: 1000 },
   ],
   thresholds: {
-    'http_req_duration': ['p(99)<1700'], // 99% of requests must complete below 1.7s
-    http_req_failed: ['rate<0.01']
+    http_req_duration: ['p(99)<1700'], // 99% of requests must complete below 1.7s
+    http_req_failed: ['rate<0.01'],
   },
   summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(95)', 'p(99)', 'count'],
 };
 
 const start = () => {
   const randomArticleName = randomString(8);
-  const params = { 
-    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken }
-  }
-  const res = http.post(`${baseUrl}/graphql`, JSON.stringify({
-    query: `
+  const params = {
+    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken },
+  };
+  const res = http.post(
+    `${baseUrl}/graphql`,
+    JSON.stringify({
+      query: `
     mutation createArticle($data: ArticleCreateInput!) {
       createOneArticle(data: $data) {
         id
@@ -39,24 +41,25 @@ const start = () => {
       }
     }
     `,
-    operationName: "createArticle",
-    variables: {
-      data: {
-        claps: 100,
-        readingTime: 365,
-        url: "https://example.com",
-        title: randomArticleName,
-        subtitle: "An example exciting article",
-        publication: "That One Site"
-      }
-    }
-  }), params)
+      operationName: 'createArticle',
+      variables: {
+        data: {
+          claps: 100,
+          readingTime: 365,
+          url: 'https://example.com',
+          title: randomArticleName,
+          subtitle: 'An example exciting article',
+          publication: 'That One Site',
+        },
+      },
+    }),
+    params,
+  );
   check(res, {
     'is status 200': (r) => r.status === 200,
   });
   check(res, {
-      'verify body': (r) =>
-          r.body ? r.body.includes(randomArticleName) : false,
+    'verify body': (r) => (r.body ? r.body.includes(randomArticleName) : false),
   });
 };
 

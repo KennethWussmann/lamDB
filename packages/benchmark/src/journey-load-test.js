@@ -18,19 +18,21 @@ export const options = {
     { duration: '10s', target: 500 },
   ],
   thresholds: {
-    'http_req_duration': ['p(99)<1500'], // 99% of requests must complete below 1.5s
-    http_req_failed: ['rate<0.01']
+    http_req_duration: ['p(99)<1500'], // 99% of requests must complete below 1.5s
+    http_req_failed: ['rate<0.01'],
   },
   summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(90)', 'p(95)', 'count'],
 };
 
 const start = () => {
   const randomArticleName = randomString(8);
-  const params = { 
-    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken }
-  }
-  const createResponse = http.post(`${baseUrl}/graphql`, JSON.stringify({
-    query: `
+  const params = {
+    headers: { 'content-type': 'application/json', accept: 'application/json', authorization: apiToken },
+  };
+  const createResponse = http.post(
+    `${baseUrl}/graphql`,
+    JSON.stringify({
+      query: `
     mutation createArticle($data: ArticleCreateInput!) {
       createOneArticle(data: $data) {
         id
@@ -42,27 +44,30 @@ const start = () => {
       }
     }
     `,
-    operationName: "createArticle",
-    variables: {
-      data: {
-        claps: 111,
-        readingTime: 222,
-        url: `https://example.com/${randomString(10)}`,
-        title: randomArticleName,
-        subtitle: "An example exciting article",
-        publication: "That One Site"
-      }
-    }
-  }), params)
+      operationName: 'createArticle',
+      variables: {
+        data: {
+          claps: 111,
+          readingTime: 222,
+          url: `https://example.com/${randomString(10)}`,
+          title: randomArticleName,
+          subtitle: 'An example exciting article',
+          publication: 'That One Site',
+        },
+      },
+    }),
+    params,
+  );
   check(createResponse, {
     'is status 200': (r) => r.status === 200,
   });
   check(createResponse, {
-      'verify body': (r) =>
-          r.body ? r.body.includes(randomArticleName) : false,
+    'verify body': (r) => (r.body ? r.body.includes(randomArticleName) : false),
   });
-  const findResponse = http.post(`${baseUrl}/graphql`, JSON.stringify({
-    query: `
+  const findResponse = http.post(
+    `${baseUrl}/graphql`,
+    JSON.stringify({
+      query: `
     query findArticleByName(
       $where: ArticleWhereInput!
     ) {
@@ -78,23 +83,23 @@ const start = () => {
       }
     }
     `,
-    operationName: "findArticleByName",
-    variables: {
-      where: {
-        title: {
-          equals: randomArticleName
-        }
-      }
-    }
-  }), params)
+      operationName: 'findArticleByName',
+      variables: {
+        where: {
+          title: {
+            equals: randomArticleName,
+          },
+        },
+      },
+    }),
+    params,
+  );
   check(findResponse, {
     'is status 200': (r) => r.status === 200,
   });
   check(findResponse, {
-      'verify body': (r) =>
-          r.body ? r.body.includes(randomArticleName) : false,
+    'verify body': (r) => (r.body ? r.body.includes(randomArticleName) : false),
   });
-
 };
 
 export default start;

@@ -32,36 +32,24 @@ export class LamDBAPI extends HttpApi {
 
     if (props.exposeReaderWriterEndpoints) {
       this.addRoutes({
-        integration: new HttpLambdaIntegration(
-          'WriterIntegration',
-          props.application.writerAlias ?? props.application.writer,
-        ),
+        integration: new HttpLambdaIntegration('WriterIntegration', props.application.writerAlias ?? props.application.writer),
         path: '/writer',
         methods,
       });
       this.addRoutes({
-        integration: new HttpLambdaIntegration(
-          'ReaderIntegration',
-          props.application.readerAlias ?? props.application.reader,
-        ),
+        integration: new HttpLambdaIntegration('ReaderIntegration', props.application.readerAlias ?? props.application.reader),
         path: '/reader',
         methods,
       });
     }
     this.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'ProxyIntegration',
-        props.application.proxyAlias ?? props.application.proxy,
-      ),
+      integration: new HttpLambdaIntegration('ProxyIntegration', props.application.proxyAlias ?? props.application.proxy),
       path: '/graphql',
       methods,
     });
     // redirect dataproxy requests to the same proxy lambda as /graphql. They are compatible and the same.
     this.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'DataProxyIntegration',
-        props.application.proxyAlias ?? props.application.proxy,
-      ),
+      integration: new HttpLambdaIntegration('DataProxyIntegration', props.application.proxyAlias ?? props.application.proxy),
       path: '/{clientId}/{schemaHash}/graphql',
       methods,
     });

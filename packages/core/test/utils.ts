@@ -1,10 +1,8 @@
 import { Request } from '@lamdb/commons';
 import { DocumentNode, print } from 'graphql';
 
-export const operationDocumentNodeToRequest = (
-  operation: DocumentNode,
-  variables: Record<string, unknown> | undefined = undefined,
-) => operationToRequest(print(operation), variables);
+export const operationDocumentNodeToRequest = (operation: DocumentNode, variables: Record<string, unknown> | undefined = undefined) =>
+  operationToRequest(print(operation), variables);
 
 export const operationToRequest = (
   operation: string,

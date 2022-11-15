@@ -1,0 +1,28 @@
+flags:
+  api-token-authorizer:
+    paths:
+      - packages/api-token-authorizer/
+  benchmark:
+    paths:
+      - packages/benchmark/
+  commons:
+    paths:
+      - packages/commons/
+  core:
+    paths:
+      - packages/core/
+  engine-layer:
+    paths:
+      - packages/engine-layer/
+  example:
+    paths:
+      - packages/example/
+  infrastructure:
+    paths:
+      - packages/infrastructure/
+  lambda:
+    paths:
+      - packages/lambda/
+  server:
+    paths:
+      - packages/server/

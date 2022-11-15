@@ -10,6 +10,7 @@
     "build": "tsc --project tsconfig.build.json",
     "dev": "npm run build -- --watch",
     "test": "npm run test:unit && npm run test:integration",
+    "test:cov": "npm run test:unit -- --collectCoverage && npm run test:integration -- --collectCoverage",
     "test:integration": "jest --runInBand --selectProjects integration",
     "test:unit": "jest --maxWorkers=50% --selectProjects unit",
     "clean": "rm -rf ./dist"

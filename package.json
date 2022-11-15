@@ -12,6 +12,7 @@
     "build": "npx turbo run build",
     "codegen": "npx turbo run codegen",
     "test": "npx turbo run test",
+    "test:cov": "npx turbo run test:cov",
     "clean": "rm -rf ./build && npx turbo run clean",
     "publish": "npm run build && npm run replace-wildcard-versions && npx changeset publish",
     "lint": "eslint \"**/*.{ts,tsx}\" --ext .ts",

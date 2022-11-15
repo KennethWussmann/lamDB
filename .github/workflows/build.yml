@@ -16,4 +16,25 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/npm-install
       - run: npm run lint
-      - run: npm run test
+      - run: npm run test:cov
+
+      - name: Upload coverage (api-token-authorizer)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/api-token-authorizer/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage (commons)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/commons/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage (core)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/core/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage (lambda)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/lambda/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -20,23 +20,22 @@ export type LamDBServiceConfig = {
  * Service that offers an opinionated interface to the Query- and MigrationEngine.
  */
 export class LamDBService {
-  private queryEngine: QueryEngine;
-  private migrationEngine: MigrationEngine;
   private logger = createLogger({ name: 'LamDBService' });
 
-  constructor(private config: LamDBConfiguration) {
-    this.queryEngine = getQueryEngine({
+  constructor(
+    private config: LamDBConfiguration,
+    private queryEngine = getQueryEngine({
       databaseFilePath: config.databasePath,
       libraryPath: config.queryEngineLibraryPath,
       prismaSchemaPath: config.prismaSchemaPath,
       operationOptimization: config.operationOptimization,
-    });
-    this.migrationEngine = getMigrationEngine({
+    }),
+    private migrationEngine = getMigrationEngine({
       binaryPath: config.migrationEngineBinaryPath,
       databaseFilePath: config.databasePath,
       prismaSchemaPath: config.prismaSchemaPath,
-    });
-  }
+    }),
+  ) {}
 
   @tracer.captureMethod({ captureResponse: false })
   async execute(request: Request, endpointType: 'reader' | 'writer' | 'proxy' = 'proxy') {

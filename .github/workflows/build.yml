@@ -11,7 +11,17 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          - buildjet-2vcpu-ubuntu-2204-arm
+          - buildjet-4vcpu-ubuntu-2204-arm
+          - buildjet-8vcpu-ubuntu-2204-arm
+          - buildjet-16vcpu-ubuntu-2204-arm
+          - buildjet-32vcpu-ubuntu-2204-arm
+    name: Build - ${{matrix.runs-on}}
+    runs-on: ${{matrix.runs-on}}
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/npm-install

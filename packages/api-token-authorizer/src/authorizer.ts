@@ -77,7 +77,7 @@ export class APITokenAuthorizer implements LambdaInterface {
   }
 
   @tracer.captureMethod({ captureResponse: false })
-  async getSecretValues(): Promise<string[]> {
+  private async getSecretValues(): Promise<string[]> {
     const names = await this.findSecretNames();
 
     return await Promise.all(

@@ -1,3 +1,5 @@
+// This file is somehow not picked up by the coverage reporter
+// istanbul ignore file
 import { getMigrationEngine, MigrationEngine } from '../migrationEngine';
 import { getQueryEngine, QueryEngine } from '../queryEngine';
 import {

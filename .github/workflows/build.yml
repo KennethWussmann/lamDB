@@ -32,7 +32,7 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           files: ./packages/core/coverage/lcov.info
-          token: ${{ secrets.CODECOV_TOKEN }
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage (engine-layer)
         uses: codecov/codecov-action@v2
         with:

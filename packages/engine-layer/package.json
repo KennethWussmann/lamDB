@@ -8,7 +8,9 @@
   "types": "src/index.ts",
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
-    "build": "ts-node src/run.ts",
+    "build": "tsc --project tsconfig.build.json && ts-node src/run.ts",
+    "test": "jest --maxWorkers=50% --passWithNoTests",
+    "test:cov": "npm run test -- --collectCoverage",
     "clean": "rm -rf ./dist ./build"
   },
   "devDependencies": {

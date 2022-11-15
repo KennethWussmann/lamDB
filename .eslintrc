@@ -5,12 +5,26 @@
   "overrides": [
     {
       "files": ["*.ts", "!*.d.ts"],
-      "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier", "plugin:jest/recommended"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier",
+        "plugin:jest/recommended",
+        "plugin:monorepo/recommended"
+      ],
       "parserOptions": {
         "project": ["./tsconfig.json"]
       },
       "rules": {
-        "@typescript-eslint/no-floating-promises": "error"
+        "@typescript-eslint/no-floating-promises": "error",
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_"
+          }
+        ]
       }
     }
   ]

@@ -6,7 +6,6 @@
   <a href="https://codecov.io/gh/KennethWussmann/lamDB" > 
     <img src="https://codecov.io/gh/KennethWussmann/lamDB/branch/main/graph/badge.svg?token=SD1GNEEG21"/> 
   </a>
-  <hr />
 </div>
 
 ## Features

@@ -1,8 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "../lambda/src/database/noOpFileAdapter.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }

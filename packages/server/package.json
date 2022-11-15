@@ -6,7 +6,9 @@
   "license": "MIT",
   "repository": "https://github.com/KennethWussmann/lamDB",
   "scripts": {
-    "build": "tsc --noEmit && ncc build src/server.ts -o build",
+    "build": "tsc --noEmit  -project tsconfig.build.json && ncc build src/server.ts -o build",
+    "test": "jest --maxWorkers=50% --passWithNoTests",
+    "test:cov": "npm run test -- --collectCoverage",
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
     "clean": "rm -rf build"

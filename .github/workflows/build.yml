@@ -32,6 +32,21 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           files: ./packages/core/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }
+      - name: Upload coverage (engine-layer)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/engine-layer/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage (infrastructure)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/infrastructure/coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload coverage (server)
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/server/coverage/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload coverage (lambda)
         uses: codecov/codecov-action@v2

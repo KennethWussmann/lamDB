@@ -1,11 +1,11 @@
 <div align="center">
   <h1><code>lamDB</code></h1>
-  <a href="https://codecov.io/gh/KennethWussmann/lamDB" > 
-    <img src="https://codecov.io/gh/KennethWussmann/lamDB/branch/main/graph/badge.svg?token=SD1GNEEG21"/> 
-  </a>
   <p>
     <strong>Pay as you go true serverless relational database using SQLite on AWS Lambda</strong>
   </p>
+  <a href="https://codecov.io/gh/KennethWussmann/lamDB" > 
+    <img src="https://codecov.io/gh/KennethWussmann/lamDB/branch/main/graph/badge.svg?token=SD1GNEEG21"/> 
+  </a>
 </div>
 
 ## Features

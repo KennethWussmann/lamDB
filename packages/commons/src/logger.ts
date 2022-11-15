@@ -1,3 +1,4 @@
+// istanbul ignore file
 import { createLogger as createWinstonLogger, format } from 'winston';
 import { Console } from 'winston/lib/winston/transports';
 

@@ -1,3 +1,4 @@
+// istanbul ignore file
 import { LamDBConfiguration, LamDBService } from '@lamdb/core';
 import { logTraceSync } from '@lamdb/commons';
 

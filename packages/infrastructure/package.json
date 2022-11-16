@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "aws-cdk-lib": "^2.50.0",
-    "constructs": "^10.1.160",
+    "constructs": "^10.1.161",
     "@lamdb/engine-layer": "*"
   },
   "dependencies": {

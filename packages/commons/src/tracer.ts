@@ -1,3 +1,4 @@
+// istanbul ignore file
 import { Tracer } from '@aws-lambda-powertools/tracer';
 import { Logger } from 'winston';
 import { createLogger, LogLevel } from './logger';

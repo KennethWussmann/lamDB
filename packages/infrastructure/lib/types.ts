@@ -92,3 +92,5 @@ export type LamDBProps = {
    */
   operationOptimization?: boolean;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;
+
+export type LambdaFileType = 'js' | 'ts';

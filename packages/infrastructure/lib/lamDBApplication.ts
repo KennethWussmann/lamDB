@@ -7,7 +7,7 @@ import { dirname, join } from 'path';
 import { LamDBEngineLayer } from './lamDBEngineLayer';
 import { LamDBFileSystem } from './lamDBFileSystem';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
-import { LambdaFunctionType, LamDBLambdaOverwritesProps } from './types';
+import { LambdaFileType, LambdaFunctionType, LamDBLambdaOverwritesProps } from './types';
 
 export type LamDBApplicationProps = {
   name: string;
@@ -29,7 +29,12 @@ export class LamDBApplication extends Construct {
   public readonly proxyAlias: Alias | undefined;
   public readonly migrate: LamDBFunction;
 
-  constructor(scope: Construct, id: string, private props: LamDBApplicationProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    private props: LamDBApplicationProps,
+    private lambdaFileType: LambdaFileType = 'js',
+  ) {
     super(scope, id);
 
     this.reader = this.createLambda('reader', 'ReaderFunction', 'readerWriter', {
@@ -120,7 +125,7 @@ export class LamDBApplication extends Construct {
     includeSchema = true,
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
-      entry: join(__dirname, 'lambda', `${handler}.js`),
+      entry: join(__dirname, 'lambda', `${handler}.${this.lambdaFileType}`),
       tracing: this.props.tracing ? Tracing.ACTIVE : undefined,
       logLevel: this.props.logLevel,
       ...props,

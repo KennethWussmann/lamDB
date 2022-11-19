@@ -23,12 +23,11 @@ describe('MigrateHandler', () => {
 
     expect(response).toMatchObject({
       appliedMigrations: ['test.sql'],
-      force: false,
       migrate: true,
       reset: false,
     });
     expect(service.reset).not.toHaveBeenCalled();
-    expect(service.migrate).toHaveBeenCalledWith(false);
+    expect(service.migrate).toHaveBeenCalledWith();
   });
 
   it('does not apply migrations when payload sets migrate false', async () => {
@@ -36,27 +35,11 @@ describe('MigrateHandler', () => {
 
     expect(response).toMatchObject({
       appliedMigrations: undefined,
-      force: false,
       migrate: false,
       reset: false,
     });
     expect(service.reset).not.toHaveBeenCalled();
     expect(service.migrate).not.toHaveBeenCalled();
-  });
-
-  it('forces migrations when no payload sets force true', async () => {
-    service.migrate.mockResolvedValue(['test.sql']);
-
-    const response = await handler.handler({ force: true }, {} as Context);
-
-    expect(response).toMatchObject({
-      appliedMigrations: ['test.sql'],
-      force: true,
-      migrate: true,
-      reset: false,
-    });
-    expect(service.reset).not.toHaveBeenCalled();
-    expect(service.migrate).toHaveBeenCalledWith(true);
   });
 
   it('resets database when payload sets reset true', async () => {
@@ -67,11 +50,10 @@ describe('MigrateHandler', () => {
 
     expect(response).toMatchObject({
       appliedMigrations: ['test.sql'],
-      force: false,
       migrate: true,
       reset: true,
     });
     expect(service.reset).toHaveBeenCalled();
-    expect(service.migrate).toHaveBeenCalledWith(false);
+    expect(service.migrate).toHaveBeenCalledWith();
   });
 });

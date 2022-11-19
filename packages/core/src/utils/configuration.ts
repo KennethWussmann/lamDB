@@ -6,9 +6,6 @@ export class LamDBConfiguration {
   get migrationEngineBinaryPath() {
     return assertEnv('MIGRATION_ENGINE_BINARY_PATH');
   }
-  get migrationEngineForceMigration() {
-    return assertEnv('MIGRATION_ENGINE_FORCE_MIGRATION', 'false').toLowerCase() === 'true';
-  }
   get queryEngineLibraryPath() {
     return assertEnv('QUERY_ENGINE_LIBRARY_PATH');
   }

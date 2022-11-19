@@ -62,7 +62,6 @@ Other options for the payload:
 
 - `reset` - `boolean` (default: `false`): Remove database files before migration
 - `migrate` - `boolean` (default: `true`): Apply migrations
-- `force` - `boolean` (default: `false`): Force applying migrations, ignore lock file
 
 They can all be combined.
 
@@ -88,7 +87,6 @@ A lamDB file system usually contains the following files:
 - `database.db` - The actual database file
 - `database.db-shm` - [Temporary file by SQLite WAL](https://www.sqlite.org/tempfiles.html)
 - `database.db-wal` - [Temporary file by SQLite WAL](https://www.sqlite.org/tempfiles.html)
-- `database.db.migration.lock` - LamDB file to avoid triggering paralell migrations. Can be removed to retrigger migrations.
 
 1. Enable S3 sync
 

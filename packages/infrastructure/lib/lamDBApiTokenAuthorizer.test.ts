@@ -23,96 +23,77 @@ describe('LamDBApiTokenAuthorizer', () => {
     const template = Template.fromStack(stack);
 
     expectResource(template, 'AWS::Lambda::Function', 3);
-    expect(findResourceProperties(template, 'AWS::Lambda::Function', 0)).toMatchInlineSnapshot(`
-      {
-        "Architectures": [
-          "arm64",
-        ],
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "50cd734cd103647a74bbcdf1d78e59d38d7ad1d6cf0df4775a613d150443d497.zip",
+    expect(findResourceProperties(template, 'AWS::Lambda::Function', 0)).toMatchObject({
+      Architectures: ['arm64'],
+      Code: {
+        S3Bucket: {
+          'Fn::Sub': 'cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}',
         },
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-            "ENABLE_TRACING": "true",
-            "LOG_LEVEL": "debug",
-            "NODE_OPTIONS": "--enable-source-maps",
-            "SECRET_PREFIX": "/test/api-token/",
-          },
+        S3Key: expect.any(String),
+      },
+      Environment: {
+        Variables: {
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+          ENABLE_TRACING: 'true',
+          LOG_LEVEL: 'debug',
+          NODE_OPTIONS: '--enable-source-maps',
+          SECRET_PREFIX: '/test/api-token/',
         },
-        "FunctionName": "test-api-token-rotation",
-        "Handler": "index.apiTokenRotation",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "AuthorizerLamDBFunctionApiTokenRotationFunctionServiceRole68D91BC8",
-            "Arn",
-          ],
+      },
+      FunctionName: 'test-api-token-rotation',
+      Handler: 'index.apiTokenRotation',
+      MemorySize: 128,
+      Role: {
+        'Fn::GetAtt': ['AuthorizerLamDBFunctionApiTokenRotationFunctionServiceRole68D91BC8', 'Arn'],
+      },
+      Runtime: 'nodejs16.x',
+      Timeout: 5,
+      TracingConfig: {
+        Mode: 'Active',
+      },
+    });
+    expect(findResourceProperties(template, 'AWS::Lambda::Function', 1)).toMatchObject({
+      Architectures: ['arm64'],
+      Code: {
+        S3Bucket: {
+          'Fn::Sub': 'cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}',
         },
-        "Runtime": "nodejs16.x",
-        "Timeout": 5,
-        "TracingConfig": {
-          "Mode": "Active",
+        S3Key: expect.any(String),
+      },
+      Environment: {
+        Variables: {
+          AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+          ENABLE_TRACING: 'true',
+          LOG_LEVEL: 'debug',
+          NODE_OPTIONS: '--enable-source-maps',
+          SECRET_PREFIX: '/test/api-token/',
         },
-      }
-    `);
-    expect(findResourceProperties(template, 'AWS::Lambda::Function', 1)).toMatchInlineSnapshot(`
-      {
-        "Architectures": [
-          "arm64",
-        ],
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "c7c524387dcf46e60cef6b7f90413a6109f2ec294cc5fff2fb6eb28ecaafb930.zip",
+      },
+      FunctionName: 'test-api-token-authorizer',
+      Handler: 'index.apiTokenAuthorizer',
+      MemorySize: 512,
+      Role: {
+        'Fn::GetAtt': ['AuthorizerLamDBFunctionApiTokenAuthorizerFunctionServiceRole9FC12EB5', 'Arn'],
+      },
+      Runtime: 'nodejs16.x',
+      Timeout: 5,
+      TracingConfig: {
+        Mode: 'Active',
+      },
+    });
+    expect(findResourceProperties(template, 'AWS::Lambda::Function', 2)).toMatchObject({
+      Code: {
+        S3Bucket: {
+          'Fn::Sub': 'cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}',
         },
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-            "ENABLE_TRACING": "true",
-            "LOG_LEVEL": "debug",
-            "NODE_OPTIONS": "--enable-source-maps",
-            "SECRET_PREFIX": "/test/api-token/",
-          },
-        },
-        "FunctionName": "test-api-token-authorizer",
-        "Handler": "index.apiTokenAuthorizer",
-        "MemorySize": 512,
-        "Role": {
-          "Fn::GetAtt": [
-            "AuthorizerLamDBFunctionApiTokenAuthorizerFunctionServiceRole9FC12EB5",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs16.x",
-        "Timeout": 5,
-        "TracingConfig": {
-          "Mode": "Active",
-        },
-      }
-    `);
-    expect(findResourceProperties(template, 'AWS::Lambda::Function', 2)).toMatchInlineSnapshot(`
-      {
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "eb5b005c858404ea0c8f68098ed5dcdf5340e02461f149751d10f59c210d5ef8.zip",
-        },
-        "Handler": "index.handler",
-        "Role": {
-          "Fn::GetAtt": [
-            "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs14.x",
-      }
-    `);
+        S3Key: expect.any(String),
+      },
+      Handler: 'index.handler',
+      Role: {
+        'Fn::GetAtt': ['LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB', 'Arn'],
+      },
+      Runtime: 'nodejs14.x',
+    });
 
     expectResource(template, 'AWS::SecretsManager::Secret', 1);
     expect(findResourceProperties(template, 'AWS::SecretsManager::Secret')).toMatchInlineSnapshot(`

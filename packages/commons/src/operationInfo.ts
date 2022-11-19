@@ -22,10 +22,6 @@ export const getOperationInfo = (
 
   const executableNodes = document.definitions.filter(isExecutableDefinitionNode);
 
-  if (executableNodes.length === 0) {
-    throw new Error('Document does not include executable nodes');
-  }
-
   const operationNodes: OperationDefinitionNode[] = executableNodes
     .filter((node: any) => !!node?.operation)
     .map((node) => node as OperationDefinitionNode);

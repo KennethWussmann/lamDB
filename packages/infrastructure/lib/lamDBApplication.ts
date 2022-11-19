@@ -1,3 +1,4 @@
+import { LogLevel } from '@lamdb/commons';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
 import { Alias, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
@@ -6,7 +7,18 @@ import { dirname, join } from 'path';
 import { LamDBEngineLayer } from './lamDBEngineLayer';
 import { LamDBFileSystem } from './lamDBFileSystem';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
-import { LambdaFunctionType, LamDBProps } from './types';
+import { LambdaFileType, LambdaFunctionType, LamDBLambdaOverwritesProps } from './types';
+
+export type LamDBApplicationProps = {
+  name: string;
+  engineLayer: LamDBEngineLayer;
+  fileSystem: LamDBFileSystem;
+  databaseStorageBucket: IBucket;
+  tracing?: boolean;
+  logLevel?: LogLevel;
+  operationOptimization?: boolean;
+  schemaPath: string;
+} & LamDBLambdaOverwritesProps;
 
 export class LamDBApplication extends Construct {
   public readonly reader: LamDBFunction;
@@ -20,27 +32,25 @@ export class LamDBApplication extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    private props: LamDBProps,
-    engineLayer: LamDBEngineLayer,
-    private fileSystem: LamDBFileSystem,
-    private databaseStorageBucket: IBucket,
+    private props: LamDBApplicationProps,
+    private lambdaFileType: LambdaFileType = 'js',
   ) {
     super(scope, id);
 
     this.reader = this.createLambda('reader', 'ReaderFunction', 'readerWriter', {
       functionName: `${props.name}-reader`,
       handler: 'readerHandler',
-      layers: [engineLayer],
-      filesystem: fileSystem.lambdaFileSystem,
-      vpc: fileSystem.vpc,
+      layers: [props.engineLayer],
+      filesystem: props.fileSystem.lambdaFileSystem,
+      vpc: props.fileSystem.vpc,
     });
     this.writer = this.createLambda('writer', 'WriterFunction', 'readerWriter', {
       functionName: `${props.name}-writer`,
       handler: 'writerHandler',
       reservedConcurrentExecutions: 1,
-      layers: [engineLayer],
-      filesystem: fileSystem.lambdaFileSystem,
-      vpc: fileSystem.vpc,
+      layers: [props.engineLayer],
+      filesystem: props.fileSystem.lambdaFileSystem,
+      vpc: props.fileSystem.vpc,
     });
     this.migrate = this.createLambda(
       'migrate',
@@ -50,10 +60,10 @@ export class LamDBApplication extends Construct {
         functionName: `${props.name}-migrate`,
         handler: 'migrateHandler',
         reservedConcurrentExecutions: 1,
-        layers: [engineLayer],
+        layers: [props.engineLayer],
         timeout: Duration.minutes(10),
-        filesystem: fileSystem.lambdaFileSystem,
-        vpc: fileSystem.vpc,
+        filesystem: props.fileSystem.lambdaFileSystem,
+        vpc: props.fileSystem.vpc,
       },
       {},
       true,
@@ -77,25 +87,25 @@ export class LamDBApplication extends Construct {
     this.reader.grantInvoke(this.proxy);
     this.writer.grantInvoke(this.proxy);
 
-    if (props.lambda?.provisionedConcurreny?.writer) {
+    if (props.provisionedConcurreny?.writer) {
       this.writerAlias = new Alias(this, 'WriterAlias', {
         aliasName: 'writer',
         version: this.writer.currentVersion,
-        provisionedConcurrentExecutions: props.lambda.provisionedConcurreny.writer,
+        provisionedConcurrentExecutions: props.provisionedConcurreny.writer,
       });
     }
-    if (props.lambda?.provisionedConcurreny?.reader) {
+    if (props.provisionedConcurreny?.reader) {
       this.readerAlias = new Alias(this, 'ReaderAlias', {
         aliasName: 'reader',
         version: this.reader.currentVersion,
-        provisionedConcurrentExecutions: props.lambda.provisionedConcurreny.reader,
+        provisionedConcurrentExecutions: props.provisionedConcurreny.reader,
       });
     }
-    if (props.lambda?.provisionedConcurreny?.proxy) {
+    if (props.provisionedConcurreny?.proxy) {
       this.proxyAlias = new Alias(this, 'ProxyAlias', {
         aliasName: 'proxy',
         version: this.proxy.currentVersion,
-        provisionedConcurrentExecutions: props.lambda.provisionedConcurreny.proxy,
+        provisionedConcurrentExecutions: props.provisionedConcurreny.proxy,
       });
     }
 
@@ -115,20 +125,20 @@ export class LamDBApplication extends Construct {
     includeSchema = true,
   ): LamDBFunction => {
     const fn = new LamDBFunction(this, id, {
-      entry: join(__dirname, 'lambda', `${handler}.js`),
+      entry: join(__dirname, 'lambda', `${handler}.${this.lambdaFileType}`),
       tracing: this.props.tracing ? Tracing.ACTIVE : undefined,
       logLevel: this.props.logLevel,
       ...props,
-      ...this.props.lambda?.overwrites?.[type],
+      ...this.props.overwrites?.[type],
       environment: {
-        DATABASE_STORAGE_BUCKET_NAME: this.databaseStorageBucket?.bucketName ?? '',
-        DATABASE_PATH: join(this.fileSystem.efsMountPath, 'database.db'),
+        DATABASE_STORAGE_BUCKET_NAME: this.props.databaseStorageBucket?.bucketName ?? '',
+        DATABASE_PATH: join(this.props.fileSystem.efsMountPath, 'database.db'),
         QUERY_ENGINE_LIBRARY_PATH: '/opt/libquery-engine.node',
         MIGRATION_ENGINE_BINARY_PATH: '/opt/migration-engine',
         PRISMA_SCHEMA_PATH: './schema.prisma',
         OPERATION_OPTIMIZATION: this.props.operationOptimization === true ? 'true' : 'false',
         ...additionalEnvironmentVariables,
-        ...this.props.lambda?.overwrites?.[type]?.environment,
+        ...this.props.overwrites?.[type]?.environment,
       },
       bundling: {
         commandHooks: {
@@ -151,9 +161,9 @@ export class LamDBApplication extends Construct {
                 ]
               : []),
           ],
-          ...this.props.lambda?.overwrites?.[type]?.bundling?.commandHooks,
+          ...this.props.overwrites?.[type]?.bundling?.commandHooks,
         },
-        ...this.props.lambda?.overwrites?.[type]?.bundling,
+        ...this.props.overwrites?.[type]?.bundling,
       },
     });
     return fn;

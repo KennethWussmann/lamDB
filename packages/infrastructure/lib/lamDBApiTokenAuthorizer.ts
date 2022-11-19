@@ -7,7 +7,7 @@ import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 import { join } from 'path';
 import { LamDBFunction, LamDBFunctionProps } from './lamDBFunction';
-import { LambdaFunctionType } from './types';
+import { LambdaFileType, LambdaFunctionType } from './types';
 
 export type LamDBApiTokenAuthorizerTokenProps = {
   name: string;
@@ -26,7 +26,12 @@ export class LamDBApiTokenAuthorizer extends Construct {
   public readonly secrets: ISecret[];
   public readonly rotationFunction: LamDBFunction;
   public readonly authorizerFunction: LamDBFunction;
-  constructor(scope: Construct, id: string, props: LamDBApiTokenAuthorizerProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    props: LamDBApiTokenAuthorizerProps,
+    private lambdaFileType: LambdaFileType = 'js',
+  ) {
     super(scope, id);
 
     if (props.tokens.length === 0) {
@@ -42,7 +47,7 @@ export class LamDBApiTokenAuthorizer extends Construct {
       memorySize: 128,
       tracing,
       logLevel: props.logLevel,
-      entry: join(__dirname, 'lambda', 'rotation.js'),
+      entry: join(__dirname, 'lambda', `rotation.${this.lambdaFileType}`),
       ...props.lambdaFunctionProps?.['token-rotation'],
       environment: {
         SECRET_PREFIX: secretPrefix,
@@ -56,7 +61,7 @@ export class LamDBApiTokenAuthorizer extends Construct {
       memorySize: 512,
       tracing,
       logLevel: props.logLevel,
-      entry: join(__dirname, 'lambda', 'authorizer.js'),
+      entry: join(__dirname, 'lambda', `authorizer.${this.lambdaFileType}`),
       ...props.lambdaFunctionProps?.authorizer,
       environment: {
         SECRET_PREFIX: secretPrefix,

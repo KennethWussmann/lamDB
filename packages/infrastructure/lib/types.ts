@@ -1,4 +1,5 @@
 import { HttpApiProps } from '@aws-cdk/aws-apigatewayv2-alpha';
+import { LogLevel } from '@lamdb/commons';
 import { Schedule } from 'aws-cdk-lib/aws-events';
 import { LamDBApiTokenAuthorizerTokenProps } from './lamDBApiTokenAuthorizer';
 import { EfsBastionHostProps } from './lamDBBastionHost';
@@ -52,7 +53,7 @@ export type LamDBProps = {
    * Log level of LamDB and subprocesses
    * @default info
    */
-  logLevel?: 'info' | 'debug' | 'error';
+  logLevel?: LogLevel;
   /**
    * Enable API Gateway access logging
    * @default false
@@ -91,3 +92,5 @@ export type LamDBProps = {
    */
   operationOptimization?: boolean;
 } & Pick<HttpApiProps, 'defaultAuthorizer'>;
+
+export type LambdaFileType = 'js' | 'ts';

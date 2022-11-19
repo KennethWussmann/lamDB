@@ -1,5 +1,4 @@
-import { databaseMigrationLockPath, databasePath, migrationEnginePath, prismaSchemaPath } from '../../test/binaryPaths';
-import { exists } from '@lamdb/commons';
+import { databasePath, migrationEnginePath, prismaSchemaPath } from '../../test/binaryPaths';
 import { MigrationEngine } from './migrationEngine';
 
 const engine = new MigrationEngine({
@@ -9,14 +8,15 @@ const engine = new MigrationEngine({
 });
 
 describe('migrationEngine', () => {
-  it('applies migrations to fresh database and trying to reapply is skipped', async () => {
+  it('applies migrations to database', async () => {
     const appliedMigrations = await engine.apply();
-    const lockFileExists = await exists(databaseMigrationLockPath);
 
-    expect(lockFileExists).toBeTruthy();
-    expect(appliedMigrations).toMatchSnapshot();
-
-    const retryAppliedMigrations = await engine.apply();
-    expect(retryAppliedMigrations).toHaveLength(0);
+    expect(appliedMigrations).toMatchInlineSnapshot(`
+      [
+        "20221022090016_configure_wal",
+        "20221022090018_create_article_table",
+        "20221022104024_import_data",
+      ]
+    `);
   });
 });

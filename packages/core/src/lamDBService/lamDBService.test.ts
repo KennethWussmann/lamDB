@@ -15,7 +15,6 @@ describe('LamDBService', () => {
     service = new LamDBService(
       {
         migrationEngineBinaryPath: '',
-        migrationEngineForceMigration: true,
         queryEngineLibraryPath: '',
         databasePath: '',
         prismaSchemaPath: '',
@@ -97,7 +96,7 @@ describe('LamDBService', () => {
   it('uses migration engine to apply migrations', async () => {
     await service.migrate();
 
-    expect(migrationEngineMock.apply).toHaveBeenCalledWith(true);
+    expect(migrationEngineMock.apply).toHaveBeenCalled();
   });
 
   it('uses migration engine to reset filesystem', async () => {

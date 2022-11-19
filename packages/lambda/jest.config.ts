@@ -11,6 +11,7 @@ module.exports = {
       displayName: 'unit',
       testMatch: ['<rootDir>/**/*.test.ts'],
       testPathIgnorePatterns: ['it.test.ts'],
+      setupFiles: ['<rootDir>/test/setupEnv.ts'],
     },
   ],
 };

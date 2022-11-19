@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { Request, requestSchema, Response } from '@lamdb/commons';
+import { Request, Response } from '@lamdb/commons';
 
 export const graphQlErrorResponse = (message: string): Response => ({
   status: 400,
@@ -39,9 +39,8 @@ export const fromApiGatewayResponse = (response: APIGatewayProxyStructuredResult
 });
 
 export const getRequestFromUnion = (request: APIGatewayProxyEventV2 | Request): Request => {
-  const result = requestSchema.safeParse(request);
-  if (result.success) {
-    return result.data;
+  if (isRequest(request)) {
+    return request;
   } else {
     return fromApiGatwayRequest(request as APIGatewayProxyEventV2);
   }

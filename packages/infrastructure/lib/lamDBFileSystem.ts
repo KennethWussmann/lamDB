@@ -3,9 +3,14 @@ import { GatewayVpcEndpointAwsService, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { AccessPoint, FileSystem } from 'aws-cdk-lib/aws-efs';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { LamDBBastionHost } from './lamDBBastionHost';
-import { LamDBProps } from './types';
+import { EfsBastionHostProps, LamDBBastionHost } from './lamDBBastionHost';
 import { FileSystem as LambdaFileSystem } from 'aws-cdk-lib/aws-lambda';
+
+export type LamDBFileSystemProps = {
+  name: string;
+  databaseStorageBucket: IBucket;
+  bastionHost?: boolean | EfsBastionHostProps;
+};
 
 export class LamDBFileSystem extends Construct {
   public readonly efsMountPath = '/mnt/efs';
@@ -15,7 +20,7 @@ export class LamDBFileSystem extends Construct {
   public readonly vpc: Vpc;
   public readonly databaseStorageEfsBastionHost: LamDBBastionHost | undefined;
 
-  constructor(scope: Construct, id: string, props: LamDBProps, databaseStorageBucket: IBucket) {
+  constructor(scope: Construct, id: string, props: LamDBFileSystemProps) {
     super(scope, id);
 
     this.vpc = new Vpc(this, 'Vpc', {
@@ -52,13 +57,13 @@ export class LamDBFileSystem extends Construct {
       this.efsMountPath,
     );
 
-    if (typeof props.efs?.bastionHost === 'boolean' ? props.efs?.bastionHost : !!props.efs?.bastionHost) {
+    if (typeof props?.bastionHost === 'boolean' ? props?.bastionHost : !!props?.bastionHost) {
       this.databaseStorageEfsBastionHost = new LamDBBastionHost(this, 'EfsBastionHost', {
         name: props.name,
         vpc: this.vpc,
         efs: this.databaseStorageFileSystem,
-        kmsKey: typeof props.efs?.bastionHost !== 'boolean' ? props.efs?.bastionHost?.kmsKey : undefined,
-        supportBucket: databaseStorageBucket,
+        kmsKey: typeof props?.bastionHost !== 'boolean' ? props?.bastionHost?.kmsKey : undefined,
+        supportBucket: props.databaseStorageBucket,
       });
     }
   }

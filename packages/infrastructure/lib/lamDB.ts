@@ -20,15 +20,22 @@ export class LamDB extends Construct {
   constructor(scope: Construct, id: string, props: LamDBProps) {
     super(scope, id);
     this.storage = new LamDBStorage(this, 'Storage', props.name);
-    this.fileSystem = new LamDBFileSystem(this, 'FileSystem', props, this.storage);
-    this.application = new LamDBApplication(
-      this,
-      'Application',
-      props,
-      new LamDBEngineLayer(this, 'EngineLayer'),
-      this.fileSystem,
-      this.storage,
-    );
+    this.fileSystem = new LamDBFileSystem(this, 'FileSystem', {
+      name: props.name,
+      databaseStorageBucket: this.storage,
+    });
+    this.application = new LamDBApplication(this, 'Application', {
+      engineLayer: new LamDBEngineLayer(this, 'EngineLayer'),
+      fileSystem: this.fileSystem,
+      databaseStorageBucket: this.storage,
+      name: props.name,
+      logLevel: props.logLevel,
+      operationOptimization: props.operationOptimization,
+      schemaPath: props.schemaPath,
+      tracing: props.tracing,
+      overwrites: props.lambda?.overwrites,
+      provisionedConcurreny: props.lambda?.provisionedConcurreny,
+    });
     this.authorizer =
       props.apiTokens && props.apiTokens?.length > 0
         ? new LamDBApiTokenAuthorizer(this, 'ApiTokenAuthorizer', {

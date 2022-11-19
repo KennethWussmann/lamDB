@@ -25,7 +25,7 @@ export class LamDBService {
   private logger = createLogger({ name: 'LamDBService' });
 
   constructor(
-    private config: LamDBConfiguration,
+    config: LamDBConfiguration,
     private queryEngine = getQueryEngine({
       databaseFilePath: config.databasePath,
       libraryPath: config.queryEngineLibraryPath,
@@ -64,8 +64,8 @@ export class LamDBService {
   }
 
   @tracer.captureMethod()
-  async migrate(force: boolean = this.config.migrationEngineForceMigration) {
-    return await this.migrationEngine.apply(force);
+  async migrate() {
+    return await this.migrationEngine.apply();
   }
 
   /**

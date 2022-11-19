@@ -1,6 +1,6 @@
-import { readFile, rm, writeFile } from 'fs/promises';
-import { basename, dirname, join } from 'path';
-import { createLogger, logTraceSync, tracer, errorLog, exists, sha1Hash } from '@lamdb/commons';
+import { rm } from 'fs/promises';
+import { dirname, join } from 'path';
+import { createLogger, logTraceSync, tracer, errorLog, exists } from '@lamdb/commons';
 import execa from 'execa';
 import { ApplyMigrationRequest, isRPCError, isRPCMigrationResult, RPCResponse, rpcResponse } from './types';
 import { getDatabaseUrl } from '../utils';
@@ -15,87 +15,18 @@ type MigrationEngineConfig = {
 
 export class MigrationEngine {
   private messageId = 0;
-  private migrationDone = false;
   private schemaHash: string | undefined;
-  private previousSchemaHash: string | undefined;
-  private schemaContent: string | undefined;
-  private migrationLockFilePath = join(
-    dirname(this.config.databaseFilePath),
-    `${basename(this.config.databaseFilePath)}.migration.lock`,
-  );
   private migrationsPath = join(dirname(this.config.prismaSchemaPath), 'migrations');
 
   constructor(private config: MigrationEngineConfig) {}
 
-  @tracer.captureMethod({ captureResponse: false })
-  private async getSchemaContent() {
-    if (this.schemaContent) {
-      return this.schemaContent;
-    }
-    this.schemaContent = await readFile(this.config.prismaSchemaPath, 'utf8');
-    return this.schemaContent;
-  }
-
-  @tracer.captureMethod()
-  private async getSchemaHash() {
-    if (this.schemaHash) {
-      return this.schemaHash;
-    }
-    this.schemaHash = sha1Hash(await this.getSchemaContent());
-    return this.schemaHash;
-  }
-
-  @tracer.captureMethod()
-  private async getPreviousSchemaHash() {
-    if (this.previousSchemaHash) {
-      return this.previousSchemaHash;
-    }
-    this.previousSchemaHash = await readFile(this.migrationLockFilePath, 'utf8');
-    return this.previousSchemaHash;
-  }
-
-  @tracer.captureMethod()
-  private async requiresMigration() {
-    if (this.migrationDone) {
-      return false;
-    }
-    if (!(await exists(this.migrationsPath))) {
-      logger.warn('No migrations exist: Database may remain empty.');
-      return false;
-    }
-    if (!(await exists(this.migrationLockFilePath))) {
-      return true;
-    }
-    return (await this.getPreviousSchemaHash()) !== (await this.getSchemaHash());
-  }
-
-  @tracer.captureMethod()
-  private async updateMigrationLockFile() {
-    await writeFile(this.migrationLockFilePath, await this.getSchemaHash(), 'utf8');
-  }
-
-  @tracer.captureMethod()
-  private async rollbackMigrationLockFile() {
-    await writeFile(this.migrationLockFilePath, await this.getPreviousSchemaHash(), 'utf8');
-  }
-
   /**
-   * Check if migration is necessary using a lockfile. If lockfile is in sync with current schema, nothing will be applied.
-   * If lockfile is out of sync with schema, the schema will be tried to apply using Prisma migration engine. Migration engine might still decide that nothing needs execution.
-   * @param force Skip checksum lockfile check and try to apply anyways
+   * Execute migrations if needed using MigrationEngine
    * @returns array of applied migration names
    */
   @tracer.captureMethod()
-  async apply(force = false): Promise<string[]> {
-    if (!force && !(await this.requiresMigration())) {
-      logger.debug('Not running migration: Database already up-to-date');
-      return [];
-    }
-    // optimistically lock the migration, to avoid another parallel migraiton
-    await this.updateMigrationLockFile();
-
+  async apply(): Promise<string[]> {
     logger.info('Executing migration', { schemaHash: this.schemaHash });
-
     let appliedMigrationNames: string[] | undefined;
     let migration: execa.ExecaChildProcess<string> | undefined;
     try {
@@ -143,7 +74,6 @@ export class MigrationEngine {
                 { appliedMigrationNames },
               );
             }
-            this.migrationDone = true;
             migration?.kill('SIGTERM');
             return;
           }
@@ -169,7 +99,6 @@ export class MigrationEngine {
     } catch (e: any) {
       // ignore a graceful SIGTERM stop, all good
       if (e?.signal !== 'SIGTERM') {
-        await this.rollbackMigrationLockFile();
         logger.error('Failed to apply migrations', errorLog(e));
         throw new Error('Failed to apply migrations');
       }
@@ -187,19 +116,14 @@ export class MigrationEngine {
   async reset() {
     const databaseDir = dirname(this.config.databaseFilePath);
     await Promise.all(
-      [
-        this.config.databaseFilePath,
-        this.migrationLockFilePath,
-        `${databaseDir}-shm`,
-        `${databaseDir}-wal`,
-        `${databaseDir}-journal`,
-      ].map(async (file) => {
-        if (await exists(file)) {
-          await rm(file);
-        }
-      }),
+      [this.config.databaseFilePath, `${databaseDir}-shm`, `${databaseDir}-wal`, `${databaseDir}-journal`].map(
+        async (file) => {
+          if (await exists(file)) {
+            await rm(file);
+          }
+        },
+      ),
     );
-    this.migrationDone = false;
   }
 }
 

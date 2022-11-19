@@ -1,5 +1,11 @@
 # @lamdb/core
 
+## 0.1.10
+
+### Patch Changes
+
+- 377c907: Disable operation optimization by default
+
 ## 0.1.9
 
 ### Patch Changes

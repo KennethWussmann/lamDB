@@ -40,4 +40,50 @@ describe('OperationInfo', () => {
       type: 'mutation',
     });
   });
+  it('returns undefined for empty body', () => {
+    const request: Request = {
+      method: 'POST',
+      body: undefined,
+    };
+
+    const response = getOperationInfo(request);
+
+    expect(response).toBeUndefined();
+  });
+  it('returns undefined for invalid json body', () => {
+    const request: Request = {
+      method: 'POST',
+      body: 'not json',
+    };
+
+    const response = getOperationInfo(request);
+
+    expect(response).toBeUndefined();
+  });
+  it('throws error when query did not contain operations', () => {
+    const request: Request = {
+      method: 'POST',
+      body: JSON.stringify({
+        operationName: 'Test',
+        variables: {},
+        query: 'fragment Test on Something { id }',
+      }),
+    };
+
+    expect(() => getOperationInfo(request)).toThrow('Document does not include operation nodes');
+  });
+  it('throws error when query contains multiple operations', () => {
+    const request: Request = {
+      method: 'POST',
+      body: JSON.stringify({
+        operationName: 'Test',
+        variables: {},
+        query: 'query Test { id } query Test2 { id }',
+      }),
+    };
+
+    expect(() => getOperationInfo(request)).toThrow(
+      'Document includes multiple operation nodes: Only one is supported',
+    );
+  });
 });

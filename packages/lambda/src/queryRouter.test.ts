@@ -159,4 +159,27 @@ describe('QueryRouter', () => {
       }
     `);
   });
+
+  it('returns GraphQL error when lambda invoke did not contain response payload', async () => {
+    lambdaMock.invoke.mockResolvedValue({
+      Payload: undefined,
+    } as never);
+
+    const response = await router.routeQuery(
+      lambdaMock,
+      { body: JSON.stringify({ query: 'query { test { id } }', operationName: 'TestOperation' }), method: 'POST' },
+      'writer-arn',
+      'reader-arn',
+    );
+
+    expect(response).toMatchInlineSnapshot(`
+      {
+        "body": "{"data":null,"errors":[{"message":"Failed to route request: Request failed: Failed to parse lambda response payload"}]}",
+        "headers": {
+          "content-type": "application/json",
+        },
+        "status": 400,
+      }
+    `);
+  });
 });

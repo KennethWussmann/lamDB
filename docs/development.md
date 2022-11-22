@@ -42,24 +42,14 @@ The `@lamdb/server` can run lamDB standalone.
 DETECT_PLATFORM=1 npm run build -- --force
 ```
 
-2. Create an `.env` file in `packages/server/.env` with the following content:
-
-```shell
-# The absolute file path to the @lamdb/example database file and prisma schema
-DATABASE_PATH=/Users/.../lamDB/packages/example/prisma/database.db
-PRISMA_SCHEMA_PATH=/Users/.../lamDB/packages/example/prisma/schema.prisma
-# The absolute file path the migration engine and query engine, which we got from running the build
-MIGRATION_ENGINE_BINARY_PATH=/Users/.../lamDB/packages/engine-layer/dist/migration-engine
-QUERY_ENGINE_LIBRARY_PATH=/Users/.../lamDB/packages/engine-layer/dist/libquery-engine.node
-
-# Files will be at the mentioned paths, they just need to be adjusted to your absolute file paths.
-```
-
-3. Start the server
+2. Start the server
 
 ```shell
 # Switch into the server directory
 cd packages/server
 # Start the server (dev = auto-reload, start = no auto-reload)
 npm run dev
+
+# If the server does not start due to missing environment variables, run "npm run codegen" to generate the .env file.
+# This is usually not needed, because it happens automatically during the build process
 ```

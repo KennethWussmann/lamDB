@@ -37,6 +37,10 @@ Deploying lamDB is done in 3 easy steps. Read the [getting started guide](docs/g
 
 Not sure if this is the right for you? Check the [FAQ](docs/faq.md)
 
+## Development
+
+To get started with development, read the [development guide](docs/development.md).
+
 ## Honourable mentions
 
 Thanks to the following related projects:

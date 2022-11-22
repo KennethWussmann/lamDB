@@ -1,13 +1,12 @@
 import { join, resolve } from 'path';
-import { createLogger, exists } from '@lamdb/commons';
 import { writeFile } from 'fs/promises';
+import { existsSync } from 'fs';
 
-const logger = createLogger({ name: 'setupEnv' });
 const envFilePath = join(__dirname, '..', '.env');
 
 void (async () => {
-  if (await exists(envFilePath)) {
-    logger.info('Using already existing .env file', { envFilePath });
+  if (existsSync(envFilePath)) {
+    console.info('Using already existing .env file', envFilePath);
     return;
   }
   await writeFile(
@@ -25,5 +24,5 @@ void (async () => {
     ].join('\n'),
     'utf-8',
   );
-  logger.info('Created .env file', { envFilePath });
+  console.info('Created .env file', envFilePath);
 })();

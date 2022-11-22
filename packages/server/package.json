@@ -11,7 +11,9 @@
     "test:cov": "npm run test -- --collectCoverage",
     "start": "ts-node src/server.ts",
     "dev": "ts-node-dev src/server.ts",
-    "clean": "rm -rf build"
+    "clean": "rm -rf build",
+    "codegen": "ts-node scripts/setupEnv.ts",
+    "prepare": "npm run codegen"
   },
   "dependencies": {
     "@lamdb/core": "*",

@@ -32,8 +32,8 @@
     "*.{ts,json,yml,yaml,html,md}": "prettier --write"
   },
   "engines": {
-    "node": "16",
-    "npm": "8"
+    "node": "18",
+    "npm": "9"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",

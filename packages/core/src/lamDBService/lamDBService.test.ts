@@ -94,6 +94,8 @@ describe('LamDBService', () => {
   });
 
   it('uses migration engine to apply migrations', async () => {
+    migrationEngineMock.apply.mockResolvedValue([]);
+
     await service.migrate();
 
     expect(migrationEngineMock.apply).toHaveBeenCalled();

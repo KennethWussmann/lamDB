@@ -12,7 +12,7 @@ export type LamDBFunctionProps = Pick<NodejsFunctionProps, 'functionName' | 'han
 export class LamDBFunction extends NodejsFunction {
   constructor(scope: Construct, id: string, props: LamDBFunctionProps) {
     super(scope, `LamDBFunction${id}`, {
-      runtime: Runtime.NODEJS_16_X,
+      runtime: Runtime.NODEJS_18_X,
       memorySize: 1024 * 2,
       timeout: Duration.seconds(5),
       architecture: Architecture.ARM_64,
@@ -23,6 +23,7 @@ export class LamDBFunction extends NodejsFunction {
         sourceMap: props.logLevel === 'debug',
         target: 'node16',
         tsconfig: 'tsconfig.json',
+        externalModules: ['@aws-sdk/client-secrets-manager', '@aws-sdk/client-lambda'],
         ...props.bundling,
       },
       environment: {

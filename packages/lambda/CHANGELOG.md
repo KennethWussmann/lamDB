@@ -1,5 +1,15 @@
 # @lamdb/lambda
 
+## 0.1.11
+
+### Patch Changes
+
+- 192c544: Update to Node 18
+- c497eb4: Write cloudwatch metrics
+- Updated dependencies [192c544]
+- Updated dependencies [c497eb4]
+  - @lamdb/core@0.1.11
+
 ## 0.1.9
 
 ### Patch Changes

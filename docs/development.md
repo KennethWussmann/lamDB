@@ -7,7 +7,7 @@
 Development is only tested on macOS using arm64. It should work on Linux and Windows as well. Let me know if there are platform specific steps needed. Alternatively, lamDB comes with a [Devcontainer to develop inside Docker](https://code.visualstudio.com/docs/devcontainers/containers). If using the devcontainer you can skip the entire setup section and continue with building.
 
 1. Clone repo
-2. [Install Node 16](https://github.com/nvm-sh/nvm) with NPM
+2. [Install Node 18](https://github.com/nvm-sh/nvm) with NPM
 3. Install dependencies
 
 ```shell

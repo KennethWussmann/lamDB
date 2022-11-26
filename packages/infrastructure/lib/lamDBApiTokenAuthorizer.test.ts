@@ -46,7 +46,7 @@ describe('LamDBApiTokenAuthorizer', () => {
       Role: {
         'Fn::GetAtt': ['AuthorizerLamDBFunctionApiTokenRotationFunctionServiceRole68D91BC8', 'Arn'],
       },
-      Runtime: 'nodejs16.x',
+      Runtime: 'nodejs18.x',
       Timeout: 5,
       TracingConfig: {
         Mode: 'Active',
@@ -75,7 +75,7 @@ describe('LamDBApiTokenAuthorizer', () => {
       Role: {
         'Fn::GetAtt': ['AuthorizerLamDBFunctionApiTokenAuthorizerFunctionServiceRole9FC12EB5', 'Arn'],
       },
-      Runtime: 'nodejs16.x',
+      Runtime: 'nodejs18.x',
       Timeout: 5,
       TracingConfig: {
         Mode: 'Active',

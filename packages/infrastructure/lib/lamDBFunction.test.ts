@@ -46,7 +46,7 @@ describe('LamDBFunction', () => {
       FunctionName: 'test-function',
       Handler: 'index.test.handler',
       MemorySize: 2048,
-      Runtime: 'nodejs16.x',
+      Runtime: 'nodejs18.x',
       Timeout: 5,
     });
   });

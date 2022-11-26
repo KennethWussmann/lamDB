@@ -1,5 +1,14 @@
 # @lamdb/api-token-authorizer
 
+## 0.1.11
+
+### Patch Changes
+
+- 192c544: Update to Node 18
+- Updated dependencies [192c544]
+- Updated dependencies [c497eb4]
+  - @lamdb/commons@0.1.11
+
 ## 0.1.9
 
 ### Patch Changes

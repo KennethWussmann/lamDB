@@ -16,6 +16,7 @@ describe('LamDBFunction', () => {
       entry: join(__dirname, 'lambda', 'proxy.ts'),
       logLevel: 'debug',
       tracing: Tracing.ACTIVE,
+      metrics: true,
       environment: {
         MY_ADDITIONAL_ENV: 'test',
       },
@@ -37,10 +38,13 @@ describe('LamDBFunction', () => {
       Environment: {
         Variables: {
           ENABLE_TRACING: 'true',
+          ENABLE_METRICS: 'true',
           NODE_OPTIONS: '--enable-source-maps',
           LOG_LEVEL: 'debug',
           AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
           MY_ADDITIONAL_ENV: 'test',
+          POWERTOOLS_METRICS_NAMESPACE: 'LamDB',
+          POWERTOOLS_SERVICE_NAME: 'LamDB',
         },
       },
       FunctionName: 'test-function',

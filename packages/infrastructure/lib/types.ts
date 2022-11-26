@@ -83,6 +83,11 @@ export type LamDBProps = {
    */
   tracing?: boolean;
   /**
+   * Enable metrics reporting to CloudWatch.
+   * @default true
+   **/
+  metrics?: boolean;
+  /**
    * Modify the incoming GraphQL operations to increase compatiblity with Prisma Query Engine.
    * The Prisma query engine does not support some GraphQL features like variables and fragments. LamDB can optimize the operation on-the-fly to increase compatability.
    * This comes at runtime overhead and should be avoided if possible. If you can do without some features of GraphQL, you should disable this optimization in favor of performance.

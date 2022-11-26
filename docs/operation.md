@@ -139,3 +139,100 @@ sudo aws s3 sync s3://<ACCOUNT-ID>-<LAMDB-INSTANCE-NAME>-database mnt/<LAMDB-INS
 ```
 
 You may need to adjust the file permissions afterwards to ensure the ec2-user has read and write permission again.
+
+## Monitoring
+
+### Metrics
+
+LamDB writes CloudWatch metrics for important performance and health measures. It does not define alarms by default. This is recommended to do based on the connected application and access patterns.
+
+<table>
+  <tr>
+    <th>Metric name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>ReadOperations</td>
+    <td>Number of successfully executed read operations</td>
+  </tr>
+  <tr>
+    <td>WriteOperations</td>
+    <td>Number of successfully executed write operations</td>
+  </tr>
+  <tr>
+    <td>ReadThroughput</td>
+    <td>Response body size in bytes for successful read operations</td>
+  </tr>
+  <tr>
+    <td>WriteThroughput</td>
+    <td>Response body size in bytes for successful write operations</td>
+  </tr>
+  <tr>
+    <td>ReadLatency</td>
+    <td>Response time of the query engine in milliseconds for successful read operations</td>
+  </tr>
+  <tr>
+    <td>WriteLatency</td>
+    <td>Response time of the query engine in milliseconds for successful write operations</td>
+  </tr>
+  <tr>
+    <td>OperationErrors</td>
+    <td>Number failed operations</td>
+  </tr>
+  <tr>
+    <td>DatabaseSize</td>
+    <td>Size of main database file in bytes</td>
+  </tr>
+  <tr>
+    <td>MigrationsApplied</td>
+    <td>Count of applied migrations</td>
+  </tr>
+</table>
+
+Metrics can be used to create alarms like this:
+
+```typescript
+const lamDB = new LamDB(...);
+
+new Alarm(this, 'DatabaseSizeAlarm', {
+  // There are helper methods for all the above mentioned metrics
+  metric: lamDB.metricDatabaseSize({ period: Duration.minutes(5) }),
+  // Define a reasonable threshold, just an example
+  threshold: 1024 * 1024 * 1024 * 10, // 10 GB
+  evaluationPeriods: 1,
+  alarmDescription: 'Database exceeded 10 GB in size',
+});
+```
+
+Metric reporting is enabled by default. No actions needed, but they can be disabled like this:
+
+```typescript
+const lamDB = new LamDB(this, 'LamDBTest', {
+  // ...
+  // Metrics are enabled by default, but can be disabled
+  metrics: false,
+});
+```
+
+### Logging
+
+Logs can help to investigate an issue with lamDB. By default lamDB only logs on `info` log level. For deeper analysis the debug logs may contain more helpful information. They can be enabled like this:
+
+```typescript
+const lamDB = new LamDB(this, 'LamDBTest', {
+  // ...
+  // trace, debug, info, warn, error or fatal
+  logLevel: 'info',
+});
+```
+
+### Tracing
+
+For performance investigation it can be helpful to enable tracing. This will log traces to AWS X-Ray with important metadata and timings. Tracing is disabled by default and can be enabled like this:
+
+```typescript
+const lamDB = new LamDB(this, 'LamDBTest', {
+  // ...
+  tracing: true,
+});
+```

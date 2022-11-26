@@ -1,4 +1,4 @@
-import { rm } from 'fs/promises';
+import { rm, stat } from 'fs/promises';
 import { dirname, join } from 'path';
 import { createLogger, logTraceSync, tracer, errorLog, exists } from '@lamdb/commons';
 import execa from 'execa';
@@ -124,6 +124,15 @@ export class MigrationEngine {
         },
       ),
     );
+  }
+
+  /**
+   * Get current database file size in bytes.
+   */
+  @tracer.captureMethod()
+  async getDatabaseSizeBytes(): Promise<number> {
+    const { size } = await stat(this.config.databaseFilePath);
+    return size;
   }
 }
 

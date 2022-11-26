@@ -7,7 +7,7 @@ import { LamDBProps } from './types';
 
 export type LamDBFunctionProps = Pick<NodejsFunctionProps, 'functionName' | 'handler' | 'entry'> &
   Partial<NodejsFunctionProps> &
-  Pick<LamDBProps, 'logLevel'>;
+  Pick<LamDBProps, 'logLevel'> & { metrics?: boolean; metricNamespace?: string };
 
 export class LamDBFunction extends NodejsFunction {
   constructor(scope: Construct, id: string, props: LamDBFunctionProps) {
@@ -27,9 +27,12 @@ export class LamDBFunction extends NodejsFunction {
         ...props.bundling,
       },
       environment: {
+        ENABLE_METRICS: props.metrics ? 'true' : 'false',
         ENABLE_TRACING: props.tracing === Tracing.ACTIVE ? 'true' : 'false',
         NODE_OPTIONS: props.logLevel === 'debug' ? '--enable-source-maps' : '',
         LOG_LEVEL: props.logLevel ?? 'info',
+        POWERTOOLS_METRICS_NAMESPACE: props.metricNamespace ?? 'LamDB',
+        POWERTOOLS_SERVICE_NAME: props.metricNamespace ?? 'LamDB',
         ...props.environment,
       },
     });

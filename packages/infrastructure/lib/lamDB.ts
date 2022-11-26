@@ -8,6 +8,8 @@ import { LamDBStorage } from './lamDBStorage';
 import { Tags } from 'aws-cdk-lib';
 import { LamDBApiTokenAuthorizer } from './lamDBApiTokenAuthorizer';
 import { LamDBDataSync } from './lamDBDataSync';
+import { CommonMetricOptions, IMetric } from 'aws-cdk-lib/aws-cloudwatch';
+import { MetricName } from '@lamdb/commons';
 
 export class LamDB extends Construct {
   public readonly api: LamDBAPI;
@@ -33,6 +35,7 @@ export class LamDB extends Construct {
       operationOptimization: props.operationOptimization,
       schemaPath: props.schemaPath,
       tracing: props.tracing,
+      metrics: props.metrics ?? true,
       overwrites: props.lambda?.overwrites,
       provisionedConcurreny: props.lambda?.provisionedConcurreny,
     });
@@ -70,4 +73,76 @@ export class LamDB extends Construct {
 
     Tags.of(this).add('lamdb:name', props.name);
   }
+
+  /**
+   * Number of successfully executed read operations
+   * @param options
+   * @returns
+   */
+  public metricReadOperations = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.READ_OPERATIONS, options);
+
+  /**
+   * Number of successfully executed write operations
+   * @param options
+   * @returns
+   */
+  public metricWriteOperations = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.WRITE_OPERATIONS, options);
+
+  /**
+   * Number failed operations
+   * @param options
+   * @returns
+   */
+  public metricOperationErrors = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.OPERATION_ERRORS, options);
+
+  /**
+   * Response body size in bytes for successful read operations
+   * @param options
+   * @returns
+   */
+  public metricReadThroughput = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.READ_THROUGHPUT, options);
+
+  /**
+   * Response body size in bytes for successful write operations
+   * @param options
+   * @returns
+   */
+  public metricWriteThroughput = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.WRITE_THROUGHPUT, options);
+
+  /**
+   * Response time of the query engine in milliseconds for successful read operations
+   * @param options
+   * @returns
+   */
+  public metricReadLatency = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.READ_LATENCY, options);
+
+  /**
+   * Response time of the query engine in milliseconds for successful write operations
+   * @param options
+   * @returns
+   */
+  public metricWriteLatency = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.WRITE_LATENCY, options);
+
+  /**
+   * Size of main database file in bytes
+   * @param options
+   * @returns
+   **/
+  public metricDatabaseSize = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.DATABASE_SIZE, options);
+
+  /**
+   * Count of applied migrations
+   * @param options
+   * @returns
+   **/
+  public metricMigrationsApplied = (options: CommonMetricOptions | undefined = undefined): IMetric =>
+    this.application.metric(MetricName.MIGRATIONS_APPLIED, options);
 }

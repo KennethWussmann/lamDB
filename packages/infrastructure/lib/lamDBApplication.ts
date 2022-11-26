@@ -1,5 +1,6 @@
-import { LogLevel } from '@lamdb/commons';
+import { LogLevel, MetricName } from '@lamdb/commons';
 import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { CommonMetricOptions, Metric } from 'aws-cdk-lib/aws-cloudwatch';
 import { Alias, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
@@ -18,6 +19,7 @@ export type LamDBApplicationProps = {
   logLevel?: LogLevel;
   operationOptimization?: boolean;
   schemaPath: string;
+  metrics?: boolean;
 } & LamDBLambdaOverwritesProps;
 
 export class LamDBApplication extends Construct {
@@ -128,6 +130,8 @@ export class LamDBApplication extends Construct {
       entry: join(__dirname, 'lambda', `${handler}.${this.lambdaFileType}`),
       tracing: this.props.tracing ? Tracing.ACTIVE : undefined,
       logLevel: this.props.logLevel,
+      metrics: this.props.metrics,
+      metricNamespace: this.props.name,
       ...props,
       ...this.props.overwrites?.[type],
       environment: {
@@ -168,4 +172,11 @@ export class LamDBApplication extends Construct {
     });
     return fn;
   };
+
+  public metric = (name: MetricName, options: CommonMetricOptions = {}): Metric =>
+    new Metric({
+      metricName: name,
+      namespace: this.props.name,
+      ...options,
+    });
 }

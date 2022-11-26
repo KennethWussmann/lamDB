@@ -10,6 +10,14 @@ import {
   Request,
   tracer,
   graphQlErrorResponse,
+  writeErrorMetric,
+  writeLatencyMetric,
+  writeMigrationsAppliedMetric,
+  metricsEnabled,
+  writeDatabaseSizeMetric,
+  writeOperationsMetric,
+  writeThroughputMetric,
+  publishMetrics,
 } from '@lamdb/commons';
 import { LamDBConfiguration } from '../utils';
 
@@ -50,14 +58,27 @@ export class LamDBService {
     }
 
     if (operationInfo?.type === 'mutation' && endpointType === 'reader') {
+      writeErrorMetric();
+      publishMetrics();
       return graphQlErrorResponse('Cannot execute mutations in read-only mode');
     }
 
     try {
+      const oerationType = operationInfo?.type === 'mutation' ? 'write' : 'read';
+      const start = new Date().getTime();
       const response = await this.queryEngine.execute(request);
-
+      writeLatencyMetric(oerationType, new Date().getTime() - start);
+      if (metricsEnabled) {
+        // as this metric requires additional IO, we only want to collect it if metrics are enabled
+        writeDatabaseSizeMetric(await this.migrationEngine.getDatabaseSizeBytes());
+      }
+      writeOperationsMetric(oerationType);
+      writeThroughputMetric(oerationType, request.body ? Buffer.byteLength(request.body, 'utf-8') : 0);
+      publishMetrics();
       return response;
     } catch (e: any) {
+      writeErrorMetric();
+      publishMetrics();
       this.logger.error('Failed to proxy request', errorLog(e));
       return graphQlErrorResponse(`Failed to proxy request: ${e?.message}`);
     }
@@ -65,7 +86,10 @@ export class LamDBService {
 
   @tracer.captureMethod()
   async migrate() {
-    return await this.migrationEngine.apply();
+    const applied = await this.migrationEngine.apply();
+    writeMigrationsAppliedMetric(applied.length);
+    publishMetrics();
+    return applied;
   }
 
   /**

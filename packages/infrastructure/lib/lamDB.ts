@@ -99,7 +99,7 @@ export class LamDB extends Construct {
     this.application.metric(MetricName.OPERATION_ERRORS, options);
 
   /**
-   * Response body size in bytes for successful read operations
+   * Response body size in bytes for successful operations
    * @param options
    * @returns
    */
@@ -107,7 +107,7 @@ export class LamDB extends Construct {
     this.application.metric(MetricName.READ_THROUGHPUT, options);
 
   /**
-   * Response body size in bytes for successful write operations
+   * Request body size in bytes for successful operations
    * @param options
    * @returns
    */

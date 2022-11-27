@@ -73,7 +73,8 @@ export class LamDBService {
         writeDatabaseSizeMetric(await this.migrationEngine.getDatabaseSizeBytes());
       }
       writeOperationsMetric(oerationType);
-      writeThroughputMetric(oerationType, request.body ? Buffer.byteLength(request.body, 'utf-8') : 0);
+      writeThroughputMetric('read', request.body ? Buffer.byteLength(request.body, 'utf-8') : 0);
+      writeThroughputMetric('write', response.body ? Buffer.byteLength(response.body, 'utf-8') : 0);
       publishMetrics();
       return response;
     } catch (e: any) {

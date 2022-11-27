@@ -161,11 +161,11 @@ LamDB writes CloudWatch metrics for important performance and health measures. I
   </tr>
   <tr>
     <td>ReadThroughput</td>
-    <td>Response body size in bytes for successful read operations</td>
+    <td>Response body size in bytes for successful operations</td>
   </tr>
   <tr>
     <td>WriteThroughput</td>
-    <td>Response body size in bytes for successful write operations</td>
+    <td>Request body size in bytes for successful operations</td>
   </tr>
   <tr>
     <td>ReadLatency</td>

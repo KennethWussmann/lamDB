@@ -19,7 +19,7 @@ export type LamDBEFSPersistenceProps = {
    * Great for debugging or maintenance, otherwise not necessary for operation.
    * @default false
    */
-  bastionHost?: Pick<EfsBastionHostProps, 'kmsKey'> | boolean;
+  bastionHost?: EfsBastionHostProps | boolean;
   /**
    * Use AWS DataSync to synchronize with an S3 bucket.
    * Great for backups, debugging, maintenance, data recovery.

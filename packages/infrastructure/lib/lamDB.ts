@@ -25,6 +25,7 @@ export class LamDB extends Construct {
     this.fileSystem = new LamDBFileSystem(this, 'FileSystem', {
       name: props.name,
       databaseStorageBucket: this.storage,
+      bastionHost: props.efs?.bastionHost,
     });
     this.application = new LamDBApplication(this, 'Application', {
       engineLayer: new LamDBEngineLayer(this, 'EngineLayer'),

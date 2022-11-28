@@ -47,7 +47,7 @@ export class MigrationEngine {
           migrationsDirectoryPath: this.migrationsPath,
         },
       };
-      logger.debug('Executing migration egnine RPC request', { request: migrationRequest });
+      logger.debug('Executing migration engine RPC request', { request: migrationRequest });
       migration.stdin?.write(`${JSON.stringify(migrationRequest)}\n`);
 
       migration.stdout?.on('data', (chunk) => {

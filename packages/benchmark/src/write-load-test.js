@@ -1,4 +1,5 @@
 import http from 'k6/http';
+import { randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 import { check } from 'k6';
 
 // eslint-disable-next-line no-undef
@@ -28,8 +29,15 @@ const start = () => {
   }
   const res = http.post(`${baseUrl}/graphql`, JSON.stringify({
     query: `
-    mutation createArticle($data: ArticleCreateInput!) {
-      createOneArticle(data: $data) {
+    mutation createArticle {
+      createOneArticle(data: {
+        claps: 100,
+        readingTime: 365,
+        url: "https://example.com",
+        title: "${randomArticleName}"
+        subtitle: "An example exciting article",
+        publication: "That One Site"
+      }) {
         id
         url
         title
@@ -40,16 +48,6 @@ const start = () => {
     }
     `,
     operationName: "createArticle",
-    variables: {
-      data: {
-        claps: 100,
-        readingTime: 365,
-        url: "https://example.com",
-        title: randomArticleName,
-        subtitle: "An example exciting article",
-        publication: "That One Site"
-      }
-    }
   }), params)
   check(res, {
     'is status 200': (r) => r.status === 200,

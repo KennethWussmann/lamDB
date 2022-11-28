@@ -1,10 +1,13 @@
 // istanbul ignore file
 import { LamDBConfiguration, LamDBService } from '@lamdb/core';
-import { logTraceSync } from '@lamdb/commons';
+import { logTraceSync, tracer } from '@lamdb/commons';
+import { DeferredService } from './handler/deferredService';
+import { DynamoDB } from '@aws-sdk/client-dynamodb';
 
 class ApplicationContext {
   configuration = new LamDBConfiguration();
-  service = new LamDBService(this.configuration);
+  lamDbService = new LamDBService(this.configuration);
+  deferredService = new DeferredService(this.lamDbService, tracer.captureAWSv3Client(new DynamoDB({})));
 }
 
 export const defaultApplicationContext = logTraceSync({

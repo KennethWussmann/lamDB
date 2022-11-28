@@ -1,21 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { Request, Response } from '@lamdb/commons';
 
-export const graphQlErrorResponse = (message: string): Response => ({
-  status: 400,
-  body: JSON.stringify({
-    data: null,
-    errors: [
-      {
-        message,
-      },
-    ],
-  }),
-  headers: {
-    'content-type': 'application/json',
-  },
-});
-
 export const toApiGatewayResponse = (response: Response): APIGatewayProxyResultV2 => ({
   statusCode: response.status,
   body: response.body,

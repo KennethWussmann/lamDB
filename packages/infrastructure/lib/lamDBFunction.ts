@@ -23,7 +23,12 @@ export class LamDBFunction extends NodejsFunction {
         sourceMap: props.logLevel === 'debug',
         target: 'node16',
         tsconfig: 'tsconfig.json',
-        externalModules: ['@aws-sdk/client-secrets-manager', '@aws-sdk/client-lambda'],
+        externalModules: [
+          '@aws-sdk/client-secrets-manager',
+          '@aws-sdk/client-lambda',
+          //'@aws-sdk/client-dynamodb',
+          //'@aws-sdk/util-dynamodb',
+        ],
         ...props.bundling,
       },
       environment: {

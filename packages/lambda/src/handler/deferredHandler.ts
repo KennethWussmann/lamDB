@@ -2,13 +2,10 @@ import { APIGatewayProxyEventV2, Context, Handler } from 'aws-lambda';
 import { fromApiGatwayRequest, isRequest, toApiGatewayResponse } from '../utils';
 import { Request, tracer } from '@lamdb/commons';
 import { defaultApplicationContext } from '../applicationContext';
-import { LamDBService } from '@lamdb/core';
+import { DeferredService } from './deferredService';
 
-export class ReaderWriterHandler {
-  constructor(
-    private endpointType: 'reader' | 'writer',
-    private service: LamDBService = defaultApplicationContext.lamDbService,
-  ) {}
+export class DeferredHandler {
+  constructor(private service: DeferredService = defaultApplicationContext.deferredService) {}
 
   @tracer.captureLambdaHandler({ captureResponse: false })
   async handler(request: APIGatewayProxyEventV2 | Request, _: Context) {
@@ -17,12 +14,9 @@ export class ReaderWriterHandler {
 
     const lamDBRequest = isRequest(request) ? request : fromApiGatwayRequest(request);
 
-    return toApiGatewayResponse(await this.service.execute(lamDBRequest, this.endpointType));
+    return toApiGatewayResponse(await this.service.execute(lamDBRequest));
   }
 }
 
-const readerClass = new ReaderWriterHandler('reader');
-const writerClass = new ReaderWriterHandler('writer');
-
-export const readerHandler: Handler = readerClass.handler.bind(readerClass);
-export const writerHandler: Handler = writerClass.handler.bind(writerClass);
+const handlerClass = new DeferredHandler();
+export const deferredHandler: Handler = handlerClass.handler.bind(handlerClass);

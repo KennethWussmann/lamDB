@@ -51,7 +51,7 @@ export class LamDBAPI extends HttpApi {
     this.addRoutes({
       integration: new HttpLambdaIntegration(
         'ProxyIntegration',
-        props.application.proxyAlias ?? props.application.proxy,
+        props.application.deferredAlias ?? props.application.deferred,
       ),
       path: '/graphql',
       methods,
@@ -60,7 +60,7 @@ export class LamDBAPI extends HttpApi {
     this.addRoutes({
       integration: new HttpLambdaIntegration(
         'DataProxyIntegration',
-        props.application.proxyAlias ?? props.application.proxy,
+        props.application.deferredAlias ?? props.application.deferred,
       ),
       path: '/{clientId}/{schemaHash}/graphql',
       methods,

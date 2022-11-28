@@ -12,7 +12,7 @@ type MigrationEvent = {
 };
 
 export class MigrateHandler implements LambdaInterface {
-  constructor(private service: LamDBService = defaultApplicationContext.service) {}
+  constructor(private service: LamDBService = defaultApplicationContext.lamDbService) {}
 
   @tracer.captureLambdaHandler()
   public async handler({ reset = false, migrate = true }: MigrationEvent = {}, _: Context): Promise<unknown> {

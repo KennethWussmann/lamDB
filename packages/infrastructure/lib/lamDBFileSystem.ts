@@ -31,6 +31,9 @@ export class LamDBFileSystem extends Construct {
         s3: {
           service: GatewayVpcEndpointAwsService.S3,
         },
+        dynamoDb: {
+          service: GatewayVpcEndpointAwsService.DYNAMODB,
+        },
       },
     });
 

@@ -1,7 +1,9 @@
 import { LogLevel, MetricName } from '@lamdb/commons';
-import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { CfnOutput, Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { CommonMetricOptions, Metric } from 'aws-cdk-lib/aws-cloudwatch';
-import { Alias, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { AttributeType, BillingMode, ITable, StreamViewType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { Alias, FilterCriteria, FilterRule, StartingPosition, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { dirname, join } from 'path';
@@ -27,9 +29,15 @@ export class LamDBApplication extends Construct {
   public readonly readerAlias: Alias | undefined;
   public readonly writer: LamDBFunction;
   public readonly writerAlias: Alias | undefined;
+  public readonly deferred: LamDBFunction;
+  public readonly deferredAlias: Alias | undefined;
+  public readonly dynamoDbStream: LamDBFunction;
+  public readonly dynamoDbStreamAlias: Alias | undefined;
   public readonly proxy: LamDBFunction;
   public readonly proxyAlias: Alias | undefined;
   public readonly migrate: LamDBFunction;
+
+  private dynamoDbTable: ITable;
 
   constructor(
     scope: Construct,
@@ -38,6 +46,23 @@ export class LamDBApplication extends Construct {
     private lambdaFileType: LambdaFileType = 'js',
   ) {
     super(scope, id);
+
+    this.dynamoDbTable = new Table(this, 'Table', {
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      encryption: TableEncryption.AWS_MANAGED,
+      timeToLiveAttribute: 'ttl',
+      removalPolicy: RemovalPolicy.DESTROY,
+      tableName: this.props.name,
+      partitionKey: {
+        name: 'pk',
+        type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'sk',
+        type: AttributeType.STRING,
+      },
+      stream: StreamViewType.NEW_IMAGE,
+    });
 
     this.reader = this.createLambda('reader', 'ReaderFunction', 'readerWriter', {
       functionName: `${props.name}-reader`,
@@ -54,6 +79,35 @@ export class LamDBApplication extends Construct {
       filesystem: props.fileSystem.lambdaFileSystem,
       vpc: props.fileSystem.vpc,
     });
+    this.deferred = this.createLambda('reader', 'DeferredFunction', 'deferred', {
+      functionName: `${props.name}-deferred`,
+      handler: 'deferredHandler',
+      layers: [props.engineLayer],
+      filesystem: props.fileSystem.lambdaFileSystem,
+      vpc: props.fileSystem.vpc,
+      timeout: Duration.seconds(30),
+    });
+
+    this.dynamoDbStream = this.createLambda('reader', 'DynamoDBStreamFunction', 'dynamoDbStream', {
+      functionName: `${props.name}-dynamodb-stream`,
+      handler: 'dynamoDbStreamHandler',
+      layers: [props.engineLayer],
+      filesystem: props.fileSystem.lambdaFileSystem,
+      vpc: props.fileSystem.vpc,
+      reservedConcurrentExecutions: 1,
+    });
+    this.dynamoDbStream.addEventSource(
+      new DynamoEventSource(this.dynamoDbTable, {
+        startingPosition: StartingPosition.TRIM_HORIZON,
+        batchSize: 50,
+        bisectBatchOnError: true,
+        retryAttempts: 3,
+        filters: [FilterCriteria.filter({ dynamodb: { Keys: { pk: { S: FilterRule.beginsWith('request#') } } } })],
+      }),
+    );
+    this.dynamoDbTable.grantReadWriteData(this.deferred);
+    this.dynamoDbTable.grantReadWriteData(this.dynamoDbStream);
+
     this.migrate = this.createLambda(
       'migrate',
       'MigrateFunction',
@@ -135,6 +189,7 @@ export class LamDBApplication extends Construct {
       ...props,
       ...this.props.overwrites?.[type],
       environment: {
+        DYNAMODB_TABLE_NAME: this.dynamoDbTable.tableName,
         DATABASE_STORAGE_BUCKET_NAME: this.props.databaseStorageBucket?.bucketName ?? '',
         DATABASE_PATH: join(this.props.fileSystem.efsMountPath, 'database.db'),
         QUERY_ENGINE_LIBRARY_PATH: '/opt/libquery-engine.node',

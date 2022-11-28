@@ -1,5 +1,11 @@
 # @lamdb/infrastructure
 
+## 0.1.13
+
+### Patch Changes
+
+- 1299185: Fix creating bastion host
+
 ## 0.1.12
 
 ### Patch Changes

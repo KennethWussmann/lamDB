@@ -1,6 +1,9 @@
-FROM node:16 AS builder
+FROM node:18 AS builder
 
 WORKDIR /app
+
+ARG NPM_TOKEN
+ENV NPM_TOKEN=${NPM_TOKEN}
 
 COPY . .
 
@@ -11,7 +14,7 @@ RUN mkdir -p /data/engines
 RUN mkdir -p /data/prisma
 RUN mkdir -p /data/database
 
-FROM node:16
+FROM node:18
 LABEL org.opencontainers.image.source https://github.com/KennethWussmann/lamDB
 
 WORKDIR /app

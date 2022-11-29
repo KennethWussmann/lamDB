@@ -35,7 +35,7 @@ export type LamDBLambdaOverwritesProps = {
    * @default undefined
    */
   overwrites?: Partial<Record<LambdaFunctionType, Partial<LamDBFunctionProps>>>;
-  provisionedConcurreny?: Partial<Record<'writer' | 'reader' | 'proxy', number>>;
+  provisionedConcurrency?: Partial<Record<'writer' | 'reader' | 'proxy', number>>;
 };
 
 export type LamDBProps = {

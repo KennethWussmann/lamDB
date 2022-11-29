@@ -55,3 +55,49 @@ The Migration Engine takes care to execute migration scripts in order if not yet
 
 The corresponding Prisma package was not used in lamDB but instead the RPC connection is re-implemented to execute the migrations just like Prisma CLI would do.
 This is because the provided Prisma package has issues with types and requires WASM dependencies where the location path cannot be specified from outside. It makes it incompatible with running via Lambda layers.
+
+## Request handling
+
+### Write request
+
+Write requests are orchestrated by a DynamoDB table to avoid data corruption, consistent writes in correct order and more efficient processing.
+
+Another lambda will pick up the request from the DynamoDB using streams and will write the response back to the DynamoDB. Meanwhile the lambda behind API Gateway will poll the DynamoDB entry for a response which it can return to the client.
+
+LamDB is not writing to SQLite directly, because SQLite cannot handle paralell writes and may corrupt the database. That's where DynamoDB helps to orchestrate the writes.
+
+The below sequence diagram outlines the communication of a cold lambda execution. Warm lambdas respond quicker because initialization of the Query Engine can be skipped.
+
+```mermaid
+sequenceDiagram autonumber
+    Client->>API Gateway: GraphQL mutation (createBook(title: "example") { id })
+    API Gateway->>Lambda: Execute GraphQL operation
+    Lambda->>DynamoDB: Execute GraphQL operation whenever possible
+    DynamoDB->>Stream processing Lambda: Execute X amount of batched GraphQL operations
+    Stream processing Lambda->>Query Engine: Start engine
+    par Process all requests
+        Stream processing Lambda->>Query Engine: Execute GraphQL operation
+        Query Engine->>Stream processing Lambda: Result of individual operation
+        Stream processing Lambda->>DynamoDB: Save result of operation
+    end
+    Lambda->>Lambda: Wait for response in DynamoDB
+    Lambda->>API Gateway: 200 OK, GraphQL Body, Created book with id
+    API Gateway->>Client: Response, 200 OK, GraphQL Body
+```
+
+### Read request
+
+Read requests are way simpler, because SQLite with WAL mode turned on is way better at handling reads. Here we directly read from the database file that lays on EFS.
+
+The below sequence diagram outlines the communication of a cold lambda execution.
+
+```mermaid
+sequenceDiagram autonumber
+    Client->>API Gateway: GraphQL query (getBooks { id, title })
+    API Gateway->>Lambda: Execute GraphQL operation
+    Lambda->>Query Engine: Start engine
+    Lambda->>Query Engine: Execute GraphQL operation
+    Query Engine->>Lambda: Books with id and title
+    Lambda->>API Gateway: 200 OK, GraphQL Body, Books with id and title
+    API Gateway->>Client: Response, 200 OK, GraphQL Body
+```

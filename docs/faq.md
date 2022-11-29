@@ -57,14 +57,16 @@ It's also a great serverful database option when you want a GraphQL API for your
 
 ## Is it production-ready?
 
-If you keep the limitations in mind, yes. LamDB uses Prisma and AWS - software that is already very well production ready and battle tested. LamDB is actually only some glue code with little caching and retry logic.
+If you keep the limitations in mind, you can start small. LamDB uses Prisma and AWS - software that is already very well production ready and battle tested. LamDB is actually only some glue code to connect Primsa and AWS.
+
+To be able to give a definitive answer and say yes, I need more input and users that verify their use-cases. Let me know in issues of any problems.
 
 ## How does auto-scaling work?
 
 Just like AWS lambda, because it's running on it. The default setup is using single-writer, multi-reader.
-Means the default configuration is designed for read demand and lower writer throughput. That's to avoid merge conflicts with the SQLite database when multiple lambda instances want to write to the database.
+Means the default configuration is designed for read demand and lower writer throughput. That's to avoid merge conflicts and data corruption with the SQLite database when multiple lambda instances want to write to the database.
 
-You don't need to worry about redirecting your writes or reads to a certain instance. The writer and readers are conveniently behind an extra proxy endpoint that takes care of routing reads and writes to the correct destination. It also takes care of write throttling.
+You don't need to worry about redirecting your writes or reads to a certain instance. LamDB is taking care of everything in that regard.
 
 ## How can I access the database?
 
@@ -83,19 +85,13 @@ The docker image does not come with any authentication. Just add an API Gateway 
 
 ## Single-writer, are writes throttled?
 
-Yes, when the writer is busy, write requests will be retried. Once they reach the maximum retry count the request will fail.
+Requests will not be rejected, but for a larger amount of open transactions you may want to keep an eye on the 30 seconds maximum runtime of lambdas behind an API Gateway.
+
+Use the [lamDB CloudWatch metrics](./operation.md#metrics) to monitor the load.
 
 ## How can I improve response times?
 
-Given how Lambda works there are cold starts, where the code needs to be initialized and connections needs to be established. The base cold start time of [JavaScript lambdas is around 400 ms](https://mikhail.io/serverless/coldstarts/aws/). There is no way of getting quicker than that. LamDB Lambdas are around 700 kB big and require some initialization of the Prisma Query Engine. Therefore the cold start with a small response is currently around 1.5 seconds. Warm instances respond in 50 - 80 ms, also depends on the response size of course.
-
-### Use the reader and writer directly
-
-The proxy `/graphql` endpoint is helpful to deal with throttles, but of course also adds up in the response times because it needs to also proxy traffic to the readers and writer.
-Usually discouraged, but you can of course also request the `/reader` and `/writer` directly. You then need to take care to only send read requests to readers and write requests only to the writer.
-Also keep in mind that there is only one writer. If it is busy currently, you'll get a 503 by API Gateway.
-
-You could even invoke the corresponding Lambdas directly to rule out API Gateway completely. This is also helpful for the opposite case, when you want to run long running operations.
+Given how Lambda works there are cold starts, where the code needs to be initialized and connections needs to be established. The base cold start time of [JavaScript lambdas is around 500 ms](https://mikhail.io/serverless/coldstarts/aws/). There is no way of getting quicker than that. LamDB Lambdas are around 700 kB big and require some initialization of the Prisma Query Engine. Therefore the cold start with a small response is currently around 800 ms - 1.5 seconds. Warm instances respond in 50 - 80 ms, also depends on the response size of course.
 
 ### Provisioned concurrency
 
@@ -106,15 +102,13 @@ This can be done via CDK like this:
 ```typescript
 new LamDB(
   // ...
-  // extend config by provisionedConcurreny. Choose what ever is reasonable to your application.
-  // Proxy, Reader, Writer can be configured individually and none of them are mandatory
+  // extend config by provisionedConcurrency. Choose what ever is reasonable to your application.
+  // Read and write operations can be configured individually and none of them are mandatory.
   lambda: {
-    provisionedConcurreny: {
-      // It makes sense to keep the proxy and reader setting the same
-      proxy: 1,
-      reader: 1,
+    provisionedConcurrency: {
+      read: 1,
       // You cannot go higher than 1.
-      writer: 1,
+      write: 1,
     },
   },
 );

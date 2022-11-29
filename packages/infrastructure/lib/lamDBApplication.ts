@@ -143,25 +143,25 @@ export class LamDBApplication extends Construct {
     this.reader.grantInvoke(this.proxy);
     this.writer.grantInvoke(this.proxy);
 
-    if (props.provisionedConcurreny?.writer) {
+    if (props.provisionedConcurrency?.writer) {
       this.writerAlias = new Alias(this, 'WriterAlias', {
         aliasName: 'writer',
         version: this.writer.currentVersion,
-        provisionedConcurrentExecutions: props.provisionedConcurreny.writer,
+        provisionedConcurrentExecutions: props.provisionedConcurrency.writer,
       });
     }
-    if (props.provisionedConcurreny?.reader) {
+    if (props.provisionedConcurrency?.reader) {
       this.readerAlias = new Alias(this, 'ReaderAlias', {
         aliasName: 'reader',
         version: this.reader.currentVersion,
-        provisionedConcurrentExecutions: props.provisionedConcurreny.reader,
+        provisionedConcurrentExecutions: props.provisionedConcurrency.reader,
       });
     }
-    if (props.provisionedConcurreny?.proxy) {
+    if (props.provisionedConcurrency?.proxy) {
       this.proxyAlias = new Alias(this, 'ProxyAlias', {
         aliasName: 'proxy',
         version: this.proxy.currentVersion,
-        provisionedConcurrentExecutions: props.provisionedConcurreny.proxy,
+        provisionedConcurrentExecutions: props.provisionedConcurrency.proxy,
       });
     }
 

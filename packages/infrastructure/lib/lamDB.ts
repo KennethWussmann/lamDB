@@ -38,7 +38,7 @@ export class LamDB extends Construct {
       tracing: props.tracing,
       metrics: props.metrics ?? true,
       overwrites: props.lambda?.overwrites,
-      provisionedConcurreny: props.lambda?.provisionedConcurreny,
+      provisionedConcurrency: props.lambda?.provisionedConcurrency,
     });
     this.authorizer =
       props.apiTokens && props.apiTokens?.length > 0

@@ -13,15 +13,15 @@
     "clean": "rm -rf ./dist"
   },
   "devDependencies": {
-    "aws-cdk-lib": "^2.51.1",
-    "constructs": "^10.1.171",
+    "aws-cdk-lib": "^2.53.0",
+    "constructs": "^10.1.182",
     "@lamdb/engine-layer": "*"
   },
   "dependencies": {
     "@lamdb/lambda": "*",
     "@lamdb/api-token-authorizer": "*",
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.51.1-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.51.1-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.51.1-alpha.0"
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.53.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-authorizers-alpha": "^2.53.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.53.0-alpha.0"
   }
 }

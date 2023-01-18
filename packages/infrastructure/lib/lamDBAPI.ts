@@ -10,7 +10,6 @@ export type LamDBAPIProps = {
   name: string;
   application: LamDBApplication;
   authorizer?: IHttpRouteAuthorizer;
-  exposeReaderWriterEndpoints?: boolean;
   accessLogging?: boolean;
 };
 
@@ -29,39 +28,18 @@ export class LamDBAPI extends HttpApi {
     });
 
     const methods = [HttpMethod.POST, HttpMethod.OPTIONS];
-
-    if (props.exposeReaderWriterEndpoints) {
-      this.addRoutes({
-        integration: new HttpLambdaIntegration(
-          'WriterIntegration',
-          props.application.writerAlias ?? props.application.writer,
-        ),
-        path: '/writer',
-        methods,
-      });
-      this.addRoutes({
-        integration: new HttpLambdaIntegration(
-          'ReaderIntegration',
-          props.application.readerAlias ?? props.application.reader,
-        ),
-        path: '/reader',
-        methods,
-      });
-    }
+    const graphQLIntegration = new HttpLambdaIntegration(
+      'GraphQLIntegration',
+      props.application.graphQlHandlerAlias ?? props.application.graphQlHandler,
+    );
     this.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'ProxyIntegration',
-        props.application.deferredAlias ?? props.application.deferred,
-      ),
+      integration: graphQLIntegration,
       path: '/graphql',
       methods,
     });
     // redirect dataproxy requests to the same proxy lambda as /graphql. They are compatible and the same.
     this.addRoutes({
-      integration: new HttpLambdaIntegration(
-        'DataProxyIntegration',
-        props.application.deferredAlias ?? props.application.deferred,
-      ),
+      integration: graphQLIntegration,
       path: '/{clientId}/{schemaHash}/graphql',
       methods,
     });

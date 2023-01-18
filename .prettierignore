@@ -5,4 +5,3 @@ build/
 export/
 cdk.out/
 .next/
-apartments*.json

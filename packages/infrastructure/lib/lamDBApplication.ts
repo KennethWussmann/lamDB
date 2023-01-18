@@ -25,17 +25,11 @@ export type LamDBApplicationProps = {
 } & LamDBLambdaOverwritesProps;
 
 export class LamDBApplication extends Construct {
-  public readonly reader: LamDBFunction;
-  public readonly readerAlias: Alias | undefined;
-  public readonly writer: LamDBFunction;
-  public readonly writerAlias: Alias | undefined;
-  public readonly deferred: LamDBFunction;
-  public readonly deferredAlias: Alias | undefined;
-  public readonly dynamoDbStream: LamDBFunction;
-  public readonly dynamoDbStreamAlias: Alias | undefined;
-  public readonly proxy: LamDBFunction;
-  public readonly proxyAlias: Alias | undefined;
-  public readonly migrate: LamDBFunction;
+  public readonly graphQlHandler: LamDBFunction;
+  public readonly graphQlHandlerAlias: Alias | undefined;
+  public readonly dynamoDbStreamHandler: LamDBFunction;
+  public readonly dynamoDbStreamHandlerAlias: Alias | undefined;
+  public readonly migrateHandler: LamDBFunction;
 
   private dynamoDbTable: ITable;
 
@@ -64,31 +58,16 @@ export class LamDBApplication extends Construct {
       stream: StreamViewType.NEW_IMAGE,
     });
 
-    this.reader = this.createLambda('reader', 'ReaderFunction', 'readerWriter', {
-      functionName: `${props.name}-reader`,
-      handler: 'readerHandler',
-      layers: [props.engineLayer],
-      filesystem: props.fileSystem.lambdaFileSystem,
-      vpc: props.fileSystem.vpc,
-    });
-    this.writer = this.createLambda('writer', 'WriterFunction', 'readerWriter', {
-      functionName: `${props.name}-writer`,
-      handler: 'writerHandler',
-      reservedConcurrentExecutions: 1,
-      layers: [props.engineLayer],
-      filesystem: props.fileSystem.lambdaFileSystem,
-      vpc: props.fileSystem.vpc,
-    });
-    this.deferred = this.createLambda('reader', 'DeferredFunction', 'deferred', {
-      functionName: `${props.name}-deferred`,
-      handler: 'deferredHandler',
+    this.graphQlHandler = this.createLambda('reader', 'GraphQLFunction', 'deferred', {
+      functionName: `${props.name}-graphql`,
+      handler: 'graphQLHandler',
       layers: [props.engineLayer],
       filesystem: props.fileSystem.lambdaFileSystem,
       vpc: props.fileSystem.vpc,
       timeout: Duration.seconds(30),
     });
 
-    this.dynamoDbStream = this.createLambda('reader', 'DynamoDBStreamFunction', 'dynamoDbStream', {
+    this.dynamoDbStreamHandler = this.createLambda('writer', 'DynamoDBStreamFunction', 'dynamoDbStream', {
       functionName: `${props.name}-dynamodb-stream`,
       handler: 'dynamoDbStreamHandler',
       layers: [props.engineLayer],
@@ -96,7 +75,7 @@ export class LamDBApplication extends Construct {
       vpc: props.fileSystem.vpc,
       reservedConcurrentExecutions: 1,
     });
-    this.dynamoDbStream.addEventSource(
+    this.dynamoDbStreamHandler.addEventSource(
       new DynamoEventSource(this.dynamoDbTable, {
         startingPosition: StartingPosition.TRIM_HORIZON,
         batchSize: 50,
@@ -105,10 +84,10 @@ export class LamDBApplication extends Construct {
         filters: [FilterCriteria.filter({ dynamodb: { Keys: { pk: { S: FilterRule.beginsWith('request#') } } } })],
       }),
     );
-    this.dynamoDbTable.grantReadWriteData(this.deferred);
-    this.dynamoDbTable.grantReadWriteData(this.dynamoDbStream);
+    this.dynamoDbTable.grantReadWriteData(this.graphQlHandler);
+    this.dynamoDbTable.grantReadWriteData(this.dynamoDbStreamHandler);
 
-    this.migrate = this.createLambda(
+    this.migrateHandler = this.createLambda(
       'migrate',
       'MigrateFunction',
       'migrate',
@@ -124,49 +103,24 @@ export class LamDBApplication extends Construct {
       {},
       true,
     );
-    this.proxy = this.createLambda(
-      'proxy',
-      'ProxyFunction',
-      'proxy',
-      {
-        functionName: `${props.name}-proxy`,
-        handler: 'proxyHandler',
-        timeout: Duration.seconds(30),
-      },
-      {
-        WRITER_FUNCTION_ARN: this.writer.functionArn,
-        READER_FUNCTION_ARN: this.reader.functionArn,
-      },
-      false,
-      false,
-    );
-    this.reader.grantInvoke(this.proxy);
-    this.writer.grantInvoke(this.proxy);
 
     if (props.provisionedConcurrency?.writer) {
-      this.writerAlias = new Alias(this, 'WriterAlias', {
+      this.dynamoDbStreamHandlerAlias = new Alias(this, 'DynamoDBStreamAlias', {
         aliasName: 'writer',
-        version: this.writer.currentVersion,
+        version: this.dynamoDbStreamHandler.currentVersion,
         provisionedConcurrentExecutions: props.provisionedConcurrency.writer,
       });
     }
     if (props.provisionedConcurrency?.reader) {
-      this.readerAlias = new Alias(this, 'ReaderAlias', {
+      this.graphQlHandlerAlias = new Alias(this, 'GraphQLAlias', {
         aliasName: 'reader',
-        version: this.reader.currentVersion,
+        version: this.graphQlHandler.currentVersion,
         provisionedConcurrentExecutions: props.provisionedConcurrency.reader,
-      });
-    }
-    if (props.provisionedConcurrency?.proxy) {
-      this.proxyAlias = new Alias(this, 'ProxyAlias', {
-        aliasName: 'proxy',
-        version: this.proxy.currentVersion,
-        provisionedConcurrentExecutions: props.provisionedConcurrency.proxy,
       });
     }
 
     new CfnOutput(this, 'lamdb-migrate-arn', {
-      value: this.migrate.functionArn,
+      value: this.migrateHandler.functionArn,
       exportName: `${props.name}-migrate-arn`,
     });
   }

@@ -106,9 +106,9 @@ new LamDB(
   // Read and write operations can be configured individually and none of them are mandatory.
   lambda: {
     provisionedConcurrency: {
-      read: 1,
+      reader: 1,
       // You cannot go higher than 1.
-      write: 1,
+      writer: 1,
     },
   },
 );

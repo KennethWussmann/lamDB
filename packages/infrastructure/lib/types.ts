@@ -28,14 +28,14 @@ export type LamDBEFSPersistenceProps = {
   s3Sync?: LamDBDataSyncProps | boolean;
 };
 
-export type LambdaFunctionType = 'writer' | 'reader' | 'migrate' | 'proxy' | 'authorizer' | 'token-rotation';
+export type LambdaFunctionType = 'writer' | 'reader' | 'migrate' | 'authorizer' | 'token-rotation';
 export type LamDBLambdaOverwritesProps = {
   /**
    * Optionally overwrite properties of lambdas.
    * @default undefined
    */
   overwrites?: Partial<Record<LambdaFunctionType, Partial<LamDBFunctionProps>>>;
-  provisionedConcurrency?: Partial<Record<'writer' | 'reader' | 'proxy', number>>;
+  provisionedConcurrency?: Partial<Record<'writer' | 'reader', number>>;
 };
 
 export type LamDBProps = {
@@ -69,12 +69,6 @@ export type LamDBProps = {
    * @default undefined No token auth
    */
   apiTokens?: LamDBApiTokenAuthorizerTokenProps[];
-  /**
-   * Create API endpoints for POST /reader and POST /writer
-   * Usually they respond quicker than the default POST /proxy but users need to make sure to separate read/write actions themselves
-   * @default false
-   */
-  exposeReaderWriterEndpoints?: boolean;
   /**
    * Enable tracing reporting to AWS X-Ray.
    * Usually only used for development of lamDB, but can also help to understand access patterns.

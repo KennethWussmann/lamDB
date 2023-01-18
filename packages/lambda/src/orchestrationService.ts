@@ -39,7 +39,7 @@ export type DeferredRequest = z.infer<typeof deferredRequestSchema>;
 /**
  * Service to handle requests asynchronously.
  */
-export class DeferredService {
+export class OrchestrationService {
   private logger = createLogger({ name: 'DeferredService' });
 
   constructor(

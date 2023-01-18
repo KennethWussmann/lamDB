@@ -1,10 +1,10 @@
 import { Context, DynamoDBStreamEvent, Handler } from 'aws-lambda';
 import { tracer } from '@lamdb/commons';
 import { defaultApplicationContext } from '../applicationContext';
-import { DeferredService } from './deferredService';
+import { OrchestrationService } from '../orchestrationService';
 
 export class DynamoDBStreamHandler {
-  constructor(private service: DeferredService = defaultApplicationContext.deferredService) {}
+  constructor(private service: OrchestrationService = defaultApplicationContext.orchestrationService) {}
 
   @tracer.captureLambdaHandler({ captureResponse: false })
   async handler(event: DynamoDBStreamEvent, _: Context) {

@@ -16,10 +16,10 @@
     "@lamdb/engine-layer": "*"
   },
   "dependencies": {
-    "@aws-lambda-powertools/metrics": "^1.5.0",
-    "@aws-lambda-powertools/tracer": "^1.5.0",
+    "@aws-lambda-powertools/metrics": "^1.5.1",
+    "@aws-lambda-powertools/tracer": "^1.5.1",
     "graphql": "^16.6.0",
     "winston": "^3.8.2",
-    "zod": "^3.19.1"
+    "zod": "^3.20.6"
   }
 }

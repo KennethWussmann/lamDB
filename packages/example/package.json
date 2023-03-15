@@ -17,18 +17,18 @@
   },
   "devDependencies": {
     "@lamdb/infrastructure": "*",
-    "@aws-cdk/aws-apigatewayv2-alpha": "^2.51.1-alpha.0",
-    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.51.1-alpha.0",
-    "@types/aws-lambda": "^8.10.109",
-    "aws-cdk": "^2.51.1",
-    "aws-cdk-lib": "^2.51.1",
-    "constructs": "^10.1.171",
-    "prisma": "^4.6.1"
+    "@aws-cdk/aws-apigatewayv2-alpha": "^2.69.0-alpha.0",
+    "@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.69.0-alpha.0",
+    "@types/aws-lambda": "^8.10.112",
+    "aws-cdk": "^2.69.0",
+    "aws-cdk-lib": "^2.69.0",
+    "constructs": "^10.1.278",
+    "prisma": "^4.11.0"
   },
   "dependencies": {
-    "@aws-sdk/client-secrets-manager": "^3.216.0",
-    "@prisma/client": "^4.6.1",
-    "esbuild": "^0.15.15",
-    "zod": "^3.19.1"
+    "@aws-sdk/client-secrets-manager": "^3.290.0",
+    "@prisma/client": "^4.11.0",
+    "esbuild": "^0.17.11",
+    "zod": "^3.21.4"
   }
 }

@@ -20,13 +20,13 @@
   },
   "dependencies": {
     "@lamdb/commons": "*",
-    "@graphql-tools/load": "^7.8.6",
-    "@graphql-tools/merge": "^8.3.12",
-    "@graphql-tools/relay-operation-optimizer": "^6.5.12",
-    "@prisma/engine-core": "^4.6.1",
+    "@graphql-tools/load": "^7.8.13",
+    "@graphql-tools/merge": "^8.4.0",
+    "@graphql-tools/relay-operation-optimizer": "^6.5.17",
+    "@prisma/engine-core": "^4.12.0",
     "execa": "5.1.1",
     "graphql": "^16.6.0",
     "winston": "^3.8.2",
-    "zod": "^3.19.1"
+    "zod": "^3.21.4"
   }
 }

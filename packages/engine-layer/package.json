@@ -14,9 +14,9 @@
     "clean": "rm -rf ./dist ./build"
   },
   "devDependencies": {
-    "@prisma/fetch-engine": "^4.6.1",
-    "@prisma/get-platform": "^4.6.1",
-    "@types/node-fetch": "^2.6.2",
+    "@prisma/fetch-engine": "^4.13.0",
+    "@prisma/get-platform": "^4.13.0",
+    "@types/node-fetch": "^2.6.3",
     "node-fetch": "2.6.7"
   }
 }
